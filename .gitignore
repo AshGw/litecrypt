@@ -1,0 +1,11 @@
+# Auto-generated  files/ Directories
+*__pycache__/
+*.pytest_cache/
+litecrypt.egg-info/
+*.mypy_cache/
+dist
+build
+litecrypt.egg-info
+
+# Docs website no need for that here
+site/

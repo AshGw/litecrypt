@@ -1,0 +1,65 @@
+site_name: "L I T E C R Y P T"
+repo_name: ashgw/litecrypt
+repo_url: https://github.com/ashgw/litecrypt
+
+nav:
+  - Introduction: index.md
+  - Installation: installation.md
+  - Documentation: docs.md
+
+theme:
+  favicon: assets/favicon.png
+  title: "L I T E C R Y P T"
+  logo: "assets/LOGO.png"
+  font:
+    text: Space Mono
+    code: JetBrains Mono
+  icon:
+    repo: fontawesome/brands/github
+  name: material
+  code_theme: monokai
+  features:
+    - search.suggest
+    - search.highlight
+    - content.tabs.link
+    - navigation.tabs
+    - navigation.sections
+    - toc.integrate
+    - navigation.top
+    - content.code.annotation
+    - content.code.copy
+    - content.code.select
+    - navigation.instant
+    - navigation.instant.prefetch
+    - navigation.expand
+    - header.autohide
+    - navigation.footer
+  language: en
+  palette:
+    - scheme: default
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/lightbulb
+        name: Switch to dark mode
+    - scheme: slate
+      primary: deep purple
+      accent: amber
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to light mode
+  extra:
+    generator: false
+    hide_powered_by: true
+
+
+markdown_extensions:
+  - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences
+  - admonition
