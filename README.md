@@ -6,7 +6,7 @@
 
 
 
-## Introducing litecrypt: Data Protection Made Simple 🔒 🔒
+## Introducing litecrypt: Data Protection Made Simple 🔒
 
 Tired of wrestling with passwords and entrusting your private files to sketchy apps? protecting your sensitive data now becomes very simple. No more struggling with intricate code – just powerful data security at your fingertips.
 

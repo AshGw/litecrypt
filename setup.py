@@ -1,17 +1,14 @@
 from setuptools import find_packages, setup
 
-with open("docs/index.md") as f:
-    readme = f.read()
-
 setup(
     name="litecrypt",
-    version="0.0.0",
+    version="0.0.1",
     author="Ashref Gwader",
     author_email="AshrefGw@proton.me",
     python_requires=">=3.7",
     description="Library to Simplify Encryption and Data Protection",
     long_description_content_type="text/markdown",
-    long_description=readme,
+    long_description='Visit The [Website](https://ashgw.github.io/litecrypt/)',
     url="https://github.com/AshGw/litecrypt.git",
     packages=find_packages(exclude=["important", "docker-build", ".github","docs","tests"]),
     package_data={
