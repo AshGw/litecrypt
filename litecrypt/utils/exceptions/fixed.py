@@ -1,6 +1,9 @@
 class MessageTamperingError(Exception):
     def __init__(self) -> None:
-        self.display = "HMAC mismatch ! Message has been TAMPERED with ,\n" " or Possible key difference"
+        self.display = (
+            "HMAC mismatch ! Message has been TAMPERED with ,\n"
+            " or Possible key difference"
+        )
         super().__init__(self.display)
 
 
@@ -30,7 +33,9 @@ class SysError(Exception):
 
 class FileCryptError(Exception):
     def __init__(self):
-        self.display = "Error in cryptographic operation for the file, probable distortion."
+        self.display = (
+            "Error in cryptographic operation for the file, probable distortion."
+        )
         super().__init__(self.display)
 
 

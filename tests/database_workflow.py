@@ -30,7 +30,10 @@ class WorkFlow:
             file3_content=self.file_contents[2],
         )
 
-        self.encrypted_contents = [Crypt(content, self.key).encrypt(get_bytes=True) for content in self.file_contents]
+        self.encrypted_contents = [
+            Crypt(content, self.key).encrypt(get_bytes=True)
+            for content in self.file_contents
+        ]
         return True
 
     def database_insertion(self):
@@ -40,7 +43,9 @@ class WorkFlow:
                 content=encrypted_content,
                 ref=self.ref,
             )
-            self.keys_conn.insert(filename=f"does-not-matter/{file}.crypt", content=self.key, ref=self.ref)
+            self.keys_conn.insert(
+                filename=f"does-not-matter/{file}.crypt", content=self.key, ref=self.ref
+            )
         return True
 
     def spawn_out(self):

@@ -48,7 +48,9 @@ class CryptFile:
                     with open(self.filename, "wb") as f:
                         if filecontent:
                             try:
-                                ins = core.EncBase(message=filecontent, mainkey=self.key)
+                                ins = core.EncBase(
+                                    message=filecontent, mainkey=self.key
+                                )
                                 new_content = ins.encrypt(get_bytes=True)
                                 f.write(new_content)
                                 go_ahead_rename_crypt = 1
@@ -81,7 +83,9 @@ class CryptFile:
                     with open(self.filename, "wb") as f:
                         if enc_content:
                             try:
-                                ins = core.DecBase(message=enc_content, mainkey=self.key)
+                                ins = core.DecBase(
+                                    message=enc_content, mainkey=self.key
+                                )
                                 a = ins.decrypt(get_bytes=True)
                                 f.write(a)
                                 go_ahead_remove_crypt = 1

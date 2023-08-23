@@ -37,21 +37,39 @@ class CoreModuleTesting(unittest.TestCase):
             lc.DecBase(message=tampered_message, mainkey=self.main_key)
 
     def test_Salt(self):
-        self.assertTrue(self.bytes_message[self.h + self.i : self.h + self.i + self.s] == self.ins1.salt)
+        self.assertTrue(
+            self.bytes_message[self.h + self.i : self.h + self.i + self.s]
+            == self.ins1.salt
+        )
 
     def test_Pepper(self):
         self.assertTrue(
-            self.bytes_message[self.h + self.i + self.s : self.h + self.i + self.s + self.p] == self.ins1.pepper
+            self.bytes_message[
+                self.h + self.i + self.s : self.h + self.i + self.s + self.p
+            ]
+            == self.ins1.pepper
         )
 
     def test_Iterations(self):
         self.assertTrue(
-            self.bytes_message[self.h + self.i + self.s + self.p : self.h + self.i + self.s + self.p + 4]
+            self.bytes_message[
+                self.h
+                + self.i
+                + self.s
+                + self.p : self.h
+                + self.i
+                + self.s
+                + self.p
+                + 4
+            ]
             == self.ins1.iterations_bytes()
         )
 
     def test_Ciphertext(self):
-        self.assertTrue(self.bytes_message[self.h + self.i + self.s + self.p + 4 :] == self.ins1.ciphertext())
+        self.assertTrue(
+            self.bytes_message[self.h + self.i + self.s + self.p + 4 :]
+            == self.ins1.ciphertext()
+        )
 
     def test_HMAC(self):
         self.assertTrue(self.bytes_message[: self.h] == self.ins1.hmac_final())

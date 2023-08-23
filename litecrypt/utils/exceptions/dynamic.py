@@ -6,7 +6,9 @@ from litecrypt.utils.consts import Size
 class IterationsOutofRangeError(Exception):
     def __init__(self, num: Any) -> None:
         self.display = (
-            f"Iterations must be between {Size.MIN_ITERATIONS} and " f"{Size.MAX_ITERATIONS}." f" RECEIVED : {num}"
+            f"Iterations must be between {Size.MIN_ITERATIONS} and "
+            f"{Size.MAX_ITERATIONS}."
+            f" RECEIVED : {num}"
         )
         super().__init__(self.display)
 

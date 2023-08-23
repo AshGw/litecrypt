@@ -60,14 +60,20 @@ def force_remove(*paths: str, echo: Optional[bool] = False):
             if os.path.isdir(path):
                 shutil.rmtree(path)
                 if echo:
-                    print(f"{Colors.GREEN}Folder '{path}' has been removed.{Colors.RESET}")
+                    print(
+                        f"{Colors.GREEN}Folder '{path}' has been removed.{Colors.RESET}"
+                    )
             elif os.path.isfile(path):
                 os.remove(path)
                 if echo:
-                    print(f"{Colors.GREEN}File '{path}' has been removed.{Colors.RESET}")
+                    print(
+                        f"{Colors.GREEN}File '{path}' has been removed.{Colors.RESET}"
+                    )
             else:
                 if echo:
-                    print(f"{Colors.YELLOW}'{path}' is neither a folder nor a file.{Colors.RESET}")
+                    print(
+                        f"{Colors.YELLOW}'{path}' is neither a folder nor a file.{Colors.RESET}"
+                    )
         except Exception as e:
             if echo:
                 print(f"{Colors.RED}Error while removing '{path}': {e}{Colors.RESET}")

@@ -98,7 +98,11 @@ class Crypt:
         if self.data:
             try:
                 dec_instance = DecBase(message=self.data, mainkey=self.key)
-                return dec_instance.decrypt(get_bytes=True) if get_bytes else dec_instance.decrypt()
+                return (
+                    dec_instance.decrypt(get_bytes=True)
+                    if get_bytes
+                    else dec_instance.decrypt()
+                )
             except BaseException:
                 raise exceptions.fixed.CryptError()
         else:
@@ -125,7 +129,17 @@ def gen_ref(n: int = 6) -> str:
     """
     ref = "#"
     for _ in range(n):
-        character = secrets.choice(string.ascii_letters + string.digits + "$" + "?" + "&" + "@" + "!" + "-" + "+")
+        character = secrets.choice(
+            string.ascii_letters
+            + string.digits
+            + "$"
+            + "?"
+            + "&"
+            + "@"
+            + "!"
+            + "-"
+            + "+"
+        )
         ref += character
     return ref
 

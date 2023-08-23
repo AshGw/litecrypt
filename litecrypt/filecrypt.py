@@ -112,7 +112,10 @@ class CryptFile:
                 new_filename = self.filename + ".crypt"
                 os.rename(self.filename, new_filename)
                 if echo:
-                    print(f"{Colors.GREEN}{self.filename} encrypted successfully! " f"==> {new_filename}{Colors.RESET}")
+                    print(
+                        f"{Colors.GREEN}{self.filename} encrypted successfully! "
+                        f"==> {new_filename}{Colors.RESET}"
+                    )
                 return 1
             else:
                 if echo:
@@ -174,7 +177,10 @@ class CryptFile:
 
                 os.rename(self.filename, new_filename)
                 if echo:
-                    print(f"{Colors.GREEN}{self.filename} decrypted successfully! " f"==> {new_filename}{Colors.RESET}")
+                    print(
+                        f"{Colors.GREEN}{self.filename} decrypted successfully! "
+                        f"==> {new_filename}{Colors.RESET}"
+                    )
                 return 1
             else:
                 if echo:

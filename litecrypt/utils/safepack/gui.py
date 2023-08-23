@@ -143,26 +143,38 @@ databaseFrame = tk.Frame(master=main_object, height=800, width=500)
 databaseFrame.place(rely=0, relx=0)
 
 if platform.system() == "Windows":
-    console_label = tk.Label(master=databaseFrame, text="DATABASE OUTPUT CONSOLE", font="Terminal 15 bold")
+    console_label = tk.Label(
+        master=databaseFrame, text="DATABASE OUTPUT CONSOLE", font="Terminal 15 bold"
+    )
     console_label.place(relx=0.09, rely=0.04)
 
-    db_display_text = tk.ScrolledText(width=43, height=27, font="terminal 13", wrap="word")
+    db_display_text = tk.ScrolledText(
+        width=43, height=27, font="terminal 13", wrap="word"
+    )
     db_display_text.place(relx=0.016, rely=0.105)
-    db_display_text.insert(tk.END, f"Running on: {platform.system()}\nClick '?' to see how this works")
+    db_display_text.insert(
+        tk.END, f"Running on: {platform.system()}\nClick '?' to see how this works"
+    )
 else:
-    console_label = tk.Label(master=databaseFrame, text="DATABASE OUTPUT CONSOLE", font="Calibre 15 bold")
+    console_label = tk.Label(
+        master=databaseFrame, text="DATABASE OUTPUT CONSOLE", font="Calibre 15 bold"
+    )
     console_label.place(relx=0.115, rely=0.04)
 
     db_display_text = tk.Text(width=38, height=22, font="Calibre 13 bold", wrap="word")
     db_display_text.place(relx=0.015, rely=0.105)
-    db_display_text.insert(tk.END, f"Running on: {platform.system()}\nClick '?' to see how this works")
+    db_display_text.insert(
+        tk.END, f"Running on: {platform.system()}\nClick '?' to see how this works"
+    )
 
 
 def show_all_content():
     global db_enable_blocker, main_db_name_var, usable_real_path, main_db_conn, db_display_text, keys_db_conn
     if db_enable_blocker != 0:
         db_display_text.delete("1.0", tk.END)
-        db_display_text.insert(tk.END, f"Check 'output.json' in the chosen path : {usable_real_path}\n")
+        db_display_text.insert(
+            tk.END, f"Check 'output.json' in the chosen path : {usable_real_path}\n"
+        )
         json_path = os.path.join(usable_real_path, "output.json")
         if swich_db_var.get() == 1:
             conn = keys_db_conn
@@ -185,7 +197,9 @@ def show_all_content():
                     "\nNote that this file will be deleted when the app is closed",
                 )
         except BaseException:
-            db_display_text.insert(tk.END, "Failed to write all table content in output.json\n")
+            db_display_text.insert(
+                tk.END, "Failed to write all table content in output.json\n"
+            )
 
 
 def show_content_by_id():
@@ -201,7 +215,9 @@ def show_content_by_id():
             if int(idd) > 0:
                 if last_id == -1:
                     db_display_text.delete("1.0", tk.END)
-                    db_display_text.insert(tk.END, "The table does not have any content to show")
+                    db_display_text.insert(
+                        tk.END, "The table does not have any content to show"
+                    )
                 elif last_id != -1:
                     if int(idd) in range(1, last_id):
                         db_display_text.delete("1.0", tk.END)
@@ -250,7 +266,9 @@ def show_content_by_id():
                             )
                     elif int(idd) > last_id:
                         db_display_text.delete("1.0", tk.END)
-                        db_display_text.insert(tk.END, "Given ID is greater than the highest available ID")
+                        db_display_text.insert(
+                            tk.END, "Given ID is greater than the highest available ID"
+                        )
             else:
                 db_display_text.delete("1.0", tk.END)
                 db_display_text.insert(tk.END, "ID must be strictly greater than 0")
@@ -272,23 +290,31 @@ def drop_content_by_id():
             if int(idd) > 0:
                 if last_id == -1:
                     db_display_text.delete("1.0", tk.END)
-                    db_display_text.insert(tk.END, "The table does not have any content to drop")
+                    db_display_text.insert(
+                        tk.END, "The table does not have any content to drop"
+                    )
                 elif last_id != -1:
                     if int(idd) in range(1, last_id):
                         db_display_text.delete("1.0", tk.END)
                         db_display_text.insert(tk.END, "Valid ID")
                         conn.drop_content(idd)
-                        db_display_text.insert(tk.END, f"\nDropping by ID {idd} Went successful")
+                        db_display_text.insert(
+                            tk.END, f"\nDropping by ID {idd} Went successful"
+                        )
 
                     if int(idd) == last_id:
                         db_display_text.delete("1.0", tk.END)
                         db_display_text.insert(tk.END, "Chosen last ID")
                         conn.drop_content(idd)
-                        db_display_text.insert(tk.END, f"\nDropping by ID {idd} Went successful")
+                        db_display_text.insert(
+                            tk.END, f"\nDropping by ID {idd} Went successful"
+                        )
 
                     elif int(idd) > last_id:
                         db_display_text.delete("1.0", tk.END)
-                        db_display_text.insert(tk.END, "Given ID is greater than the highest available ID")
+                        db_display_text.insert(
+                            tk.END, "Given ID is greater than the highest available ID"
+                        )
             else:
                 db_display_text.delete("1.0", tk.END)
                 db_display_text.insert(tk.END, "ID must be strictly greater than 0")
@@ -324,15 +350,21 @@ def query():
                 with open(json_file, "w") as f:
                     query_out = conn._query(query_var)
                     conn.create_table()
-                    json_content = json.dumps({f"query {query_clicks}": query_out}, indent=2)
+                    json_content = json.dumps(
+                        {f"query {query_clicks}": query_out}, indent=2
+                    )
                     query_clicks += 1
                     f.write(json_content)
                 db_display_text.insert(tk.END, f"Ran query {query_clicks} !\n\n")
-                db_display_text.insert(tk.END, "The result of the query is in 'output.json' file\n\n")
+                db_display_text.insert(
+                    tk.END, "The result of the query is in 'output.json' file\n\n"
+                )
             except BaseException:
                 db_display_text.delete("1.0", tk.END)
                 db_display_text.insert(tk.END, "Failed to finish the query!\n\n")
-                db_display_text.insert(tk.END, "Detected object that is not JSON serializable\n\n")
+                db_display_text.insert(
+                    tk.END, "Detected object that is not JSON serializable\n\n"
+                )
                 db_display_text.insert(tk.END, "Use buttons instead if possible")
         else:
             db_display_text.delete("1.0", tk.END)
@@ -340,11 +372,15 @@ def query():
 
 
 query_entry_var = tk.StringVar()
-query_entry = tk.Entry(master=databaseFrame, width=38, font="Calibre 13 bold", textvariable=query_entry_var)
+query_entry = tk.Entry(
+    master=databaseFrame, width=38, font="Calibre 13 bold", textvariable=query_entry_var
+)
 
 query_entry.place(relx=0.043, rely=0.742)
 
-query_button = tk.Button(master=databaseFrame, text="RUN QUERY", command=query, bootstyle="warning outline")
+query_button = tk.Button(
+    master=databaseFrame, text="RUN QUERY", command=query, bootstyle="warning outline"
+)
 query_button.place(relx=0.39, rely=0.81)
 
 
@@ -357,7 +393,9 @@ drop_content_by_id_button = tk.Button(
 drop_content_by_id_button.place(relx=0.08, rely=0.93)
 
 content_id_entry_var = tk.StringVar(value=" ID")
-content_id_entry = tk.Entry(master=databaseFrame, textvariable=content_id_entry_var, width=3, font="Calibre 11")
+content_id_entry = tk.Entry(
+    master=databaseFrame, textvariable=content_id_entry_var, width=3, font="Calibre 11"
+)
 content_id_entry.place(relx=0.45, rely=0.93)
 
 show_content_by_id_button = tk.Button(
@@ -410,7 +448,9 @@ def main_db_name():
             if db_path_blocker == 1:
                 fullpath = usable_real_path
                 conn_path_db = os.path.join(usable_real_path, maindbname)
-                if os.path.isfile(fullpath + f"\\{maindbname}") or os.path.isfile(fullpath + f"/{maindbname}"):
+                if os.path.isfile(fullpath + f"\\{maindbname}") or os.path.isfile(
+                    fullpath + f"/{maindbname}"
+                ):
                     db_already_exists_blocker = 1
                     main_db_conn = ld.Database(conn_path_db)
                     main_db_conn.create_table()
@@ -475,7 +515,9 @@ def keyd_db_setup():
             else:
                 keys_db_conn = ld.Database(conn_path_keys)
                 keys_db_conn.create_table()
-                db_display_text.insert(tk.END, f"Created and Connected to '{keys_db}' ..\n\n")
+                db_display_text.insert(
+                    tk.END, f"Created and Connected to '{keys_db}' ..\n\n"
+                )
                 success_keysdb_connection_blocker = 1
         except BaseException:
             db_display_text.delete("1.0", tk.END)
@@ -501,7 +543,9 @@ def path_name_wrapper():
 
 
 db_path_var = tk.StringVar()
-db_path_entry = tk.Entry(master=lowerFrame, width=31, font="Calibre 14 bold", textvariable=db_path_var)
+db_path_entry = tk.Entry(
+    master=lowerFrame, width=31, font="Calibre 14 bold", textvariable=db_path_var
+)
 db_path_entry.place(relx=0.03, rely=0.005)
 
 db_path_result_var = tk.StringVar(value="")
@@ -513,10 +557,14 @@ db_path_result_entry = tk.Label(
 )
 db_path_result_entry.place(relx=0.7, rely=0.022)
 
-path_label = tk.Label(master=lowerFrame, font="Calibre 13 bold", bootstyle="light", text="DATABASES PATH")
+path_label = tk.Label(
+    master=lowerFrame, font="Calibre 13 bold", bootstyle="light", text="DATABASES PATH"
+)
 path_label.place(relx=0.47, rely=0.022)
 
-main_database_label = tk.Label(master=lowerFrame, font="Calibre 13 bold", bootstyle="light", text="MAIN DATABASE")
+main_database_label = tk.Label(
+    master=lowerFrame, font="Calibre 13 bold", bootstyle="light", text="MAIN DATABASE"
+)
 main_database_label.place(relx=0.47, rely=0.205)
 
 set_db_path_button = tk.Button(
@@ -542,7 +590,9 @@ def checksize():
             db_display_text.insert(tk.END, f"Current size is {size:.5f} (MB)'\n\n")
         if size >= 1024:
             db_display_text.delete("1.0", tk.END)
-            db_display_text.insert(tk.END, f"Current size is {(size/1024):.3f} (GB)'\n\n")
+            db_display_text.insert(
+                tk.END, f"Current size is {(size/1024):.3f} (GB)'\n\n"
+            )
 
 
 size_button = tk.Button(
@@ -609,7 +659,9 @@ las_mod_button.place(relx=0.031, rely=0.74)
 
 
 main_db_name_var = tk.StringVar()
-main_db_name_entry = tk.Entry(master=lowerFrame, width=31, font="Calibre 14 bold", textvariable=main_db_name_var)
+main_db_name_entry = tk.Entry(
+    master=lowerFrame, width=31, font="Calibre 14 bold", textvariable=main_db_name_var
+)
 main_db_name_entry.place(relx=0.03, rely=0.192)
 
 
@@ -680,12 +732,16 @@ def create_spawned_directory():
                 actual_spawned_path = spawned_path
                 break
             except Exception:
-                db_display_text.insert(tk.END, f"ERROR CREATING '{spawned_path}' directory!\n")
+                db_display_text.insert(
+                    tk.END, f"ERROR CREATING '{spawned_path}' directory!\n"
+                )
         else:
             spawning_try_count += 1
             db_display_text.insert(tk.END, f"Trying '{spawned_path}'...\n")
     else:
-        db_display_text.insert(tk.END, "ABORTING: Reached the maximum number of directories to spawn in.\n")
+        db_display_text.insert(
+            tk.END, "ABORTING: Reached the maximum number of directories to spawn in.\n"
+        )
 
 
 spawn_out_blocker = 1
@@ -696,7 +752,9 @@ def spawn_out():
 
     if db_enable_blocker:
         db_display_text.delete("1.0", tk.END)
-        db_display_text.insert(tk.END, "ATTEMPTING TO SPAWN OUT FILES IN THE CHOSEN PATH..\n")
+        db_display_text.insert(
+            tk.END, "ATTEMPTING TO SPAWN OUT FILES IN THE CHOSEN PATH..\n"
+        )
 
         filenames_list = ld.reference_linker(
             connection=main_db_conn,
@@ -730,7 +788,9 @@ def spawn_out():
                             key_reference=key_ref_entry_var.get().__str__(),
                         )
                     except Exception:
-                        db_display_text.insert(tk.END, f"ERROR OCCURRED DURING FILES RETREIVAL !'\n")
+                        db_display_text.insert(
+                            tk.END, f"ERROR OCCURRED DURING FILES RETREIVAL !'\n"
+                        )
                 else:
                     return
 
@@ -752,13 +812,17 @@ def spawn_out():
                             directory=actual_spawned_path,
                         )
                     except Exception:
-                        db_display_text.insert(tk.END, f"ERROR OCCURRED DURING FILES RETREIVAL !'\n")
+                        db_display_text.insert(
+                            tk.END, f"ERROR OCCURRED DURING FILES RETREIVAL !'\n"
+                        )
                 else:
                     return
 
 
 key_ref_entry_var = tk.StringVar()
-key_ref_entry = tk.Entry(master=lowerFrame, width=11, font="calibre 10 bold", textvariable=key_ref_entry_var)
+key_ref_entry = tk.Entry(
+    master=lowerFrame, width=11, font="calibre 10 bold", textvariable=key_ref_entry_var
+)
 key_ref_entry.place(relx=0.484, rely=0.575)
 
 spawn_ref_label = tk.Label(
@@ -839,10 +903,14 @@ def qr_dec_func():
         qr_label_decryption.config(text="QR OFF")
 
 
-encrypt_text_button = tk.Button(master=textFrame1, text="ENCRYPT", command=encryption, bootstyle="light outline")
+encrypt_text_button = tk.Button(
+    master=textFrame1, text="ENCRYPT", command=encryption, bootstyle="light outline"
+)
 encrypt_text_button.place(relx=0.42, rely=0.73)
 
-decrypt_text_button = tk.Button(master=textFrame2, text="DECRYPT", command=decryption, bootstyle="light outline")
+decrypt_text_button = tk.Button(
+    master=textFrame2, text="DECRYPT", command=decryption, bootstyle="light outline"
+)
 decrypt_text_button.place(relx=0.42, rely=0.8)
 
 text_encryption_var = tk.StringVar()
@@ -891,11 +959,15 @@ else:
 
 
 text_encryption_output_var = tk.StringVar()
-text_encryption_output = tk.Entry(master=textFrame1, textvariable=text_encryption_output_var, font="terminal 11 bold")
+text_encryption_output = tk.Entry(
+    master=textFrame1, textvariable=text_encryption_output_var, font="terminal 11 bold"
+)
 text_encryption_output.place(relx=0.02, rely=0.48, width=480, height=50)
 
 text_decryption_output_var = tk.StringVar()
-text_decryption_output = tk.Entry(master=textFrame2, textvariable=text_decryption_output_var, font="terminal 11 bold")
+text_decryption_output = tk.Entry(
+    master=textFrame2, textvariable=text_decryption_output_var, font="terminal 11 bold"
+)
 text_decryption_output.place(relx=0.02, rely=0.55, width=480, height=50)
 
 
@@ -956,7 +1028,9 @@ if platform.system() == "Windows":
     filepathlabel.place(relx=0.335, rely=0.10)
 
     resultvarfile = tk.StringVar(value="                 .............")
-    resultLabelfile = tk.Label(master=frameFile1, textvariable=resultvarfile, font="terminal 13 bold")
+    resultLabelfile = tk.Label(
+        master=frameFile1, textvariable=resultvarfile, font="terminal 13 bold"
+    )
     resultLabelfile.place(rely=0.55)
 else:
     filepathlabel = tk.Label(
@@ -966,7 +1040,9 @@ else:
     )
     filepathlabel.place(relx=0.335, rely=0.10)
     resultvarfile = tk.StringVar(value="                    ..........")
-    resultLabelfile = tk.Label(master=frameFile1, textvariable=resultvarfile, font="terminal 13 bold")
+    resultLabelfile = tk.Label(
+        master=frameFile1, textvariable=resultvarfile, font="terminal 13 bold"
+    )
     resultLabelfile.place(rely=0.55)
 
 
@@ -989,10 +1065,14 @@ def enc_file():
                     with open(filename, "rb") as f:
                         file_content = f.read()
                     try:
-                        main_db_conn.insert(filename, file_content, outputKeyref.get().strip())
+                        main_db_conn.insert(
+                            filename, file_content, outputKeyref.get().strip()
+                        )
                     except BaseException:
                         db_display_text.delete("1.0", tk.END)
-                        db_display_text.insert(tk.END, "ERROR \n\nDatabase might be distorted\n")
+                        db_display_text.insert(
+                            tk.END, "ERROR \n\nDatabase might be distorted\n"
+                        )
             if platform.system() == "Windows":
                 if a == 2:
                     resultvarfile.set("                 File is Empty")
@@ -1044,10 +1124,14 @@ def decfile():
                     with open(filename, "rb") as f:
                         file_content = f.read()
                     try:
-                        main_db_conn.insert(filename, file_content, outputKeyref.get().strip())
+                        main_db_conn.insert(
+                            filename, file_content, outputKeyref.get().strip()
+                        )
                     except BaseException:
                         db_display_text.delete("1.0", tk.END)
-                        db_display_text.insert(tk.END, "ERROR \n\nDatabase might be distorted\n")
+                        db_display_text.insert(
+                            tk.END, "ERROR \n\nDatabase might be distorted\n"
+                        )
             if platform.system() == "Windows":
                 if a == 2:
                     resultvarfile.set("                 File is Empty")
@@ -1088,16 +1172,22 @@ encryptionfilebutton = tk.Button(
 )
 encryptionfilebutton.place(relx=0.25, rely=0.73)
 
-decryptionfilebutton = tk.Button(master=frameFile1, text="DECRYPT FILE", command=decfile, bootstyle="warning outline")
+decryptionfilebutton = tk.Button(
+    master=frameFile1, text="DECRYPT FILE", command=decfile, bootstyle="warning outline"
+)
 decryptionfilebutton.place(relx=0.55, rely=0.73)
 
 filenameStringVar = tk.StringVar(value="")
 
-filenametext = tk.Entry(master=frameFile1, width=31, font="Calibre 15 bold", textvariable=filenameStringVar)
+filenametext = tk.Entry(
+    master=frameFile1, width=31, font="Calibre 15 bold", textvariable=filenameStringVar
+)
 filenametext.place(relx=0.05, rely=0.30)
 
 
-addtodbLabel = tk.Label(master=frameFile1, text="ADD TO DATABASE", font=("Calibre", 11), bootstyle="warning")
+addtodbLabel = tk.Label(
+    master=frameFile1, text="ADD TO DATABASE", font=("Calibre", 11), bootstyle="warning"
+)
 addtodbLabel.place(relx=0.35, rely=0.908)
 
 add_enc_to_db = 0
@@ -1158,9 +1248,15 @@ def main_key_wrapper():
         keyselectionvar.set("       SELECTED")
         keySelectionFlag.set(1)
         try:
-            if success_keysdb_connection_blocker and os.path.isfile(filenameStringVar.get().strip()):
-                keys_db_conn.insert(filenameStringVar.get().strip(), mainkey, outputKeyref.get())
-            if success_keysdb_connection_blocker and not os.path.isfile(filenameStringVar.get().strip()):
+            if success_keysdb_connection_blocker and os.path.isfile(
+                filenameStringVar.get().strip()
+            ):
+                keys_db_conn.insert(
+                    filenameStringVar.get().strip(), mainkey, outputKeyref.get()
+                )
+            if success_keysdb_connection_blocker and not os.path.isfile(
+                filenameStringVar.get().strip()
+            ):
                 keys_db_conn.insert("STANDALONE", mainkey, outputKeyref.get())
         except BaseException:
             db_display_text.delete("1.0", tk.END)
@@ -1189,14 +1285,26 @@ else:
 
 
 mainkeyvar = tk.StringVar()
-mainkeyEntry = tk.Entry(master=frameFile2, font="Calibre 14 bold", textvariable=mainkeyvar, width=29)
+mainkeyEntry = tk.Entry(
+    master=frameFile2, font="Calibre 14 bold", textvariable=mainkeyvar, width=29
+)
 mainkeyEntry.place(relx=0.09, rely=0.29)
 
 
 def keyref_gen():
     ref = "#"
     for _ in range(6):
-        character = secrets.choice(string.ascii_letters + string.digits + "$" + "?" + "&" + "@" + "!" + "-" + "+")
+        character = secrets.choice(
+            string.ascii_letters
+            + string.digits
+            + "$"
+            + "?"
+            + "&"
+            + "@"
+            + "!"
+            + "-"
+            + "+"
+        )
         ref += character
     outputKeyref.set(ref)
 
@@ -1234,10 +1342,14 @@ def genkey():
 
 
 keyGenVar = tk.StringVar(value="")
-keyGenEntry = tk.Entry(master=frameFile2, font="Calibre 12 bold", textvariable=keyGenVar, width=23)
+keyGenEntry = tk.Entry(
+    master=frameFile2, font="Calibre 12 bold", textvariable=keyGenVar, width=23
+)
 keyGenEntry.place(relx=0.1, rely=0.69)
 
-keyButton = tk.Button(master=frameFile2, text="GENERATE", command=genkey, bootstyle="success outline")
+keyButton = tk.Button(
+    master=frameFile2, text="GENERATE", command=genkey, bootstyle="success outline"
+)
 keyButton.place(relx=0.671, rely=0.7)
 
 

@@ -2,7 +2,9 @@ import requests
 
 
 def latest_tag(repo_name):
-    response = requests.get(f"https://hub.docker.com/v2/repositories/{repo_name}/tags/?page_size=1")
+    response = requests.get(
+        f"https://hub.docker.com/v2/repositories/{repo_name}/tags/?page_size=1"
+    )
     if response.status_code == 200:
         return response.json()["results"][0]["name"]
     else:

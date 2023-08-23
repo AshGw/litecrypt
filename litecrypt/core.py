@@ -29,7 +29,13 @@ class EncBase:
         iterations (int, optional): The number of iterations for key derivation. Default is 50
     """
 
-    def __init__(self, message: Union[str, bytes], mainkey: str, *, iterations: int = Size.MIN_ITERATIONS) -> None:
+    def __init__(
+        self,
+        message: Union[str, bytes],
+        mainkey: str,
+        *,
+        iterations: int = Size.MIN_ITERATIONS
+    ) -> None:
         if isinstance(message, str):
             self.message = message.encode()
         elif isinstance(message, bytes):
@@ -42,7 +48,10 @@ class EncBase:
         self.salt = os.urandom(Size.SALT)
         self.pepper = os.urandom(Size.PEPPER)
         self.iterations = iterations
-        if self.iterations < Size.MIN_ITERATIONS or self.iterations > Size.MAX_ITERATIONS:
+        if (
+            self.iterations < Size.MIN_ITERATIONS
+            or self.iterations > Size.MAX_ITERATIONS
+        ):
             raise exceptions.dynamic.IterationsOutofRangeError(self.iterations)
 
         self.enc_key = self.derkey(self.mainkey, self.salt, self.iterations)
@@ -164,7 +173,10 @@ class EncBase:
         Returns:
             bytes: The encrypted ciphertext.
         """
-        return self._cipher_encryptor().update(self.padded_message()) + self._cipher_encryptor().finalize()
+        return (
+            self._cipher_encryptor().update(self.padded_message())
+            + self._cipher_encryptor().finalize()
+        )
 
     def iterations_bytes(self) -> bytes:
         """
@@ -184,7 +196,13 @@ class EncBase:
             bytes: The computed HMAC-SHA256 value.
         """
         hmac_ = hmac.HMAC(self.hmac_key, hashes.SHA256())
-        hmac_.update(self.iv + self.salt + self.pepper + self.iterations_bytes() + self.ciphertext())
+        hmac_.update(
+            self.iv
+            + self.salt
+            + self.pepper
+            + self.iterations_bytes()
+            + self.ciphertext()
+        )
         return hmac_.finalize()
 
     def encrypt(self, get_bytes: Optional[bool] = False) -> Union[bytes, str]:
@@ -196,7 +214,14 @@ class EncBase:
         :param get_bytes: Set to True to get the encrypted data as bytes. Default is False.
         :return: Encrypted data as bytes or URL safe base64 encoded string.
         """
-        raw = self.hmac_final() + self.iv + self.salt + self.pepper + self.iterations_bytes() + self.ciphertext()
+        raw = (
+            self.hmac_final()
+            + self.iv
+            + self.salt
+            + self.pepper
+            + self.iterations_bytes()
+            + self.ciphertext()
+        )
         return raw if get_bytes else base64.urlsafe_b64encode(raw).decode("UTF-8")
 
 
@@ -230,7 +255,10 @@ class DecBase:
         self.rec_pepper = self.message[_h + _i + _s : _h + _i + _s + _p]
         self.rec_iters_raw = self.message[_h + _i + _s + _p : _h + _i + _s + _p + 4]
         self.rec_iterations = struct.unpack("!I", self.rec_iters_raw)[0]
-        if self.rec_iterations < Size.MIN_ITERATIONS or self.rec_iterations > Size.MAX_ITERATIONS:
+        if (
+            self.rec_iterations < Size.MIN_ITERATIONS
+            or self.rec_iterations > Size.MAX_ITERATIONS
+        ):
             raise exceptions.dynamic.IterationsOutofRangeError(self.rec_iterations)
 
         self.rec_ciphertext = self.message[_h + _i + _s + _p + 4 :]
@@ -248,7 +276,13 @@ class DecBase:
             bytes: The computed HMAC-SHA256 value.
         """
         hmac_ = hmac.HMAC(self.hmac_k, hashes.SHA256())
-        hmac_.update(self.rec_iv + self.rec_salt + self.rec_pepper + self.rec_iters_raw + self.rec_ciphertext)
+        hmac_.update(
+            self.rec_iv
+            + self.rec_salt
+            + self.rec_pepper
+            + self.rec_iters_raw
+            + self.rec_ciphertext
+        )
         return hmac_.finalize()
 
     def verify_hmac(self) -> bool:
@@ -292,7 +326,10 @@ class DecBase:
         return self._cipher().decryptor()
 
     def _pre_unpadding(self) -> bytes:
-        return self._cipher_decryptor().update(self.rec_ciphertext) + self._cipher_decryptor().finalize()
+        return (
+            self._cipher_decryptor().update(self.rec_ciphertext)
+            + self._cipher_decryptor().finalize()
+        )
 
     def unpadded_message(self) -> bytes:
         """

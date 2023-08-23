@@ -153,7 +153,9 @@ class Database:
         except self.DatabaseError as e:
             return {"status": "FAILURE", "result": e.__str__()}
 
-    def create_table(self, tablename: Optional[str] = None) -> Union[int, DatabaseFailure]:
+    def create_table(
+        self, tablename: Optional[str] = None
+    ) -> Union[int, DatabaseFailure]:
         """Creates a new table in the database with the given table name.
         If the table name is not provided, it uses the default table name: 'stash'.
 
@@ -167,7 +169,9 @@ class Database:
         if tablename is None:
             try:
                 with self._conn:
-                    self._c.execute(self.custom_query.create_table(tablename=self.tablename))
+                    self._c.execute(
+                        self.custom_query.create_table(tablename=self.tablename)
+                    )
                 return 1
             except self.DatabaseError as e:
                 return DatabaseFailure(failure=1, error=e).get()
@@ -245,7 +249,9 @@ class Database:
             try:
                 with self._conn:
                     self._c.execute(
-                        self.custom_query.update(tablename=self.tablename, column_name=column_name),
+                        self.custom_query.update(
+                            tablename=self.tablename, column_name=column_name
+                        ),
                         (new_column_val, id_),
                     )
                     return 1
@@ -257,7 +263,9 @@ class Database:
             try:
                 with self._conn:
                     self._c.execute(
-                        self.custom_query.update(tablename=tablename, column_name=column_name),
+                        self.custom_query.update(
+                            tablename=tablename, column_name=column_name
+                        ),
                         (new_column_val, id_),
                     )
                     return 1
@@ -265,13 +273,17 @@ class Database:
             except self.DatabaseError as e:
                 return DatabaseFailure(failure=1, error=e).get()
 
-    def content(self, tablename: Optional[str] = None) -> Union[Generator, DatabaseFailure]:
+    def content(
+        self, tablename: Optional[str] = None
+    ) -> Union[Generator, DatabaseFailure]:
         """Yields all rows from the specified table, or the default table
         if no arguments are passed ( as a Generator object ) ."""
         if tablename is None:
             try:
                 with self._conn:
-                    self._c.execute(self.custom_query.select(tablename=self.tablename, all=True))
+                    self._c.execute(
+                        self.custom_query.select(tablename=self.tablename, all=True)
+                    )
                     yield from self._c.fetchall()
 
             except self.DatabaseError as e:
@@ -280,13 +292,17 @@ class Database:
         else:
             try:
                 with self._conn:
-                    self._c.execute(self.custom_query.select(tablename=tablename, all=True))
+                    self._c.execute(
+                        self.custom_query.select(tablename=tablename, all=True)
+                    )
                     yield from self._c.fetchall()
 
             except self.DatabaseError as e:
                 return DatabaseFailure(failure=1, error=e).get()
 
-    def content_by_id(self, id_: int, tablename: Optional[str] = None) -> Union[Generator, DatabaseFailure]:
+    def content_by_id(
+        self, id_: int, tablename: Optional[str] = None
+    ) -> Union[Generator, DatabaseFailure]:
         """
         Yields a specific row from the specified table or the default table based on a given ID.
 
@@ -302,7 +318,12 @@ class Database:
         if tablename is None:
             try:
                 with self._conn:
-                    self._c.execute(self.custom_query.select(tablename=self.tablename, id=True, all=True), (id_,))
+                    self._c.execute(
+                        self.custom_query.select(
+                            tablename=self.tablename, id=True, all=True
+                        ),
+                        (id_,),
+                    )
                     yield from self._c.fetchall()
 
             except self.DatabaseError as e:
@@ -311,7 +332,12 @@ class Database:
         else:
             try:
                 with self._conn:
-                    self._c.execute(self.custom_query.select(tablename=tablename, id=True, all=True), (id_,))
+                    self._c.execute(
+                        self.custom_query.select(
+                            tablename=tablename, id=True, all=True
+                        ),
+                        (id_,),
+                    )
                     yield from self._c.fetchall()
 
             except self.DatabaseError as e:
@@ -332,7 +358,9 @@ class Database:
             try:
                 for tablename in tablenames:
                     with self._conn:
-                        self._c.execute(self.custom_query.select(tablename=tablename, all=True))
+                        self._c.execute(
+                            self.custom_query.select(tablename=tablename, all=True)
+                        )
                         for row in self._c.fetchall():
                             yield {tablename: row}
 
@@ -342,7 +370,9 @@ class Database:
         else:
             try:
                 with self._conn:
-                    self._c.execute(self.custom_query.select(tablename=self.tablename, all=True))
+                    self._c.execute(
+                        self.custom_query.select(tablename=self.tablename, all=True)
+                    )
                     for row in self._c.fetchall():
                         yield {self.tablename: row}
 
@@ -410,7 +440,9 @@ class Database:
         except self.DatabaseError as e:
             return DatabaseFailure(failure=1, error=e).get()
 
-    def drop_content(self, id_: int, tablename: Optional[str] = None) -> Union[int, DatabaseFailure]:
+    def drop_content(
+        self, id_: int, tablename: Optional[str] = None
+    ) -> Union[int, DatabaseFailure]:
         """
         Deletes a row from the specified table or the default table based on the given ID.
 
@@ -424,9 +456,14 @@ class Database:
         try:
             with self._conn:
                 if tablename is None:
-                    self._c.execute(self.custom_query.drop(tablename=self.tablename, id=True), (id_,))
+                    self._c.execute(
+                        self.custom_query.drop(tablename=self.tablename, id=True),
+                        (id_,),
+                    )
                 else:
-                    self._c.execute(self.custom_query.drop(tablename=tablename, id=True), (id_,))
+                    self._c.execute(
+                        self.custom_query.drop(tablename=tablename, id=True), (id_,)
+                    )
             return 1
 
         except self.DatabaseError as e:
@@ -473,12 +510,15 @@ def reference_linker(
     """
     engine = connection.engine
     if get_filename and get_content_or_key:
-        raise ValueError("Cannot select both 'get_filename' and 'get_content_or_key' simultaneously.")
+        raise ValueError(
+            "Cannot select both 'get_filename' and 'get_content_or_key' simultaneously."
+        )
     if not get_filename and not get_content_or_key:
         raise ValueError("Select either 'get_filename' or 'get_content_or_key'.")
     if get_all:
         data_list = connection.query(
-            Query(engine=engine).select(tablename=tablename, all=True, ref=True), (key_reference,)
+            Query(engine=engine).select(tablename=tablename, all=True, ref=True),
+            (key_reference,),
         )["result"]
         all_matches_list = [(e[1], e[2], e[3]) for e in data_list]
         # e[1] is the file name / e[2] is the file content / e[3] is the key reference value
@@ -490,9 +530,10 @@ def reference_linker(
         return file_content_or_keys_list if get_content_or_key else filenames_list
 
     elif not get_all:
-        data = connection.query(Query(engine=engine).select(tablename=tablename, all=True, ref=True), (key_reference,))[
-            "result"
-        ][0]
+        data = connection.query(
+            Query(engine=engine).select(tablename=tablename, all=True, ref=True),
+            (key_reference,),
+        )["result"][0]
         return data[2] if get_content_or_key else data[1]
         # conn[2] == content column content containing the first content it matches
         # conn[1] == filename column containing the first filename it matches
@@ -593,19 +634,32 @@ def spawn(
 
                 # Removing duplicates from the lists using the collected indexes
                 filenames_list[:] = [
-                    filename for index, filename in enumerate(filenames_list) if index not in duplicate_indexes
+                    filename
+                    for index, filename in enumerate(filenames_list)
+                    if index not in duplicate_indexes
                 ]
                 contents_list[:] = [
-                    content for index, content in enumerate(contents_list) if index not in duplicate_indexes
+                    content
+                    for index, content in enumerate(contents_list)
+                    if index not in duplicate_indexes
                 ]
-                keys_list[:] = [key for index, key in enumerate(keys_list) if index not in duplicate_indexes]
+                keys_list[:] = [
+                    key
+                    for index, key in enumerate(keys_list)
+                    if index not in duplicate_indexes
+                ]
 
             # The creation of the extracted files in the specified directory
-            full_paths_list = [os.path.join(directory, os.path.split(path)[1]) for path in filenames_list]
+            full_paths_list = [
+                os.path.join(directory, os.path.split(path)[1])
+                for path in filenames_list
+            ]
             for full_path, content in zip(full_paths_list, contents_list):
                 CryptFile.make_file(filename=full_path, content=content)
                 if echo:
-                    print(f"{Colors.GREEN}{full_path} has been spawned successfully.{Colors.RESET}")
+                    print(
+                        f"{Colors.GREEN}{full_path} has been spawned successfully.{Colors.RESET}"
+                    )
             # done with that
             files_in_new_directory = []
             for file in filenames_list:
@@ -648,7 +702,9 @@ def spawn(
             )
 
             if CryptFile.key_verify(key) != 1 and key != "STANDALONE":
-                raise ValueError("Invalid key, check if Database object placement is correct.")
+                raise ValueError(
+                    "Invalid key, check if Database object placement is correct."
+                )
 
             full_path = os.path.join(directory, filename)
 
@@ -662,7 +718,9 @@ def spawn(
 
             result = {
                 "status": "SUCCESS",
-                "filenames": [os.path.join(directory, filename)],  # made lists out of them for easy exec
+                "filenames": [
+                    os.path.join(directory, filename)
+                ],  # made lists out of them for easy exec
                 "contents": [content],
                 "keys": [key],
             }

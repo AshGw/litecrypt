@@ -3,7 +3,11 @@ import warnings
 
 from litecrypt.utils.safepack.gui import main_object
 
-if sys.version_info.major <= 3 and sys.version_info.minor <= 6 or sys.version_info.major < 3:
+if (
+    sys.version_info.major <= 3
+    and sys.version_info.minor <= 6
+    or sys.version_info.major < 3
+):
     warnings.warn(
         message="""\033[38;5;214m
             This Python version is no longer supported by the Python team, nor is it supported by this project.
