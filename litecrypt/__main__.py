@@ -10,7 +10,8 @@ if (
 ):
     warnings.warn(
         message="""\033[38;5;214m
-            This Python version is no longer supported by the Python team, nor is it supported by this project.
+            This Python version is no longer supported by the Python team,
+            nor is it supported by this project.
             Python 3.6 or newer is required for this library to work properly.
             Existing..\033[0m
         """,

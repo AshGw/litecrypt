@@ -16,7 +16,8 @@ class Database:
     """
     Represents a database class with various methods to interact with a given database.
 
-    This class provides a simplified interface to interact with a database, designed for various database systems.
+    This class provides a simplified interface to interact with a database,
+    designed for various database systems.
     It includes methods to connect to the database, perform basic operations, and more.
 
     :param dbname: The identifier or connection details for the target database.
@@ -34,9 +35,11 @@ class Database:
         Initialize the database connection and cursor after object creation.
 
         This method establishes a connection to the database specified by the 'dbname' attribute
-        and creates a cursor for executing queries. It also initializes the 'custom_query' and 'DatabaseError'
+        and creates a cursor for executing queries. It also initializes the
+        'custom_query' and 'DatabaseError'
         attributes for executing custom queries and handling database errors respectively.
-        Additionally, it ensures the specified table exists in the database by invoking the 'create_table' method.
+        Additionally, it ensures the specified table exists in the database by invoking
+        the 'create_table' method.
         """
         self.engine = Engine(db_type=self.db_type)
         self._conn = self.engine.create(database=self.dbname)
@@ -163,7 +166,8 @@ class Database:
             tablename (str, optional): The name of the table to create. Defaults to None.
 
         Returns:
-            Union[int, DatabaseFailure]: Returns 1 if the table creation is successful, or a DatabaseFailure object
+            Union[int, DatabaseFailure]: Returns 1 if the table creation is successful,
+            or a DatabaseFailure object
             if an error occurs during table creation.
         """
         if tablename is None:
@@ -202,7 +206,8 @@ class Database:
             tablename (str, optional): The name of the table to insert into. Defaults to None.
 
         Returns:
-            Union[int, DatabaseFailure]: Returns 1 if the insertion is successful, or a DatabaseFailure object
+            Union[int, DatabaseFailure]: Returns 1 if the insertion is successful,
+            or a DatabaseFailure object
             if an error occurs during insertion.
         """
         if tablename is None:
@@ -234,7 +239,8 @@ class Database:
         id_: int,
         tablename: Optional[str] = None,
     ) -> Union[int, DatabaseFailure]:
-        """Updates a specific column of a row based on the given ID in the specified table or the default table
+        """Updates a specific column of a row based on the given ID in the specified table
+        or the default table
         if no argument is passed.
 
         :param column_name: The name of the column to be updated must be in the attribute '_columns'.
@@ -403,7 +409,8 @@ class Database:
             *tablenames (str): Name(s) of the table(s) to drop.
 
         Returns:
-            Union[int, DatabaseFailure]: 1 if successful, or a DatabaseFailure object if there's an error.
+            Union[int, DatabaseFailure]: 1 if successful,
+            or a DatabaseFailure object if there's an error.
         """
         if tablenames:
             try:
@@ -428,7 +435,8 @@ class Database:
         Drops ALL tables in the Database.
 
         Returns:
-            Union[int, DatabaseFailure]: 1 if successful, or a DatabaseFailure object if there's an error.
+            Union[int, DatabaseFailure]: 1 if successful,
+            or a DatabaseFailure object if there's an error.
         """
         try:
             with self._conn:
@@ -448,7 +456,8 @@ class Database:
 
         Args:
             id_ (int): The ID of the row to be deleted.
-            tablename (str, optional): The name of the table to delete from. Default is None (uses default table).
+            tablename (str, optional): The name of the table to delete from.
+            Default is None (uses default table).
 
         Returns:
             Union[int, DatabaseFailure]: 1 if successful, or a DatabaseFailure object if there's an error.
@@ -551,20 +560,24 @@ def spawn(
     echo: Optional[bool] = False,
 ) -> Dict[str, Any]:
     """
-    Retrieve file content and related data from specified databases and create files in the designated directory.
+    Retrieve file content and related data from specified databases and create files
+    in the designated directory.
 
-    Depending on the parameters, this function can fetch a single file or multiple files associated with
-    the provided key_reference. The fetched files are then created in the specified directory.
+    Depending on the parameters, this function can fetch a single file or multiple
+    files associated with the provided key_reference.
+    The fetched files are then created in the specified directory.
 
     Args:
         main_connection (Database): Connection to the main database.
         keys_connection (Database): Connection to the keys' database.
         key_reference (str): The reference key to link with.
         tablename (str, optional): The name of the table in the databases. Default is 'stash'.
-        directory (str, optional): The directory where files will be created. Default is the current directory.
+        directory (str, optional): The directory where files will be created.
+        Default is the current directory.
         get_all (bool, optional): Retrieve and create all files associated with the key_reference.
             Default is False, indicating retrieval of a single file.
-        ignore_duplicate_files (bool, optional): When True, duplicate filenames are ignored during creation.
+        ignore_duplicate_files (bool, optional): When True, duplicate filenames
+        are ignored during creation.
             Default is False.
         echo (bool, optional): Whether to print result information. Default is False.
 

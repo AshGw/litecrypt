@@ -229,7 +229,8 @@ class DecBase:
     """
     Class to decrypt data of either type bytes or str.
 
-    This class provides functionality to decrypt data that was previously encrypted using the EncBase class.
+    This class provides functionality to decrypt data that
+    was previously encrypted using the EncBase class.
     It handles key derivation, verification, and decryption.
 
     Args:

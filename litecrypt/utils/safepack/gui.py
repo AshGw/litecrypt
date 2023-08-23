@@ -15,7 +15,8 @@ from litecrypt.utils.consts import Gui
 from litecrypt.utils.safepack import qr
 
 """--------------------------------HOW TO ?------------------------"""
-gui_usage_manual = f"""This is the Database Output Console, designed to display database-related operations.
+gui_usage_manual = f"""This is the Database Output Console,
+designed to display database-related operations.
 Below is a guide on how to use the GUI for different tasks.
 
 
@@ -43,7 +44,8 @@ File Encryption:
 
 - Enter the file name or full path in the "FILE PATH" field.
 - Click "ENCRYPT FILE" to encrypt the file.
-- A success message will appear if the encryption is successful, along with the addition of the ".crypt" extension.
+- A success message will appear if the encryption is successful,
+along with the addition of the ".crypt" extension.
 - An error message will be displayed if encryption fails.
 
 File Decryption:
@@ -66,14 +68,16 @@ Both databases have the same table called `stash` that has 4 columns:
 
 - `ID` which is auto-generated & incremented for each piece of data that gets inserted.
 
-- `name` that holds the filename in both db's , although for the keys database if you haven't specified any file
+- `name` that holds the filename in both db's ,
+although for the keys database if you haven't specified any file
 to operate on while selecting different keys, then all these inserted keys will be tagged with:
 `STANDALONE` for their associated filename.
 
 - `content` for the main db this holds the entire content of the given file whereas for the keys db
 it holds the actual 256-bit encryption key.
 
-- `ref` for both db's, this holds the `ref` A.K.A key reference value. Which is the only piece of data between the
+- `ref` for both db's, this holds the `ref` A.K.A key reference value.
+Which is the only piece of data between the
 two databases.
 
 Buttons
@@ -94,7 +98,8 @@ The buttons are self-explanatory. Here's a quick overview of their functions:
 
 - "DROP CONTENT BY ID": Drops content by specifying a valid ID.
 
-- "SHOW CONTENT BY ID": Writes specific ID's content to an "output.json" file which auto-deletes when you exit the app,
+- "SHOW CONTENT BY ID": Writes specific ID's content to an "output.json" file
+which auto-deletes when you exit the app,
 in the path you chose.
 
 
@@ -104,11 +109,13 @@ in the path you chose.
 - "QUERY": Execute raw SQLite queries, the result will be in "output.json."
 
 
-- "SPAWN": Extracts file(s) from the database associated with a specific key reference and creates them in the
+- "SPAWN": Extracts file(s) from the database associated with a specific key reference
+and creates them in the
 chosen directory.
 
 
-Click the buttons and observe the results in the "DATABASE OUTPUT CONSOLE." The output guides you through the process.
+Click the buttons and observe the results in the "DATABASE OUTPUT CONSOLE."
+The output guides you through the process.
 """
 """------------------------FRAMING STARTED-------------------"""
 
@@ -170,6 +177,7 @@ else:
 
 def show_all_content():
     global db_enable_blocker, main_db_name_var, usable_real_path, main_db_conn, db_display_text, keys_db_conn
+
     if db_enable_blocker != 0:
         db_display_text.delete("1.0", tk.END)
         db_display_text.insert(

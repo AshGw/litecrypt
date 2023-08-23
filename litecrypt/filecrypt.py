@@ -69,7 +69,8 @@ class CryptFile:
         Encrypt a given file.
 
         This method attempts to encrypt the specified file using the provided key. If the encryption
-        process is successful, it will return 1. Otherwise, it will raise an exception specifying the problem.
+        process is successful, it will return 1. Otherwise,
+        it will raise an exception specifying the problem.
 
         Args:
             echo (bool, optional): Whether to print a success message after encryption. Default is False.
@@ -122,7 +123,8 @@ class CryptFile:
                     print(
                         f"{Colors.GREEN}{self.filename} encrypted successfully! "
                         f"==> {self.filename}{Colors.RESET}\n"
-                        f"{Colors.YELLOW}Filename left unchanged, could not rename it for some rare reason{Colors.RESET}"
+                        f"{Colors.YELLOW}Filename left unchanged,"
+                        f" could not rename it for some rare reason{Colors.RESET}"
                     )
                 return -1
         except OSError:
@@ -132,8 +134,9 @@ class CryptFile:
         """
         Decrypt a given file.
 
-        This method attempts to decrypt the specified encrypted file using the provided key. If the decryption
-        process is successful, it will return 1. Otherwise, it will raise an exception specifying the problem.
+        This method attempts to decrypt the specified encrypted file using the provided key.
+        If the decryption process is successful, it will return 1.
+        Otherwise, it will raise an exception specifying the problem.
 
         Args:
             echo (bool, optional): Whether to print a success message after decryption. Default is False.
@@ -187,7 +190,8 @@ class CryptFile:
                     print(
                         f"{Colors.GREEN}{self.filename} decrypted successfully! "
                         f"==> {self.filename}{Colors.RESET}\n"
-                        f"{Colors.YELLOW}Filename left unchanged, could not rename it for some rare reason{Colors.RESET}"
+                        f"{Colors.YELLOW}Filename left unchanged,"
+                        f" could not rename it for some rare reason{Colors.RESET}"
                     )
                 return -1
         except OSError:

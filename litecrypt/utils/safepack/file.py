@@ -1,4 +1,5 @@
-"""This module is used to encrypt and decrypt files of either type str or bytes made only for the GUI"""
+"""This module is used to encrypt and decrypt files of either type str or bytes
+ made only for the GUI"""
 
 
 import os
