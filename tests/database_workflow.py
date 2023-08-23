@@ -4,7 +4,7 @@ from litecrypt.database import spawn
 from litecrypt.datacrypt import Crypt, gen_key, gen_ref
 from litecrypt.filecrypt import CryptFile
 
-from .lab.tools import Names, Vals, create_test_grounds, force_remove, verify_exact
+from .lab.base import Names, Vals, create_test_grounds, force_remove, verify_exact
 
 
 class WorkFlow:
