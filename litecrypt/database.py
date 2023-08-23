@@ -34,10 +34,12 @@ class Database:
         """
         Initialize the database connection and cursor after object creation.
 
-        This method establishes a connection to the database specified by the 'dbname' attribute
+        This method establishes a connection to the database specified by
+        the 'dbname' attribute
         and creates a cursor for executing queries. It also initializes the
         'custom_query' and 'DatabaseError'
-        attributes for executing custom queries and handling database errors respectively.
+        attributes for executing custom queries and handling database
+        errors respectively.
         Additionally, it ensures the specified table exists in the database by invoking
         the 'create_table' method.
         """
@@ -72,7 +74,8 @@ class Database:
         Property to get the last modification time of the Database.
 
         Returns:
-            Union[datetime, DatabaseFailure]: The last modification time as a datetime object if successful,
+            Union[datetime, DatabaseFailure]: The last modification time as
+            a datetime object if successful,
             or a DatabaseFailure object if an error occurs.
         """
         try:
@@ -92,7 +95,8 @@ class Database:
 
         Args:
             tablename (str): The name of the table to set as the current default.
-            If the table exists in the database, it will switch to it; otherwise, it will pass.
+            If the table exists in the database, it will switch to it;
+            otherwise, it will pass.
         """
         tables = [tab[0] for tab in self.show_tables()]
         if tablename in tables:
@@ -102,8 +106,9 @@ class Database:
         """
          Closes the database session and commits pending transactions.
 
-        If there is an active session, this method commits any pending transactions and then closes
-        the session to the SQLite database. It's important to call this method when you're done using
+        If there is an active session, this method commits any pending
+        transactions and then closes the session to the SQLite database.
+        It's important to call this method when you're done using
         the database to ensure proper cleanup and release of resources.
 
         Usage example:
@@ -140,8 +145,10 @@ class Database:
             params (tuple): The parameters to be passed to the query.
 
         Returns:
-            dict: A dictionary containing the query execution status, and the result if successful.
-            If the query fails, it includes the status as "FAILURE" and the error information.
+            dict: A dictionary containing the query execution status,
+            and the result if successful.
+            If the query fails, it includes the status as "FAILURE"
+            and the error information.
         """
         try:
             with self._conn:
@@ -163,7 +170,8 @@ class Database:
         If the table name is not provided, it uses the default table name: 'stash'.
 
         Args:
-            tablename (str, optional): The name of the table to create. Defaults to None.
+            tablename (str, optional): The name of the table to create.
+            Defaults to None.
 
         Returns:
             Union[int, DatabaseFailure]: Returns 1 if the table creation is successful,
@@ -202,8 +210,10 @@ class Database:
         Args:
             filename (str): The name of the file to be inserted.
             content (Union[bytes, str]): The content to be stored in the row.
-            ref (str, optional): The ref associated with the row. Defaults to "STANDALONE".
-            tablename (str, optional): The name of the table to insert into. Defaults to None.
+            ref (str, optional): The ref associated with the row.
+            Defaults to "STANDALONE".
+            tablename (str, optional): The name of the table to insert into.
+            Defaults to None.
 
         Returns:
             Union[int, DatabaseFailure]: Returns 1 if the insertion is successful,
@@ -243,10 +253,13 @@ class Database:
         or the default table
         if no argument is passed.
 
-        :param column_name: The name of the column to be updated must be in the attribute '_columns'.
+        :param column_name: The name of the column to be updated must be
+        in the attribute '_columns'.
         :param new_column_val: The new value to be assigned to the column.
         :param id_: The ID of the row to be updated.
-        :param tablename: The name of the table to update the row in. Default is None for the default table.
+        :param tablename: The name of the table to update the row in.
+        Default is None for the default table.
+
         :return: 1 if the update was successful, or a DatabaseFailure object if there was an error.
         """
         if column_name.lower() not in ["filename", "content", "ref"]:
@@ -310,7 +323,8 @@ class Database:
         self, id_: int, tablename: Optional[str] = None
     ) -> Union[Generator, DatabaseFailure]:
         """
-        Yields a specific row from the specified table or the default table based on a given ID.
+        Yields a specific row from the specified table or the default table
+        based on a given ID.
 
         Args:
             id_ (int): The ID of the row to retrieve.
@@ -357,8 +371,8 @@ class Database:
             *tablenames (str): Names of the tables to retrieve rows from 0 or many.
 
         :returns:
-            Union[Generator, DatabaseFailure]: Generator yielding rows from specified tables,
-             or a DatabaseFailure object if there's an error.
+            Union[Generator, DatabaseFailure]: Generator yielding rows
+            from specified tables, or a DatabaseFailure object if there's an error.
         """
         if tablenames:
             try:
@@ -452,7 +466,8 @@ class Database:
         self, id_: int, tablename: Optional[str] = None
     ) -> Union[int, DatabaseFailure]:
         """
-        Deletes a row from the specified table or the default table based on the given ID.
+        Deletes a row from the specified table or the default table
+        based on the given ID.
 
         Args:
             id_ (int): The ID of the row to be deleted.
@@ -460,7 +475,8 @@ class Database:
             Default is None (uses default table).
 
         Returns:
-            Union[int, DatabaseFailure]: 1 if successful, or a DatabaseFailure object if there's an error.
+            Union[int, DatabaseFailure]: 1 if successful, or a DatabaseFailure object
+            if there's an error.
         """
         try:
             with self._conn:
@@ -497,11 +513,11 @@ def reference_linker(
     Args:
         connection (Database): A connected Database object.
         key_reference (str): The key reference to link with.
-        get_filename (bool, optional): Retrieve the filename(s) associated with the key reference.
-            Default is False.
-        get_content_or_key (bool, optional): Retrieve content(s) associated with the key reference
-            if connected to the main database, or retrieve key(s) if connected to the keys database.
-            Default is False.
+        get_filename (bool, optional): Retrieve the filename(s) associated with
+        the key reference. Default is False.
+        get_content_or_key (bool, optional): Retrieve content(s) associated with
+        the key reference if connected to the main database, or retrieve key(s) if
+        connected to the keys database. Default is False.
         get_all (bool, optional): Retrieve all filenames or all contents/keys.
             If True, fetches all matches; otherwise, only the first match is retrieved.
             Default is False.
@@ -530,7 +546,8 @@ def reference_linker(
             (key_reference,),
         )["result"]
         all_matches_list = [(e[1], e[2], e[3]) for e in data_list]
-        # e[1] is the file name / e[2] is the file content / e[3] is the key reference value
+        # e[1] is the file name / e[2] is the file content / e[3] is the
+        # key reference value
 
         # each trio is representative of the info of one file at once
         filenames_list = [trio[0] for trio in all_matches_list]
@@ -571,14 +588,14 @@ def spawn(
         main_connection (Database): Connection to the main database.
         keys_connection (Database): Connection to the keys' database.
         key_reference (str): The reference key to link with.
-        tablename (str, optional): The name of the table in the databases. Default is 'stash'.
+        tablename (str, optional): The name of the table in the databases.
+        Default is 'stash'.
         directory (str, optional): The directory where files will be created.
         Default is the current directory.
-        get_all (bool, optional): Retrieve and create all files associated with the key_reference.
-            Default is False, indicating retrieval of a single file.
+        get_all (bool, optional): Retrieve and create all files associated
+        with the key_reference. Default is False, indicating retrieval of a single file.
         ignore_duplicate_files (bool, optional): When True, duplicate filenames
-        are ignored during creation.
-            Default is False.
+        are ignored during creation. Default is False.
         echo (bool, optional): Whether to print result information. Default is False.
 
     Returns:
@@ -671,7 +688,8 @@ def spawn(
                 CryptFile.make_file(filename=full_path, content=content)
                 if echo:
                     print(
-                        f"{Colors.GREEN}{full_path} has been spawned successfully.{Colors.RESET}"
+                        f"{Colors.GREEN}{full_path} has been spawned"
+                        f" successfully.{Colors.RESET}"
                     )
             # done with that
             files_in_new_directory = []
@@ -725,7 +743,8 @@ def spawn(
 
             if echo:
                 print(
-                    f"{Colors.GREEN}{filename} has been successfully spawned in the directory: "
+                    f"{Colors.GREEN}{filename} has been successfully"
+                    f" spawned in the directory: "
                     f"{directory}{Colors.RESET}"
                 )
 

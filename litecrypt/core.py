@@ -20,13 +20,16 @@ class EncBase:
     """
     Class to encrypt data of either type bytes or str.
 
-    This class provides the foundation for encrypting data using a specified key. It handles the conversion
-    of messages to bytes if needed and performs the necessary cryptographic operations for encryption.
+    This class provides the foundation for encrypting data using a specified key.
+     It handles the conversion
+    of messages to bytes if needed and performs the necessary cryptographic
+     operations for encryption.
 
     Args:
         message (str,bytes): The message to be encrypted, either as a string or bytes.
         mainkey (str): The main key to derive the HMAC & encryption key from.
-        iterations (int, optional): The number of iterations for key derivation. Default is 50
+        iterations (int, optional): The number of iterations for key derivation.
+         Default is 50
     """
 
     def __init__(
@@ -62,7 +65,8 @@ class EncBase:
         """
         AES Key & HMAC derivation function.
 
-        This method derives encryption and HMAC keys using the specified main key, salt or pepper, and
+        This method derives encryption and HMAC keys using the specified main key,
+         salt or pepper, and
         the number of iterations.
 
         Args:
@@ -108,14 +112,16 @@ class EncBase:
         """
         Verify if a given key is valid.
 
-        This method checks whether a given key is valid by attempting to convert it from hexadecimal
+        This method checks whether a given key is valid by attempting to convert
+         it from hexadecimal
         representation and ensuring its length meets the requirements.
 
         Args:
             key (str): The key to be verified.
 
         Returns:
-            int: 1 if the key is valid, 0 if the key is valid but does not meet length requirements,
+            int: 1 if the key is valid, 0 if the key is valid but does not
+             meet length requirements,
             or -1 if the key is not valid.
         """
         try:
@@ -139,7 +145,8 @@ class EncBase:
         Creates an AES cipher object using the encryption key and CBC mode.
 
         Returns:
-            Cipher: The AES cipher object configured with the encryption key and CBC mode.
+            Cipher: The AES cipher object configured with the encryption key
+             and CBC mode.
         """
         return Cipher(
             algorithms.AES(key=self.enc_key),
@@ -211,7 +218,8 @@ class EncBase:
         -> 'Salt value' -> 'pepper value' -> 'iterations' -> 'ciphertext'.
         Or as a URL safe base64 encoded string of the encrypted bytes' data.
 
-        :param get_bytes: Set to True to get the encrypted data as bytes. Default is False.
+        :param get_bytes: Set to True to get the encrypted data as bytes.
+         Default is False.
         :return: Encrypted data as bytes or URL safe base64 encoded string.
         """
         raw = (
@@ -234,7 +242,8 @@ class DecBase:
     It handles key derivation, verification, and decryption.
 
     Args:
-        message (str, bytes): The encrypted message to be decrypted, either as a string or bytes.
+        message (str, bytes): The encrypted message to be decrypted, either as
+         a string or bytes.
         mainkey (str): The main key to derive the HMAC & decryption key from.
     """
 
@@ -291,7 +300,8 @@ class DecBase:
         Verify the received HMAC-SHA256 against the calculated HMAC.
 
         Returns:
-            bool: True if the received HMAC matches the calculated HMAC, False otherwise.
+            bool: True if the received HMAC matches the calculated HMAC,
+             False otherwise.
         """
         return hmc.compare_digest(self.calculated_hmac(), self.rec_hmac)
 
@@ -309,7 +319,8 @@ class DecBase:
         Creates an AES cipher object using the decryption key and CBC mode.
 
         Returns:
-            Cipher: The AES cipher object configured with the decryption key and CBC mode.
+            Cipher: The AES cipher object configured with the decryption
+             key and CBC mode.
         """
         return Cipher(
             algorithms.AES(key=self.dec_key),
@@ -348,7 +359,8 @@ class DecBase:
         Or as a URL safe base64 encoded string of the decrypted bytes data,
         which is the default return value.
 
-        :param get_bytes: Set to True to get the decrypted data as bytes. Default is False.
+        :param get_bytes: Set to True to get the decrypted data as bytes.
+         Default is False.
         :return: Decrypted data as bytes or URL safe base64 encoded string.
         """
         raw = self.unpadded_message()

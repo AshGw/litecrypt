@@ -134,23 +134,29 @@ class CryptFile:
         """
         Decrypt a given file.
 
-        This method attempts to decrypt the specified encrypted file using the provided key.
+        This method attempts to decrypt the specified encrypted file using
+         the provided key.
         If the decryption process is successful, it will return 1.
         Otherwise, it will raise an exception specifying the problem.
 
         Args:
-            echo (bool, optional): Whether to print a success message after decryption. Default is False.
+            echo (bool, optional): Whether to print a success message after decryption.
+             Default is False.
 
         Returns:
             int: 1 if the decryption process was successful.
 
         Raises:
             exceptions.fixed.GivenDirectoryError: If the provided path is a directory.
-            exceptions.fixed.FileDoesNotExistError: If the specified file does not exist.
+            exceptions.fixed.FileDoesNotExistError: If the specified file does not
+             exist.
             exceptions.fixed.AlreadyDecryptedError: If the file is not encrypted.
-            exceptions.fixed.EmptyContentError: If the file's encrypted content is empty.
-            exceptions.fixed.FileCryptError: If an error occurs during the decryption process.
-            exceptions.fixed.SysError: If a system error occurs during the decryption process.
+            exceptions.fixed.EmptyContentError: If the file's encrypted content
+             is empty.
+            exceptions.fixed.FileCryptError: If an error occurs during
+             the decryption process.
+            exceptions.fixed.SysError: If a system error occurs during
+             the decryption process.
         """
 
         if os.path.isdir(self.filename):

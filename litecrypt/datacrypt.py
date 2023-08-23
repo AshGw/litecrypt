@@ -37,14 +37,16 @@ class Crypt:
         """
         Verify if a given key is valid for usage.
 
-        This function checks whether a given key is valid by attempting to convert it from hexadecimal
+        This function checks whether a given key is valid by attempting
+         to convert it from hexadecimal
         representation and ensuring its length is the required 32 bytes.
 
         Args:
             key (str): The key to be verified.
 
         Returns:
-            int: 1 if the key is valid, 0 if the key is valid but doesn't meet length requirements,
+            int: 1 if the key is valid, 0 if the key is valid but doesn't meet
+             length requirements,
             or -1 if the key is not valid.
         """
         try:
@@ -61,14 +63,16 @@ class Crypt:
         Encrypt the given content, which can be of type bytes or str.
 
         Args:
-            get_bytes (Optional[bool], optional): Set to True if you want to receive the output as bytes.
+            get_bytes (Optional[bool], optional): Set to True if you want
+             to receive the output as bytes.
                 Defaults to False.
 
         Returns:
             Union[bytes, str]: The encrypted content.
 
         Raises:
-            exceptions.fixed.CryptError: If an error occurs during the encryption process.
+            exceptions.fixed.CryptError: If an error occurs during
+             the encryption process.
             exceptions.fixed.EmptyContentError: If the content to be encrypted is empty.
         """
         if self.data:
@@ -85,14 +89,16 @@ class Crypt:
         Decrypt the given content, which can be of type bytes or str.
 
         Args:
-            get_bytes (Optional[bool], optional): Set to True if you want to receive the output as bytes.
+            get_bytes (Optional[bool], optional): Set to True if you
+             want to receive the output as bytes.
                 Defaults to False.
 
         Returns:
             Union[bytes, str]: The decrypted content.
 
         Raises:
-            exceptions.fixed.CryptError: If an error occurs during the decryption process.
+            exceptions.fixed.CryptError: If an error occurs during
+             the decryption process.
             exceptions.fixed.EmptyContentError: If the content to be decrypted is empty.
         """
         if self.data:

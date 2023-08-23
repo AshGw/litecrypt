@@ -76,7 +76,10 @@ class Query:
 
     def size(self) -> Optional[str]:
         if self.engine.type == "sqlite":
-            return "SELECT page_count * page_size FROM pragma_page_count(), pragma_page_size"
+            return (
+                "SELECT page_count * page_size FROM pragma_page_count(),"
+                " pragma_page_size"
+            )
         return None
 
     def create_table(self, *, tablename: str) -> Optional[str]:
@@ -90,7 +93,7 @@ class Query:
     def insert(self, *, tablename: str) -> Optional[str]:
         if self.engine.type == "sqlite":
             return (
-                f"INSERT INTO {tablename} (filename , content ,ref) VALUES (? , ? , ?) "
+                f"INSERT INTO {tablename} (filename , content ,ref) VALUES (? , ? , ?)"
             )
         return None
 
