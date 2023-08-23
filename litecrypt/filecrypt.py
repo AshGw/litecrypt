@@ -69,7 +69,8 @@ class CryptFile:
         Encrypt a given file.
 
         This method attempts to encrypt the specified file using the provided key. If the encryption
-        process is successful, it will return 1. Otherwise, it will raise an exception specifying the problem.
+        process is successful, it will return 1. Otherwise,
+        it will raise an exception specifying the problem.
 
         Args:
             echo (bool, optional): Whether to print a success message after encryption. Default is False.
@@ -112,14 +113,18 @@ class CryptFile:
                 new_filename = self.filename + ".crypt"
                 os.rename(self.filename, new_filename)
                 if echo:
-                    print(f"{Colors.GREEN}{self.filename} encrypted successfully! " f"==> {new_filename}{Colors.RESET}")
+                    print(
+                        f"{Colors.GREEN}{self.filename} encrypted successfully! "
+                        f"==> {new_filename}{Colors.RESET}"
+                    )
                 return 1
             else:
                 if echo:
                     print(
                         f"{Colors.GREEN}{self.filename} encrypted successfully! "
                         f"==> {self.filename}{Colors.RESET}\n"
-                        f"{Colors.YELLOW}Filename left unchanged, could not rename it for some rare reason{Colors.RESET}"
+                        f"{Colors.YELLOW}Filename left unchanged,"
+                        f" could not rename it for some rare reason{Colors.RESET}"
                     )
                 return -1
         except OSError:
@@ -129,22 +134,29 @@ class CryptFile:
         """
         Decrypt a given file.
 
-        This method attempts to decrypt the specified encrypted file using the provided key. If the decryption
-        process is successful, it will return 1. Otherwise, it will raise an exception specifying the problem.
+        This method attempts to decrypt the specified encrypted file using
+         the provided key.
+        If the decryption process is successful, it will return 1.
+        Otherwise, it will raise an exception specifying the problem.
 
         Args:
-            echo (bool, optional): Whether to print a success message after decryption. Default is False.
+            echo (bool, optional): Whether to print a success message after decryption.
+             Default is False.
 
         Returns:
             int: 1 if the decryption process was successful.
 
         Raises:
             exceptions.fixed.GivenDirectoryError: If the provided path is a directory.
-            exceptions.fixed.FileDoesNotExistError: If the specified file does not exist.
+            exceptions.fixed.FileDoesNotExistError: If the specified file does not
+             exist.
             exceptions.fixed.AlreadyDecryptedError: If the file is not encrypted.
-            exceptions.fixed.EmptyContentError: If the file's encrypted content is empty.
-            exceptions.fixed.FileCryptError: If an error occurs during the decryption process.
-            exceptions.fixed.SysError: If a system error occurs during the decryption process.
+            exceptions.fixed.EmptyContentError: If the file's encrypted content
+             is empty.
+            exceptions.fixed.FileCryptError: If an error occurs during
+             the decryption process.
+            exceptions.fixed.SysError: If a system error occurs during
+             the decryption process.
         """
 
         if os.path.isdir(self.filename):
@@ -174,14 +186,18 @@ class CryptFile:
 
                 os.rename(self.filename, new_filename)
                 if echo:
-                    print(f"{Colors.GREEN}{self.filename} decrypted successfully! " f"==> {new_filename}{Colors.RESET}")
+                    print(
+                        f"{Colors.GREEN}{self.filename} decrypted successfully! "
+                        f"==> {new_filename}{Colors.RESET}"
+                    )
                 return 1
             else:
                 if echo:
                     print(
                         f"{Colors.GREEN}{self.filename} decrypted successfully! "
                         f"==> {self.filename}{Colors.RESET}\n"
-                        f"{Colors.YELLOW}Filename left unchanged, could not rename it for some rare reason{Colors.RESET}"
+                        f"{Colors.YELLOW}Filename left unchanged,"
+                        f" could not rename it for some rare reason{Colors.RESET}"
                     )
                 return -1
         except OSError:

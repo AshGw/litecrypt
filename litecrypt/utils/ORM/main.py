@@ -52,13 +52,22 @@ class DatabaseError:
 
 
 class DatabaseFailure:
-    def __init__(self, error: Any, failure: Optional[int] = None, possible_fix: Optional[str] = None):
+    def __init__(
+        self,
+        error: Any,
+        failure: Optional[int] = None,
+        possible_fix: Optional[str] = None,
+    ):
         self.error = error
         self.failure = failure
         self.possible_fix = possible_fix
 
     def get(self):
-        return {"failure": self.failure, "error": self.error, "possible fix": self.possible_fix}
+        return {
+            "failure": self.failure,
+            "error": self.error,
+            "possible fix": self.possible_fix,
+        }
 
 
 class Query:
@@ -67,7 +76,10 @@ class Query:
 
     def size(self) -> Optional[str]:
         if self.engine.type == "sqlite":
-            return "SELECT page_count * page_size FROM pragma_page_count(), pragma_page_size"
+            return (
+                "SELECT page_count * page_size FROM pragma_page_count(),"
+                " pragma_page_size"
+            )
         return None
 
     def create_table(self, *, tablename: str) -> Optional[str]:
@@ -80,7 +92,9 @@ class Query:
 
     def insert(self, *, tablename: str) -> Optional[str]:
         if self.engine.type == "sqlite":
-            return f"INSERT INTO {tablename} (filename , content ,ref) VALUES (? , ? , ?) "
+            return (
+                f"INSERT INTO {tablename} (filename , content ,ref) VALUES (? , ? , ?)"
+            )
         return None
 
     def update(self, *, tablename: str, column_name: str) -> Optional[str]:
@@ -110,7 +124,9 @@ class Query:
                 return "SELECT name FROM sqlite_master WHERE type = 'table'"
         return None
 
-    def drop(self, *, tablename: Optional[str] = None, id: Optional[bool] = False) -> Optional[Union[str, None]]:
+    def drop(
+        self, *, tablename: Optional[str] = None, id: Optional[bool] = False
+    ) -> Optional[Union[str, None]]:
         if self.engine.type == "sqlite":
             if tablename and id:
                 return f"DELETE FROM {tablename} WHERE ID = ?"

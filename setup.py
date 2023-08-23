@@ -2,15 +2,17 @@ from setuptools import find_packages, setup
 
 setup(
     name="litecrypt",
-    version="0.0.1",
+    version="0.0.2",
     author="Ashref Gwader",
     author_email="AshrefGw@proton.me",
     python_requires=">=3.7",
     description="Library to Simplify Encryption and Data Protection",
     long_description_content_type="text/markdown",
-    long_description='Visit The [Website](https://ashgw.github.io/litecrypt/)',
+    long_description="Visit The [Website](https://ashgw.github.io/litecrypt/)",
     url="https://github.com/AshGw/litecrypt.git",
-    packages=find_packages(exclude=["important", "docker-build", ".github","docs","tests"]),
+    packages=find_packages(
+        exclude=["important", "docker-build", ".github", "docs", "tests"]
+    ),
     package_data={
         "litecrypt": ["**"],
     },

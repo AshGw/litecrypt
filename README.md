@@ -2,7 +2,7 @@
 ![workflow](https://github.com/ashgw/litecrypt/actions/workflows/deploy.yaml/badge.svg)
 [![Static Badge](https://img.shields.io/badge/Docs-latest-%237e56c2)](https://ashgw.github.io/litecrypt)
 [![Python Versions](https://img.shields.io/badge/Python-3.7%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue)](https://pypi.org/project/litecrypt/)
-[![Static Badge](https://img.shields.io/badge/PyPI-v0.0.1-brightgreen)](https://pypi.org/project/litecrypt/)
+[![Static Badge](https://img.shields.io/badge/PyPI-latest-brightgreen)](https://pypi.org/project/litecrypt/)
 
 
 

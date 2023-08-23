@@ -1,15 +1,17 @@
 import requests
 
 
-def latest_tag(repo_name):
-    response = requests.get(f"https://hub.docker.com/v2/repositories/{repo_name}/tags/?page_size=1")
+def latest_tag(repo_name: str):
+    response = requests.get(
+        f"https://hub.docker.com/v2/repositories/{repo_name}/tags/?page_size=1"
+    )
     if response.status_code == 200:
         return response.json()["results"][0]["name"]
     else:
         raise Exception("Failed to fetch the latest tag")
 
 
-def generate_compose_content(repo_name):
+def generate_compose_content(repo_name: str):
     latest_tag_value = latest_tag(repo_name)
     service = repo_name.split("/")[1]
     compose_content = f"""
@@ -28,7 +30,7 @@ services:
     return compose_content.strip()
 
 
-def write_compose_file(content, output_path):
+def write_compose_file(content: str, output_path: str):
     with open(output_path, "w") as output_file:
         output_file.write(content)
 

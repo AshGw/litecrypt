@@ -3,7 +3,6 @@ from dataclasses import dataclass
 
 @dataclass
 class Size:
-
     IV: int = 16
     SALT: int = 16
     PEPPER: int = 16
@@ -17,7 +16,6 @@ class Size:
 
 @dataclass
 class Gui:
-
     THEME: str = "vapor"
     TITLE: str = "Litecrypt"
     DIMENSIONS: str = "1500x800"
@@ -25,7 +23,6 @@ class Gui:
 
 @dataclass
 class Colors:
-
     RED: str = "\033[91m"
     GREEN: str = "\033[92m"
     YELLOW: str = "\033[93m"

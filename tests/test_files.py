@@ -2,7 +2,7 @@ import os
 import secrets
 import tempfile
 import unittest
-from unittest.mock import patch, mock_open
+from unittest.mock import mock_open, patch
 
 from litecrypt import CryptFile, gen_key
 from litecrypt.utils.exceptions.fixed import (
@@ -14,6 +14,7 @@ from litecrypt.utils.exceptions.fixed import (
     GivenDirectoryError,
     SysError,
 )
+
 
 class CryptFileModuleTesting(unittest.TestCase):
     def setUp(self) -> None:
@@ -77,6 +78,7 @@ class CryptFileModuleTesting(unittest.TestCase):
 
     def tearDown(self) -> None:
         self.tempdir.cleanup()
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -9,3 +9,6 @@ litecrypt.egg-info
 
 # Docs website no need for that here
 site/
+
+# Folder to test stuff
+playground/
