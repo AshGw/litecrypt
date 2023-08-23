@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="litecrypt",
-    version="0.0.1",
+    version="0.0.2",
     author="Ashref Gwader",
     author_email="AshrefGw@proton.me",
     python_requires=">=3.7",
