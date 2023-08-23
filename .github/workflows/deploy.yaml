@@ -35,10 +35,8 @@ jobs:
           pip install -r important/minimal_requirements.txt
           pip install pytest
 
-      - name: Running core module tests
-        run: pytest tests/test_core.py
-      - name: Running file tests
-        run: pytest tests/test_files.py
+      - name: Running fixed tests
+        run: pytest tests
       - name: Running database workflow tests
         run: pytest tests/database_workflow.py --no-header --no-summary -q
 
