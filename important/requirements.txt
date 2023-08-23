@@ -7,3 +7,5 @@ mkdocs==1.5.2
 mkdocs-material==9.1.21
 pre-commit==3.3.3
 pytest==7.4.0
+black==23.7.0
+flake8==6.1.0
