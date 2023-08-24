@@ -6,15 +6,15 @@
 
 
 
-## Introducing litecrypt: Data Protection Made Simple 🔒
+## 🔒 Encryption Made Simple
 
-Tired of wrestling with passwords and entrusting your private files to sketchy apps? protecting your sensitive data now becomes very simple. No more struggling with intricate code – just powerful data security at your fingertips.
+No more struggling with intricate code – just powerful data security at your fingertips.
 
 
 
 ## 🔑 Effortlessly Secure Encryption!
 
-Worried about complex encryption steps? Don't worry! With litecrypt, encrypting a file is as simple as can be. Check this out:
+No complex encryption steps, encrypting a file is as simple as can be:
 
 ```python
 from litecrypt import CryptFile, gen_key
@@ -33,9 +33,9 @@ print(encrypted)  # Check the return value
 ```
 
 
-## 💾 Secure Database Integration
+## 💾 Database Integration
 
-Got valuable data to stash? litecrypt has your back. For example:
+Got valuable data to stash? litecrypt has your back:
 
 Let's say we have 3 files: `file`, `image.png`, and `notes.txt` in a directory called `test`:
 ```python
@@ -213,17 +213,11 @@ That's it! Try this yourself and see the output in your terminal.
 <br>Feeling confused? Read the [docs](https://ashgw.github.io/litecrypt)
 
 
-## 🚀 Or, Simplify with the App
+## 🚀 Or, Simplify with the GUI
 
 ![alt text](docs/assets/GUI.png)
 
-
-
-## 📦 So What's Under the Hood?
-
-**Library:** : A tool that ensures data safety. It aids in securing information through encryption and decryption processes using the strong AES-256 (CBC) security approach. This isn't limited to just that—it also includes database support for more thorough protection.
-
-**App:** The place where everything comes together. It's a user-friendly software that combines the library's power into an easy-to-use application.
+**The place where everything comes together, a user-friendly software that combines the library's power into an easy-to-use application.**
 
 
 ## 🧙‍♂️ Installation Made Easy
@@ -234,7 +228,7 @@ Starting is a breeze. If you want to use it as a library, just use pip:
 pip install litecrypt
 ```
 
-Want the entire repository? Run this command for a simple setup:
+Want the entire repository? Run this command for auto setup:
 
 ```shell
 curl -sSfL https://raw.githubusercontent.com/AshGw/litecrypt/main/important/setup.sh | bash
@@ -251,13 +245,3 @@ I designed the library's documentation with simplicity in mind. So check out the
 ## 🔐 License
 
 Litecrypt is open-source and licensed under the [MIT License](https://github.com/AshGw/litecrypt/blob/main/LICENSE).
-
-
-
-## 🙌 Acknowledgments
-
-
-Litecrypt is built upon solid encryption principles and draws inspiration from various open-source implementations. It's powered by the widely recognized **'cryptography'** library, making sure data security is not left to chance.
-## 💭 Why ?
-
-I was just looking for a solution to secure my stuff. So, why not make a library of this ?
