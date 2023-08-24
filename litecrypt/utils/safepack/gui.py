@@ -25,24 +25,24 @@ Usage
 First step is to set the main key up
 
 - If you don't have a main key, click the "GENERATE" button to create a secure key.
-- Paste the generated key into the "MAINKEY" field and press "SELECT."
+- Paste the generated key into the "ENC KEY" field and press "SELECT."
 
 Text Encryption:
 
-- Enter your text in the field under the "TEXT ENCRYPTION" label.
+- Enter your text in the field "TEXT".
 - Click "ENCRYPT" to encrypt the text.
 - Optionally, choose to display the encrypted text as a QR code.
 
 Text Decryption:
 
-- Enter the encrypted text in the field under the "TEXT DECRYPTION" label.
+- Enter the encrypted text in the field "CIPHERTEXT"
 - Click "DECRYPT" to decrypt the text.
 - Optionally, choose to display the decrypted text as a QR code.
 
 
 File Encryption:
 
-- Enter the file name or full path in the "FILE PATH" field.
+- Enter the file name or full path in the "FILE" field.
 - Click "ENCRYPT FILE" to encrypt the file.
 - A success message will appear if the encryption is successful,
 along with the addition of the ".crypt" extension.
@@ -89,24 +89,7 @@ The buttons are self-explanatory. Here's a quick overview of their functions:
 
 - "SWITCH DATABASE" toggles between the main database and keys database.
 
-
-- "LAST MODIFICATION": Shows the last database alteration timestamp.
-
-- "SIZE": Displays the current size of the chosen database.
-
-- "LAST ID": Shows the ID of the last insertion.
-
-- "DROP CONTENT BY ID": Drops content by specifying a valid ID.
-
-- "SHOW CONTENT BY ID": Writes specific ID's content to an "output.json" file
-which auto-deletes when you exit the app,
-in the path you chose.
-
-
-- "SHOW ALL TABLE CONTENT": Displays full content of the "stash" table in an "output.json" file.
-
-
-- "QUERY": Execute raw SQLite queries, the result will be in "output.json."
+- "QUERY": Execute raw SQL queries, the result will be in "output.json."
 
 
 - "SPAWN": Extracts file(s) from the database associated with a specific key reference
@@ -151,9 +134,9 @@ databaseFrame.place(rely=0, relx=0)
 
 if platform.system() == "Windows":
     console_label = tk.Label(
-        master=databaseFrame, text="DATABASE OUTPUT CONSOLE", font="Terminal 15 bold"
+        master=databaseFrame, text="DATABASE OUTPUT CONSOLE", font="Calibre 15"
     )
-    console_label.place(relx=0.09, rely=0.04)
+    console_label.place(relx=0.12, rely=0.04)
 
     db_display_text = tk.ScrolledText(
         width=43, height=27, font="terminal 13", wrap="word"
@@ -333,11 +316,11 @@ def drop_content_by_id():
 
 show_all_content_button = tk.Button(
     master=databaseFrame,
-    text="SHOW ALL TABLE CONTENT",
+    text="SHOW ALL CONTENT",
     command=show_all_content,
-    bootstyle="warning outline",
+    bootstyle="light outline",
 )
-show_all_content_button.place(relx=0.287, rely=0.87)
+show_all_content_button.place(relx=0.334, rely=0.87)
 
 
 query_clicks = 1
@@ -387,16 +370,20 @@ query_entry = tk.Entry(
 query_entry.place(relx=0.043, rely=0.742)
 
 query_button = tk.Button(
-    master=databaseFrame, text="RUN QUERY", command=query, bootstyle="warning outline"
+    master=databaseFrame,
+    text="RUN RAW SQL QUERY",
+    command=query,
+    bootstyle="light outline",
+    width=25,
 )
-query_button.place(relx=0.39, rely=0.81)
+query_button.place(relx=0.28, rely=0.81)
 
 
 drop_content_by_id_button = tk.Button(
     master=databaseFrame,
     text="DROP CONTENT BY ID",
     command=drop_content_by_id,
-    bootstyle="warning outline",
+    bootstyle="light outline",
 )
 drop_content_by_id_button.place(relx=0.08, rely=0.93)
 
@@ -410,7 +397,7 @@ show_content_by_id_button = tk.Button(
     master=databaseFrame,
     text="SHOW CONTENT BY ID",
     command=show_content_by_id,
-    bootstyle="warning outline",
+    bootstyle="light outline",
 )
 show_content_by_id_button.place(relx=0.562, rely=0.93)
 
@@ -566,12 +553,12 @@ db_path_result_entry = tk.Label(
 db_path_result_entry.place(relx=0.7, rely=0.022)
 
 path_label = tk.Label(
-    master=lowerFrame, font="Calibre 13 bold", bootstyle="light", text="DATABASES PATH"
+    master=lowerFrame, font="Calibre 13", bootstyle="light", text="PATH"
 )
 path_label.place(relx=0.47, rely=0.022)
 
 main_database_label = tk.Label(
-    master=lowerFrame, font="Calibre 13 bold", bootstyle="light", text="MAIN DATABASE"
+    master=lowerFrame, font="Calibre 13", bootstyle="light", text="MAIN DATABASE"
 )
 main_database_label.place(relx=0.47, rely=0.205)
 
@@ -580,7 +567,7 @@ set_db_path_button = tk.Button(
     text="SUBMIT PATH AND NAME",
     width=49,
     command=path_name_wrapper,
-    bootstyle="info outline",
+    bootstyle="light outline",
 )
 set_db_path_button.place(relx=0.031, rely=0.38)
 
@@ -608,7 +595,7 @@ size_button = tk.Button(
     text="SIZE",
     width=22,
     command=checksize,
-    bootstyle="warning outline",
+    bootstyle="light outline",
 )
 size_button.place(relx=0.031, rely=0.58)
 
@@ -640,7 +627,7 @@ id_button = tk.Button(
     text="LAST ID",
     width=22,
     command=checkid,
-    bootstyle="warning outline",
+    bootstyle="light outline",
 )
 id_button.place(relx=0.247, rely=0.58)
 
@@ -661,7 +648,7 @@ las_mod_button = tk.Button(
     text="LAST MODIFICATION",
     width=49,
     command=check_las_mod,
-    bootstyle="warning outline",
+    bootstyle="light outline",
 )
 las_mod_button.place(relx=0.031, rely=0.74)
 
@@ -705,7 +692,7 @@ switch_db_label = tk.Label(
     master=lowerFrame,
     textvariable=switch_db_label_var,
     bootstyle="light",
-    font="Calibre 13 bold",
+    font="Calibre 13",
 )
 switch_db_label.place(relx=0.52, rely=0.39)
 
@@ -836,10 +823,10 @@ key_ref_entry.place(relx=0.484, rely=0.575)
 spawn_ref_label = tk.Label(
     master=lowerFrame,
     text="#KEYREF",
-    bootstyle="light",
-    font="Calibre 13 bold",
+    bootstyle="secondary",
+    font="Calibre 13",
 )
-spawn_ref_label.place(relx=0.62, rely=0.593)
+spawn_ref_label.place(relx=0.62, rely=0.58)
 
 spawn_me_button = las_mod_button = tk.Button(
     master=lowerFrame,
@@ -921,7 +908,7 @@ decrypt_text_button = tk.Button(
 )
 decrypt_text_button.place(relx=0.42, rely=0.8)
 
-text_encryption_var = tk.StringVar()
+text_encryption_var = tk.StringVar(value="               TEXT")
 text_encryption_entry = tk.Entry(
     master=textFrame1,
     width=20,
@@ -930,7 +917,7 @@ text_encryption_entry = tk.Entry(
 )
 text_encryption_entry.place(relx=0.29, rely=0.30)
 
-text_decryption_var = tk.StringVar()
+text_decryption_var = tk.StringVar(value="        CIPHERTEXT")
 text_decryption_entry = tk.Entry(
     master=textFrame2,
     font="Calibre 11 bold",
@@ -941,16 +928,16 @@ text_decryption_entry.place(relx=0.290, rely=0.38)
 if platform.system() == "Windows":
     text_encryption_label = tk.Label(
         master=textFrame1,
-        text="TEXT ENCRYPTION",
+        text="--------------------------------------------",
         font="Calibre 20",
     )
-    text_encryption_label.place(relx=0.190, rely=0.10)
+    text_encryption_label.place(relx=0.01, rely=0.10)
     text_decryption_label = tk.Label(
         master=textFrame2,
-        text="TEXT DECRYPTION",
+        text="--------------------------------------------",
         font="Calibre 20",
     )
-    text_decryption_label.place(relx=0.190, rely=0.200)
+    text_decryption_label.place(relx=0.01, rely=0.200)
 else:
     text_encryption_label = tk.Label(
         master=textFrame1,
@@ -1030,16 +1017,16 @@ progressbar_dec.place(relx=0.05, rely=0.42)
 if platform.system() == "Windows":
     filepathlabel = tk.Label(
         master=frameFile1,
-        text="FILE PATH",
+        text="F I L E S",
         font="Calibre 20",
     )
-    filepathlabel.place(relx=0.335, rely=0.10)
+    filepathlabel.place(relx=0.385, rely=0.10)
 
-    resultvarfile = tk.StringVar(value="                 .............")
+    resultvarfile = tk.StringVar(value="-----------------------------")
     resultLabelfile = tk.Label(
         master=frameFile1, textvariable=resultvarfile, font="terminal 13 bold"
     )
-    resultLabelfile.place(rely=0.55)
+    resultLabelfile.place(relx=0.2, rely=0.55)
 else:
     filepathlabel = tk.Label(
         master=frameFile1,
@@ -1176,14 +1163,14 @@ encryptionfilebutton = tk.Button(
     master=frameFile1,
     text="ENCRYPT FILE",
     command=enc_file,
-    bootstyle="warning outline",
+    bootstyle="light outline",
 )
 encryptionfilebutton.place(relx=0.25, rely=0.73)
 
 decryptionfilebutton = tk.Button(
-    master=frameFile1, text="DECRYPT FILE", command=decfile, bootstyle="warning outline"
+    master=frameFile1, text="DECRYPT FILE", command=decfile, bootstyle="light outline"
 )
-decryptionfilebutton.place(relx=0.55, rely=0.73)
+decryptionfilebutton.place(relx=0.53, rely=0.73)
 
 filenameStringVar = tk.StringVar(value="")
 
@@ -1194,9 +1181,9 @@ filenametext.place(relx=0.05, rely=0.30)
 
 
 addtodbLabel = tk.Label(
-    master=frameFile1, text="ADD TO DATABASE", font=("Calibre", 11), bootstyle="warning"
+    master=frameFile1, text="ADD TO DB", font=("Calibre", 11), bootstyle="light"
 )
-addtodbLabel.place(relx=0.35, rely=0.908)
+addtodbLabel.place(relx=0.4, rely=0.908)
 
 add_enc_to_db = 0
 
@@ -1242,7 +1229,7 @@ decfiletoolbutt = tk.Checkbutton(
     command=dec_toggle_func,
 )
 decfiletoolbutt.state(["disabled"])
-decfiletoolbutt.place(relx=0.717, rely=0.92)
+decfiletoolbutt.place(relx=0.7, rely=0.92)
 
 
 keySelectionFlag = tk.IntVar(value=0)
@@ -1277,11 +1264,11 @@ def main_key_wrapper():
 if platform.system() == "Windows":
     mainkeyLabel = tk.Label(
         master=frameFile2,
-        text="MAIN KEY",
+        text="E N C   K E Y",
         font="Calibre 20",
         bootstyle="info",
     )
-    mainkeyLabel.place(relx=0.3, rely=0.075)
+    mainkeyLabel.place(relx=0.21, rely=0.075)
 else:
     mainkeyLabel = tk.Label(
         master=frameFile2,
@@ -1317,7 +1304,7 @@ def keyref_gen():
     outputKeyref.set(ref)
 
 
-outputKeyref = tk.StringVar(value="#XXXXXX")
+outputKeyref = tk.StringVar(value="#KEYREF")
 keyrefLabel = tk.Label(
     master=frameFile2,
     textvariable=outputKeyref,
@@ -1340,7 +1327,7 @@ keyselectionLabel = tk.Label(
     master=frameFile2,
     textvariable=keyselectionvar,
     bootstyle="info",
-    font="terminal 11 bold",
+    font="terminal 11",
 )
 keyselectionLabel.place(relx=0.15, rely=0.465, height=50)
 
