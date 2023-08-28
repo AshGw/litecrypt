@@ -5,9 +5,15 @@ import unittest
 from unittest.mock import mock_open, patch
 
 from litecrypt import CryptFile, gen_key
-from litecrypt.utils.exceptions.fixed import (AlreadyDecryptedError, AlreadyEncryptedError,
-                                              EmptyContentError, FileCryptError, FileDoesNotExistError,
-                                              GivenDirectoryError, SysError)
+from litecrypt.utils.exceptions.fixed import (
+    AlreadyDecryptedError,
+    AlreadyEncryptedError,
+    EmptyContentError,
+    FileCryptError,
+    FileDoesNotExistError,
+    GivenDirectoryError,
+    SysError,
+)
 
 
 class CryptFileModuleTesting(unittest.TestCase):
