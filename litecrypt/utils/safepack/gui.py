@@ -1022,11 +1022,11 @@ if platform.system() == "Windows":
     )
     filepathlabel.place(relx=0.385, rely=0.10)
 
-    resultvarfile = tk.StringVar(value="-----------------------------")
+    resultvarfile = tk.StringVar(value="     -----------------------------------")
     resultLabelfile = tk.Label(
         master=frameFile1, textvariable=resultvarfile, font="terminal 13 bold"
     )
-    resultLabelfile.place(relx=0.2, rely=0.55)
+    resultLabelfile.place(rely=0.55)
 else:
     filepathlabel = tk.Label(
         master=frameFile1,
