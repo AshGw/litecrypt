@@ -51,10 +51,7 @@ class Crypt:
         """
         try:
             a = bytes.fromhex(key.strip())
-            if len(a) == 32:
-                return 1
-            else:
-                return 0
+            return 1 if len(a) == 32 else 0
         except ValueError:
             return -1
 
@@ -79,10 +76,9 @@ class Crypt:
             try:
                 ins = EncBase(self.data, self.key)
                 return ins.encrypt(get_bytes=True) if get_bytes else ins.encrypt()
-            except BaseException:
-                raise exceptions.fixed.CryptError()
-        else:
-            raise exceptions.fixed.EmptyContentError()
+            except BaseException as exc:
+                raise exceptions.fixed.CryptError() from exc
+        raise exceptions.fixed.EmptyContentError()
 
     def decrypt(self, get_bytes: Optional[bool] = False) -> Union[str, bytes]:
         """
@@ -109,10 +105,9 @@ class Crypt:
                     if get_bytes
                     else dec_instance.decrypt()
                 )
-            except BaseException:
-                raise exceptions.fixed.CryptError()
-        else:
-            raise exceptions.fixed.EmptyContentError()
+            except BaseException as exc:
+                raise exceptions.fixed.CryptError() from exc
+        raise exceptions.fixed.EmptyContentError()
 
 
 def gen_ref(n: int = 6) -> str:
