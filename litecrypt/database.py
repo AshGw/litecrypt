@@ -563,7 +563,7 @@ def reference_linker(
         # conn[1] == filename column containing the first filename it matches
 
 
-def spawn_single_file(
+def _spawn_single_file(
     main_connection: Database,
     keys_connection: Database,
     key_reference: str,
@@ -571,10 +571,57 @@ def spawn_single_file(
     directory: Optional[str] = ".",
     echo: Optional[bool] = False,
 ) -> Dict[str, Any]:
-    ...
+    try:
+        content = reference_linker(
+            connection=main_connection,
+            key_reference=key_reference,
+            get_content_or_key=True,
+            tablename=tablename,
+        )
+        path = reference_linker(
+            connection=main_connection,
+            key_reference=key_reference,
+            get_filename=True,
+            tablename=tablename,
+        )
+        filename = os.path.split(path)[1]
+
+        key = reference_linker(
+            connection=keys_connection,
+            key_reference=key_reference,
+            get_content_or_key=True,
+            tablename=tablename,
+        )
+
+        if CryptFile.key_verify(key) != 1 and key != "STANDALONE":
+            raise ValueError(
+                "Invalid key, check if Database object placement is correct."
+            )
+
+        full_path = os.path.join(directory, filename)
+
+        CryptFile.make_file(filename=full_path, content=content)
+
+        if echo:
+            print(
+                f"{Colors.GREEN}{filename} has been successfully"
+                f" spawned in the directory: "
+                f"{directory}{Colors.RESET}"
+            )
+
+        return {
+            "status": "SUCCESS",
+            "filenames": [
+                os.path.join(directory, filename)
+            ],  # made lists out of them for easy exec
+            "contents": [content],
+            "keys": [key],
+        }
+    except BaseException:
+        pass
 
 
-def spawn_all_files(
+def _spawn_all_files(
     main_connection: Database,
     keys_connection: Database,
     key_reference: str,
@@ -583,7 +630,88 @@ def spawn_all_files(
     ignore_duplicate_files: Optional[bool] = False,
     echo: Optional[bool] = False,
 ) -> Dict[str, Any]:
-    ...
+    try:
+        keys_list = reference_linker(
+            connection=keys_connection,
+            key_reference=key_reference,
+            get_content_or_key=True,
+            get_all=True,
+            tablename=tablename,
+        )
+        for key in keys_list:
+            if CryptFile.key_verify(key) != 1 and key != "STANDALONE":
+                raise ValueError(
+                    "Invalid key for cryptographic usage detected, mismatch found"
+                    " check if Database object placement is correct."
+                )
+
+        contents_list = reference_linker(
+            connection=main_connection,
+            key_reference=key_reference,
+            get_content_or_key=True,
+            get_all=True,
+            tablename=tablename,
+        )
+        paths_list = reference_linker(
+            connection=main_connection,
+            key_reference=key_reference,
+            get_filename=True,
+            get_all=True,
+            tablename=tablename,
+        )
+
+        filenames_list = [os.path.basename(path) for path in paths_list]
+
+        if ignore_duplicate_files:
+            seen_filenames = {}
+            duplicate_indexes = []
+
+            for index, filename in enumerate(filenames_list):
+                if filename in seen_filenames:
+                    duplicate_indexes.append(index)
+                else:
+                    seen_filenames[filename] = index
+
+            # Removing duplicates from the lists using the collected indexes
+            filenames_list[:] = [
+                filename
+                for index, filename in enumerate(filenames_list)
+                if index not in duplicate_indexes
+            ]
+            contents_list[:] = [
+                content
+                for index, content in enumerate(contents_list)
+                if index not in duplicate_indexes
+            ]
+            keys_list[:] = [
+                key
+                for index, key in enumerate(keys_list)
+                if index not in duplicate_indexes
+            ]
+
+        # The creation of the extracted files in the specified directory
+        full_paths_list = [
+            os.path.join(directory, os.path.split(path)[1]) for path in filenames_list
+        ]
+        for full_path, content in zip(full_paths_list, contents_list):
+            CryptFile.make_file(filename=full_path, content=content)
+            if echo:
+                print(
+                    f"{Colors.GREEN}{full_path} has been spawned"
+                    f" successfully.{Colors.RESET}"
+                )
+        files_in_new_directory = [
+            os.path.join(directory, file) for file in filenames_list
+        ]
+        return {
+            "status": "SUCCESS",
+            "filenames": files_in_new_directory,
+            "contents": contents_list,
+            "keys": keys_list,
+        }
+
+    except Exception as e:
+        raise e
 
 
 def spawn(
@@ -631,7 +759,7 @@ def spawn(
     if main_connection is keys_connection:
         raise ValueError("Main and keys databases must be different")
 
-    if not os.path.isdir(directory):
+    elif not os.path.isdir(directory):
         raise ValueError("Provide a valid directory")
     result = {
         "status": "FAILURE",
@@ -641,140 +769,24 @@ def spawn(
     }
 
     if get_all:
-        try:
-            keys_list = reference_linker(
-                connection=keys_connection,
-                key_reference=key_reference,
-                get_content_or_key=True,
-                get_all=True,
-                tablename=tablename,
-            )
-            for key in keys_list:
-                if CryptFile.key_verify(key) != 1 and key != "STANDALONE":
-                    raise ValueError(
-                        "Invalid key for cryptographic usage detected, mismatch found"
-                        " check if Database object placement is correct."
-                    )
-
-            contents_list = reference_linker(
-                connection=main_connection,
-                key_reference=key_reference,
-                get_content_or_key=True,
-                get_all=True,
-                tablename=tablename,
-            )
-            paths_list = reference_linker(
-                connection=main_connection,
-                key_reference=key_reference,
-                get_filename=True,
-                get_all=True,
-                tablename=tablename,
-            )
-
-            filenames_list = [os.path.basename(path) for path in paths_list]
-
-            if ignore_duplicate_files:
-                seen_filenames = {}
-                duplicate_indexes = []
-
-                for index, filename in enumerate(filenames_list):
-                    if filename in seen_filenames:
-                        duplicate_indexes.append(index)
-                    else:
-                        seen_filenames[filename] = index
-
-                # Removing duplicates from the lists using the collected indexes
-                filenames_list[:] = [
-                    filename
-                    for index, filename in enumerate(filenames_list)
-                    if index not in duplicate_indexes
-                ]
-                contents_list[:] = [
-                    content
-                    for index, content in enumerate(contents_list)
-                    if index not in duplicate_indexes
-                ]
-                keys_list[:] = [
-                    key
-                    for index, key in enumerate(keys_list)
-                    if index not in duplicate_indexes
-                ]
-
-            # The creation of the extracted files in the specified directory
-            full_paths_list = [
-                os.path.join(directory, os.path.split(path)[1])
-                for path in filenames_list
-            ]
-            for full_path, content in zip(full_paths_list, contents_list):
-                CryptFile.make_file(filename=full_path, content=content)
-                if echo:
-                    print(
-                        f"{Colors.GREEN}{full_path} has been spawned"
-                        f" successfully.{Colors.RESET}"
-                    )
-            files_in_new_directory = [
-                os.path.join(directory, file) for file in filenames_list
-            ]
-            result = {
-                "status": "SUCCESS",
-                "filenames": [os.path.join(directory, file) for file in filenames_list],
-                "contents": contents_list,
-                "keys": keys_list,
-            }
-
-        except Exception as e:
-            raise e
-
-    else:
-        try:
-            content = reference_linker(
-                connection=main_connection,
-                key_reference=key_reference,
-                get_content_or_key=True,
-                tablename=tablename,
-            )
-            path = reference_linker(
-                connection=main_connection,
-                key_reference=key_reference,
-                get_filename=True,
-                tablename=tablename,
-            )
-            filename = os.path.split(path)[1]
-
-            key = reference_linker(
-                connection=keys_connection,
-                key_reference=key_reference,
-                get_content_or_key=True,
-                tablename=tablename,
-            )
-
-            if CryptFile.key_verify(key) != 1 and key != "STANDALONE":
-                raise ValueError(
-                    "Invalid key, check if Database object placement is correct."
-                )
-
-            full_path = os.path.join(directory, filename)
-
-            CryptFile.make_file(filename=full_path, content=content)
-
-            if echo:
-                print(
-                    f"{Colors.GREEN}{filename} has been successfully"
-                    f" spawned in the directory: "
-                    f"{directory}{Colors.RESET}"
-                )
-
-            result = {
-                "status": "SUCCESS",
-                "filenames": [
-                    os.path.join(directory, filename)
-                ],  # made lists out of them for easy exec
-                "contents": [content],
-                "keys": [key],
-            }
-        except BaseException:
-            pass
-
+        result = _spawn_all_files(
+            main_connection=main_connection,
+            keys_connection=keys_connection,
+            key_reference=key_reference,
+            tablename=tablename,
+            directory=directory,
+            ignore_duplicate_files=ignore_duplicate_files,
+            echo=echo,
+        )
+    elif not get_all:
+        result = _spawn_single_file(
+            main_connection=main_connection,
+            keys_connection=keys_connection,
+            key_reference=key_reference,
+            tablename=tablename,
+            directory=directory,
+            echo=echo,
+        )
     _echo_dict(echo=echo, dictionnary=result)
     return result
 
