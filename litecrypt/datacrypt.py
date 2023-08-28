@@ -29,8 +29,8 @@ class Crypt:
         Raises:
             exceptions.dynamic.KeyLengthError: If the provided key is invalid.
         """
-        if self.key_verify(self.key) != 1: raise exceptions.dynamic.KeyLengthError()
-
+        if self.key_verify(self.key) != 1:
+            raise exceptions.dynamic.KeyLengthError()
 
     @staticmethod
     def key_verify(key: str) -> int:

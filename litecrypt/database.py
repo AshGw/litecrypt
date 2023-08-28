@@ -573,6 +573,7 @@ def spawn_single_file(
 ) -> Dict[str, Any]:
     ...
 
+
 def spawn_all_files(
     main_connection: Database,
     keys_connection: Database,
@@ -583,9 +584,6 @@ def spawn_all_files(
     echo: Optional[bool] = False,
 ) -> Dict[str, Any]:
     ...
-
-
-
 
 
 def spawn(
@@ -776,7 +774,6 @@ def spawn(
             }
         except BaseException:
             pass
-
 
     _echo_dict(echo=echo, dictionnary=result)
     return result
