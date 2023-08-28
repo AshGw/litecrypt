@@ -63,8 +63,7 @@ class Database:
             with self._conn:
                 self._c.execute(self.custom_query.size())
                 size_info = self._c.fetchone()
-                size = size_info[0] / 1024 / 1024
-                return size
+                return size_info[0] / 1024 / 1024
         except self.DatabaseError as e:
             return DatabaseFailure(failure=1, error=e).get()
 
@@ -79,8 +78,7 @@ class Database:
             or a DatabaseFailure object if an error occurs.
         """
         try:
-            time_stat = datetime.fromtimestamp(os.stat(self.dbname).st_mtime)
-            return time_stat
+            return datetime.fromtimestamp(os.stat(self.dbname).st_mtime)
         except OSError as e:
             return DatabaseFailure(failure=1, error=e).get()
 
@@ -555,7 +553,7 @@ def reference_linker(
 
         return file_content_or_keys_list if get_content_or_key else filenames_list
 
-    elif not get_all:
+    else:
         data = connection.query(
             Query(engine=engine).select(tablename=tablename, all=True, ref=True),
             (key_reference,),
@@ -563,6 +561,31 @@ def reference_linker(
         return data[2] if get_content_or_key else data[1]
         # conn[2] == content column content containing the first content it matches
         # conn[1] == filename column containing the first filename it matches
+
+
+def spawn_single_file(
+    main_connection: Database,
+    keys_connection: Database,
+    key_reference: str,
+    tablename: Optional[str] = "stash",
+    directory: Optional[str] = ".",
+    echo: Optional[bool] = False,
+) -> Dict[str, Any]:
+    ...
+
+def spawn_all_files(
+    main_connection: Database,
+    keys_connection: Database,
+    key_reference: str,
+    tablename: Optional[str] = "stash",
+    directory: Optional[str] = ".",
+    ignore_duplicate_files: Optional[bool] = False,
+    echo: Optional[bool] = False,
+) -> Dict[str, Any]:
+    ...
+
+
+
 
 
 def spawn(
@@ -691,11 +714,9 @@ def spawn(
                         f"{Colors.GREEN}{full_path} has been spawned"
                         f" successfully.{Colors.RESET}"
                     )
-            # done with that
-            files_in_new_directory = []
-            for file in filenames_list:
-                files_in_new_directory.append(os.path.join(directory, file))
-
+            files_in_new_directory = [
+                os.path.join(directory, file) for file in filenames_list
+            ]
             result = {
                 "status": "SUCCESS",
                 "filenames": [os.path.join(directory, file) for file in filenames_list],
@@ -705,9 +726,6 @@ def spawn(
 
         except Exception as e:
             raise e
-
-        _echo_dict(echo=echo, dictionnary=result)
-        return result
 
     else:
         try:
@@ -759,9 +777,9 @@ def spawn(
         except BaseException:
             pass
 
-        _echo_dict(echo=echo, dictionnary=result)
 
-        return result
+    _echo_dict(echo=echo, dictionnary=result)
+    return result
 
 
 def _echo_dict(dictionnary: dict, echo: Optional[bool] = False):
