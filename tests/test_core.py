@@ -2,8 +2,8 @@ import struct
 import unittest
 
 import litecrypt.core as lc
+from litecrypt.consts import Size
 from litecrypt.utils import exceptions
-from litecrypt.utils.consts import Size
 
 
 class CoreModuleTesting(unittest.TestCase):

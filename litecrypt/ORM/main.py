@@ -2,7 +2,7 @@ import sqlite3
 from dataclasses import dataclass
 from typing import Any, Optional, Type, Union, overload
 
-# Ok, could've used an actual ORM but why not make one real quick ?
+# Ok, could've used an actual ORM but why not make a knock-off one real quick, still works tho.
 
 
 class Connection:

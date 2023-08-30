@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="litecrypt",
-    version="0.0.5",
+    version="0.0.6",
     author="Ashref Gwader",
     author_email="AshrefGw@proton.me",
     python_requires=">=3.7",
@@ -21,7 +21,7 @@ setup(
     },
     install_requires=[
         "bcrypt==4.0.1",
-        "cryptography==40.0.5",
+        "cryptography==40.0.6",
         "qrcode==7.4.2",
         "ttkbootstrap==1.10.1",
     ],

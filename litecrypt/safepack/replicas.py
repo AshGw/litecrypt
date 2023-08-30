@@ -1,10 +1,78 @@
-"""This module is used to encrypt and decrypt files of either type str or bytes
- made only for the GUI"""
-
-
 import os
+from typing import Union
+
+import qrcode
 
 from litecrypt import core
+
+
+def tqr(text: str) -> Union[int, tuple]:
+    try:
+        qr = qrcode.QRCode(
+            version=10,
+            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            box_size=20,
+            border=1,
+        )
+        qr.add_data(text.strip())
+        qr.make(fit=True)
+        img = qr.make_image(fill_color="black", back_color="white")
+        img.show()
+        return 1
+
+    except Exception as e:
+        return 0, e
+
+
+class Crypt:
+    def __init__(self, text: Union[str, bytes], key: str):
+        self.text = text
+        if self.keyverify(key) == 1:
+            self.key = key
+        else:
+            raise ValueError("Key must be 256 Bit long !")
+
+    @staticmethod
+    def genkey() -> str:
+        return core.EncBase.gen_key()
+
+    @staticmethod
+    def keyverify(key: str) -> int:
+        if isinstance(key, str):
+            try:
+                a = bytes.fromhex(key.strip())
+                if len(a) == 32:
+                    return 1
+            except Exception:
+                return 0
+
+        else:
+            return 2
+
+    def encrypt(self) -> tuple:
+        if self.text:
+            try:
+                ins = core.EncBase(self.text, self.key)
+                new_content = ins.encrypt()
+                return 1, new_content
+            except BaseException:
+                output = "E"
+                return 0, output
+        else:
+            return 0.0, "Empty"
+
+    def decrypt(self) -> tuple:
+        if self.text:
+            try:
+                dec_instance = core.DecBase(message=self.text, mainkey=self.key)
+                a = dec_instance.decrypt()
+                output = a
+                return 1, output
+            except Exception:
+                output = self.text
+                return 0, output
+        else:
+            return 0.0, "Empty"
 
 
 class CryptFile:

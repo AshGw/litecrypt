@@ -9,10 +9,8 @@ import string
 import ttkbootstrap as tk
 
 import litecrypt.database as ld
-import litecrypt.utils.safepack.file as lf
-import litecrypt.utils.safepack.text as lt
-from litecrypt.utils.consts import Gui
-from litecrypt.utils.safepack import qr
+from litecrypt.consts import Gui
+from litecrypt.safepack.replicas import Crypt, CryptFile, tqr
 
 """--------------------------------HOW TO ?------------------------"""
 gui_usage_manual = f"""This is the Database Output Console,
@@ -858,30 +856,30 @@ how_to_button.place(relx=0.95, rely=0.8)
 
 def encryption():
     m = text_encryption_var.get()
-    if lf.CryptFile.keyverify(mainkeyvar.get()) == 1 and keySelectionFlag.get() == 1:
+    if CryptFile.keyverify(mainkeyvar.get()) == 1 and keySelectionFlag.get() == 1:
         if len(m) > 200:
             text_encryption_output_var.set("Too Long")
         else:
             if text_encryption_var.get():
                 progressbar_enc.start()
-                a = lt.Crypt(m, mainkeyvar.get())
+                a = Crypt(m, mainkeyvar.get())
                 b = a.encrypt()[1]
                 text_encryption_output_var.set(b.__str__())
                 if qr_enc_var.get() == 1:
-                    qr.tqr(b)
+                    tqr(b)
 
 
 def decryption():
     n = text_decryption_var.get()
-    if lf.CryptFile.keyverify(mainkeyvar.get()) == 1 and keySelectionFlag.get() == 1:
+    if CryptFile.keyverify(mainkeyvar.get()) == 1 and keySelectionFlag.get() == 1:
         if text_decryption_var.get():
             progressbar_dec.start()
-            a = lt.Crypt(n, mainkeyvar.get())
+            a = Crypt(n, mainkeyvar.get())
             b = a.decrypt()[1]
             text_decryption_output_var.set(b.__str__())
             if qr_dec_var.get() == 1:
                 if not len(b) > 200:
-                    qr.tqr(b)
+                    tqr(b)
 
 
 def qr_enc_func():
@@ -1047,7 +1045,7 @@ def enc_file():
         if keySelectionFlag.get() != 0:
             filename = filenameStringVar.get().strip()
             key = mainkey
-            target = lf.CryptFile(filename, key)
+            target = CryptFile(filename, key)
             a = target.encrypt()
             if a == 1:
                 filename = filename + ".crypt"
@@ -1106,7 +1104,7 @@ def decfile():
         if keySelectionFlag.get() != 0:
             filename = filenameStringVar.get().strip()
             key = mainkey
-            target = lf.CryptFile(filename, key)
+            target = CryptFile(filename, key)
             a = target.decrypt()
             if a == 1:
                 filename = os.path.splitext(filename)[0]
@@ -1237,7 +1235,7 @@ keySelectionFlag = tk.IntVar(value=0)
 
 def main_key_wrapper():
     global success_keysdb_connection_blocker, mainkey
-    if lf.CryptFile.keyverify(mainkeyvar.get().strip()) == 1:
+    if CryptFile.keyverify(mainkeyvar.get().strip()) == 1:
         mainkey = mainkeyvar.get().strip()
         keyref_gen()
         keyselectionvar.set("       SELECTED")
@@ -1333,7 +1331,7 @@ keyselectionLabel.place(relx=0.15, rely=0.465, height=50)
 
 
 def genkey():
-    keyGenVar.set(lf.CryptFile.genkey())
+    keyGenVar.set(CryptFile.genkey())
 
 
 keyGenVar = tk.StringVar(value="")
