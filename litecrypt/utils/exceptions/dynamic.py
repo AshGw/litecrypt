@@ -1,6 +1,6 @@
 from typing import Any
 
-from litecrypt.utils.consts import Size
+from litecrypt.consts import Size
 
 
 class IterationsOutofRangeError(Exception):

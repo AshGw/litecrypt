@@ -4,9 +4,9 @@ from collections import deque
 from typing import Optional
 from uuid import uuid4
 
+from litecrypt.consts import Colors
 from litecrypt.database import Database
 from litecrypt.filecrypt import CryptFile
-from litecrypt.utils.consts import Colors
 
 
 class Names:

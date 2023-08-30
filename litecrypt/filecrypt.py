@@ -5,9 +5,9 @@ from dataclasses import dataclass, field
 from typing import Optional, Union
 
 from litecrypt import core
+from litecrypt.consts import Colors
 from litecrypt.datacrypt import Crypt
 from litecrypt.utils import exceptions
-from litecrypt.utils.consts import Colors
 
 
 @dataclass

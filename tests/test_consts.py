@@ -1,6 +1,6 @@
 import unittest
 
-from litecrypt.utils.consts import Size
+from litecrypt.consts import Size
 
 
 class ConstsTesting(unittest.TestCase):
