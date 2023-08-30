@@ -1,5 +1,4 @@
 import unittest
-from uuid import uuid4
 
 from litecrypt.datacrypt import Crypt, gen_key
 from litecrypt.utils.exceptions.fixed import CryptError, EmptyContentError
@@ -8,7 +7,7 @@ from litecrypt.utils.exceptions.fixed import CryptError, EmptyContentError
 class DataTesting(unittest.TestCase):
     def setUp(self) -> None:
         self.key = gen_key()
-        self.message = uuid4().hex
+        self.message = "fixed message"
         self.bytes_message = self.message.encode("UTF-8")
 
     def test_strings(self):
