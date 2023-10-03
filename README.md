@@ -6,9 +6,11 @@
 
 
 
-## 🔒 Encryption Made Simple
+## 🔒 Encryption & Data Storage Made Simple
 
-No more struggling with intricate code – just powerful data security at your fingertips.
+**Embed in Code**: Easily integrated into your existing codebase with just a few lines.
+
+**Use the GUI**: Zero coding required! Enjoy the full functionality of the library through the intuitive GUI.
 
 
 
@@ -34,8 +36,12 @@ print(encrypted)  # Check the return value
 
 
 ## 💾 Database Integration
+<h3>Databases</h3>
 
-Got valuable data to stash? litecrypt has your back:
+Currently supports MySQL, PostgreSQL and SQLite, check the [docs](https://ashgw.github.io/litecrypt) for more info.
+
+<h3>Example Usage</h3>
+Got valuable data to keep safe? litecrypt has your back:
 
 Let's say we have 3 files: `file`, `image.png`, and `notes.txt` in a directory called `test`:
 ```python
@@ -92,9 +98,9 @@ Now that we have their content encrypted we need storage
 ```python
 from litecrypt import Database, gen_ref
 
-# Create & connect to the databases
+# Create & connect to the databases (sqlite for simplicity)
 main_db = Database('secure_vault.db')
-keys_db = Database('secure_vaultKeys.db')
+keys_db = Database('secure_vaultKeys.db',for_keys=True) # Specify it's for keys
 
 # Generate a key reference value to link up the two databases with
 key_ref = gen_ref()
@@ -105,6 +111,7 @@ for file, encrypted_content in zip(files, encrypted_contents):
     keys_db.insert(filename=f'does-not-matter/{file}.crypt', content=key, ref=key_ref)
 # Add .crypt to indicate they're encrypted
 ```
+
 Done! Your files are still in `test/`, but you now have encrypted copies of them in the main database.
 <br>The keys used for encryption are stored in the keys database.
 <br>You can encrypt your keys database too, but for this demo, let it be as is.
@@ -173,10 +180,9 @@ for content in file_contents:
     encrypted_content = Crypt(content, key).encrypt(get_bytes=True)
     encrypted_contents.append(encrypted_content)
 
-
 # Initialize the main & the associated keys database
 main_db = Database("secure_vault.db")
-keys_db = Database("secure_vaultKeys.db")  # to hold the keys
+keys_db = Database("secure_vaultKeys.db",for_keys=True)  # Specify it's for keys
 
 # Generate a key reference value to link up the two databases with
 key_ref = gen_ref()
@@ -219,6 +225,12 @@ That's it! Try this yourself and see the output in your terminal.
 
 **The place where everything comes together, a user-friendly software that combines the library's power into an easy-to-use application.**
 
+<details><summary>Check the GUI demo</summary>
+
+https://github.com/AshGw/litecrypt/assets/126174609/190b6ab8-3f8a-4656-9525-dbaf5e56db5e
+
+</details>
+
 
 ## 🧙‍♂️ Installation Made Easy
 
@@ -228,17 +240,17 @@ Starting is a breeze. If you want to use it as a library, just use pip:
 pip install litecrypt
 ```
 
-Want the entire repository? Run this command for auto setup:
+For the entire repository? Run this command for auto setup:
 
 ```shell
-curl -sSfL https://raw.githubusercontent.com/AshGw/litecrypt/main/important/setup.sh | bash
+curl -sSfL https://raw.githubusercontent.com/AshGw/litecrypt/main/scripts/setup/setup.sh | bash
 ```
 
 
 
 ## 📚 Dive into the Docs
 
-I designed the library's documentation with simplicity in mind. So check out the [Docs](https://ashgw.github.io/litecrypt).
+I designed the library's documentation with simplicity in mind. So check out the **[Docs](https://ashgw.github.io/litecrypt)**.
 
 
 

@@ -1,6 +1,6 @@
 import unittest
 
-from litecrypt.datacrypt import Crypt, gen_key
+from litecrypt.core.datacrypt import Crypt, gen_key
 from litecrypt.utils.exceptions.fixed import CryptError, EmptyContentError
 
 

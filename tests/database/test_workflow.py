@@ -1,10 +1,10 @@
 import os
 
-from litecrypt.database import spawn
-from litecrypt.datacrypt import Crypt, gen_key, gen_ref
-from litecrypt.filecrypt import CryptFile
+from litecrypt.core.datacrypt import Crypt, gen_key, gen_ref
+from litecrypt.core.filecrypt import CryptFile
+from litecrypt.mapper.database import spawn
 
-from .lab.base import Names, Vals, create_test_grounds, force_remove, verify_exact
+from ..lab.main import Names, Vals, create_test_grounds, force_remove, verify_exact
 
 
 class WorkFlow:

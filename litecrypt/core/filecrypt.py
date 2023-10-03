@@ -4,10 +4,10 @@ import os
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
-from litecrypt import core
-from litecrypt.consts import Colors
-from litecrypt.datacrypt import Crypt
+import litecrypt.core.base as core
+from litecrypt.core.datacrypt import Crypt
 from litecrypt.utils import exceptions
+from litecrypt.utils.consts import Colors
 
 
 @dataclass

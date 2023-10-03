@@ -1,7 +1,7 @@
 import sys
 import warnings
 
-from litecrypt.safepack.gui import main_object
+from litecrypt.core.safepack.gui import main_object
 
 if (
     sys.version_info.major <= 3

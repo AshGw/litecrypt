@@ -4,9 +4,9 @@ from collections import deque
 from typing import Optional
 from uuid import uuid4
 
-from litecrypt.consts import Colors
-from litecrypt.database import Database
-from litecrypt.filecrypt import CryptFile
+from litecrypt.core.filecrypt import CryptFile
+from litecrypt.mapper.database import Database
+from litecrypt.utils.consts import Colors
 
 
 class Names:
@@ -19,7 +19,7 @@ class Names:
 
 class Vals:
     MAIN_DB = Database(Names.MAIN_DB)
-    KEYS_DB = Database(Names.KEYS_DB)
+    KEYS_DB = Database(Names.KEYS_DB, for_keys=True)
     FILE_CONTENTS = [uuid4().bytes for _ in range(len(Names.FILES))]
 
 

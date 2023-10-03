@@ -10,7 +10,7 @@
 Litecrypt is a minimal library that provides a simple solution for encrypting and decrypting data and files. Prioritizing both security and ease of use, by employing AES-256 encryption in CBC mode. The library offers the added benefit of secure storage, ensuring the protection of sensitive information. For those seeking a user-friendly experience, an accompanying graphical user interface is also available.
 
 ## Key Features
-- **Minimalism:** It's all about simplicity. No convoluted code, no more wrestling with complex and unintuitive crypto libraries. You can achieve more with less.
+- **Minimalism:** No convoluted code, no more wrestling with complex and unintuitive crypto libraries. You can achieve more with less.
 - **User-Friendly App:** Even if you don't want to write code, an app is available.
 - **Built on Proven Security Foundations:** By using well established cryptographic primitives sourced from the renowned 'cryptography' library, ensuring a foundation of rock-solid security.
 - **Great Editor Support:**  Navigating through Litecrypt is a breeze with intuitive code completion, instant contextual documentation, and interactive examples.
@@ -54,7 +54,7 @@ from litecrypt import Crypt, CryptFile, Database, gen_key, gen_ref
 
 # Create connections to the main and keys databases
 main_conn = Database('vault.db')
-keys_conn = Database('vaultKeys.db')
+keys_conn = Database('vaultKeys.db',for_keys=True)
 
 # Specify the filename you want to store in the database
 filename = 'notes.csv'
@@ -80,14 +80,50 @@ keys_conn.insert(filename=filename + '.crypt',
                  ref=reference_value)
 
 ```
+### Supported Databases
 
+The library currently supports: MySQL, PostgreSQL and SQLite.
+> **Note:** The GUI only support SQLite
+#### How To Connect ?
+**SQLite**: only specify the file name of the database, it must end with either `.db` or `.sqlite`
+```Py
+from litecrypt import Database
+main_connection = Database('test.db')
+keys_connection = Database('somekeysdatabase.db',for_keys=True)
+```
+By default, every database connection defaults to main, set the parameter `for_keys=True` to let the underlying process know this is used for keys so that it doesn't bring conflicts when you try to retrieve files by references.
+
+**PostgreSQL**:
+<br>
+Plug in the coordinates  as the url.
+```Py
+from litecrypt import Database
+
+main_conn = Database(url='username:password@host:port/database',
+                     engine_for='postgres',
+                     echo=True)
+```
+The echo parameter is optional, it shows what's happening behind the scenes.
+
+**MySQL**:<br>
+Same as PostgreSQL except the engine is different.
+```Py
+from litecrypt import Database
+
+main_conn = Database(url='username:password@host:port/database',
+                     engine_for='mysql',
+                     echo=True)
+```
+
+
+###  Why Use Reference ?
 The reference value, such as `#8jX?7c`, remains independent of both the encrypted data and the encryption keys. It does not reveal any information about the keys used or the encrypted data itself. Instead, its purpose is to establish a connection between the two databases, consistently linking each file to its corresponding key.
 
 The primary database holds the filenames and their encrypted data, while the keys database stores the filenames and the keys used to encrypt them. To recover files, both databases need to be simultaneously accessible. However, a crucial point to note is that robust security for the keys database is necessary only when BOTH databases are accessible together.
 
 If someone gets hold of the main database, they'll only get some encrypted content and file names. Trying to break this content would be really hard. On the other hand, if someone only accesses the keys database, they'll only find keys and filenames. It won't help them much.
 
-You have two options: keep the databases separate (though that might be hard and impractical) or make copies of your main database—regardless of your level of trust in the system you place them in.
+You can keep the databases separate (though that might be hard and impractical) or make copies of your main database—regardless of your level of trust in the system you place them in.
 
 In this situation, the keys database should be kept safe, preferably encrypted. When you want your files back, get your main database from wherever you stored it. Then, use the keys database to unlock the files you need.
 
@@ -129,7 +165,7 @@ for content in file_contents:
 
 # Initialize the main & the associated keys database
 main_db = Database("secure_vault.db")
-keys_db = Database("secure_vaultKeys.db")  # to hold the keys
+keys_db = Database("secure_vaultKeys.db",for_keys=True)  # to hold the keys
 
 # Generate a key reference value to link up the two databases with
 key_ref = gen_ref()
@@ -160,7 +196,7 @@ for file, key in zip(spawned["filenames"], spawned["keys"]):
     CryptFile(file, key).decrypt(echo=True)
 ```
 
-The demonstration highlights a practical use case of Litecrypt. The process of securing and recovering encrypted files becomes incredibly straightforward. The demo outlines how to extract and encrypt data from files, establish connections between two databases by associating files and their respective keys using reference values to securely manage keys and file data. It briefly illustrates how  significantly simple the task of safeguarding data is.
+The demonstration highlights a practical use case of Litecrypt. The process of securing and recovering encrypted files becomes incredibly straightforward. This outlines how to extract and encrypt data from files, establish connections between two databases by associating files and their respective keys using reference values to securely manage keys and file data. It briefly illustrates how  significantly simple the task of safeguarding data is.
 <br>Feel free to copy this demo and observe the output in your terminal.
 
 If you don't want to deal with code here's an

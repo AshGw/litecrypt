@@ -12,8 +12,8 @@ from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, hmac, padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
-from litecrypt.consts import Size
 from litecrypt.utils import exceptions
+from litecrypt.utils.consts import Size
 
 
 class EncBase:

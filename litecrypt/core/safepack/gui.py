@@ -8,9 +8,9 @@ import string
 
 import ttkbootstrap as tk
 
-import litecrypt.database as ld
-from litecrypt.consts import Gui
-from litecrypt.safepack.replicas import Crypt, CryptFile, tqr
+import litecrypt.mapper.database as ld
+from litecrypt.core.safepack.replicas import Crypt, CryptFile, tqr
+from litecrypt.utils.consts import Gui
 
 """--------------------------------HOW TO ?------------------------"""
 gui_usage_manual = f"""This is the Database Output Console,
@@ -53,16 +53,20 @@ File Decryption:
 
 Databases
 
+This GUI only supports sqlite databases.
+
 Setup
 
 - Specify the database path where you want your databases to be and any associated output information..
 - Specify the name of your main database.
-- The main database and an auto-generated keys database will be created.
-* Example: test_database.db which in turn will generate test_databaseKeys.db
+- The main database and the auto-generated keys database will be created.
+* Example: you type test_database.db which will in turn generate test_databaseKeys.db
 
 Info
 
-Both databases have the same table called `stash` that has 4 columns:
+The main database's table is 'stashmain' whereas for the keys database it's 'stashkeys'
+
+Both databases have the same table structure that has 4 columns:
 
 - `ID` which is auto-generated & incremented for each piece of data that gets inserted.
 
@@ -87,16 +91,15 @@ The buttons are self-explanatory. Here's a quick overview of their functions:
 
 - "SWITCH DATABASE" toggles between the main database and keys database.
 
-- "QUERY": Execute raw SQL queries, the result will be in "output.json."
+- "QUERY": Execute raw SQLite queries, the result will be in "output.json."
 
 
 - "SPAWN": Extracts file(s) from the database associated with a specific key reference
-and creates them in the
-chosen directory.
+and creates them in the directory you chose.
 
 
 Click the buttons and observe the results in the "DATABASE OUTPUT CONSOLE."
-The output guides you through the process.
+The genrated output will guide you through the process.
 """
 """------------------------FRAMING STARTED-------------------"""
 
@@ -185,9 +188,10 @@ def show_all_content():
                     "\nSuccessfully written all table content in output.json\n"
                     "\nNote that this file will be deleted when the app is closed",
                 )
-        except BaseException:
+        except BaseException as e:
             db_display_text.insert(
-                tk.END, "Failed to write all table content in output.json\n"
+                tk.END,
+                "Failed to write all table content in output.json\n" f"Reason: {e}",
             )
 
 
@@ -213,12 +217,12 @@ def show_content_by_id():
                         to_json_path = os.path.join(usable_real_path, "output.json")
                         with open(to_json_path, "w") as f:
                             buffer = {}
-                            for e in conn.content_by_id(int(idd)):
-                                buffer["ID_" + e[0].__str__()] = [
-                                    {"filename": e[1]},
-                                    {"content": e[2].__str__()},
-                                    {"ref": e[3]},
-                                ]
+                            e = conn.content_by_id(idd)
+                            buffer["ID_" + e[0].__str__()] = [
+                                {"filename": e[1]},
+                                {"content": e[2].__str__()},
+                                {"ref": e[3]},
+                            ]
                             json_content = json.dumps(buffer, indent=2)
                             f.write(json_content)
                         db_display_text.insert(
@@ -233,12 +237,12 @@ def show_content_by_id():
                         try:
                             with open(to_json_path, "w") as f:
                                 buffer = {}
-                                for e in conn.content_by_id(int(idd)):
-                                    buffer["ID_" + e[0].__str__()] = [
-                                        {"filename": e[1]},
-                                        {"content": e[2].__str__()},
-                                        {"ref": e[3]},
-                                    ]
+                                e = conn.content_by_id(int(idd))
+                                buffer["ID_" + e[0].__str__()] = [
+                                    {"filename": e[1]},
+                                    {"content": e[2].__str__()},
+                                    {"ref": e[3]},
+                                ]
                                 json_content = json.dumps(buffer, indent=2)
                                 f.write(json_content)
                             db_display_text.insert(
@@ -246,12 +250,13 @@ def show_content_by_id():
                                 f"Successful fetch !\n\nCheck the 'output.json' file in the"
                                 f" the chosen path :\n\n'{usable_real_path}'",
                             )
-                        except BaseException:
+                        except BaseException as e:
                             db_display_text.delete("1.0", tk.END)
                             db_display_text.insert(
                                 tk.END,
                                 "ERROR \n\nCheck the validity of 'output.json' file"
-                                "\n\nCheck if the database is faulty\n",
+                                "\n\nCheck if the database is faulty\n"
+                                f"Error: {e}",
                             )
                     elif int(idd) > last_id:
                         db_display_text.delete("1.0", tk.END)
@@ -261,9 +266,12 @@ def show_content_by_id():
             else:
                 db_display_text.delete("1.0", tk.END)
                 db_display_text.insert(tk.END, "ID must be strictly greater than 0")
-        except BaseException:
+        except BaseException as e:
             db_display_text.delete("1.0", tk.END)
-            db_display_text.insert(tk.END, "ID value must be a valid integer")
+            db_display_text.insert(
+                tk.END,
+                "ID value must be a valid integer in the database\n" f"Error: {e}",
+            )
 
 
 def drop_content_by_id():
@@ -302,14 +310,16 @@ def drop_content_by_id():
                     elif int(idd) > last_id:
                         db_display_text.delete("1.0", tk.END)
                         db_display_text.insert(
-                            tk.END, "Given ID is greater than the highest available ID"
+                            tk.END, "Given ID is greater than the greatest available ID"
                         )
             else:
                 db_display_text.delete("1.0", tk.END)
                 db_display_text.insert(tk.END, "ID must be strictly greater than 0")
-        except BaseException:
+        except BaseException as e:
             db_display_text.delete("1.0", tk.END)
-            db_display_text.insert(tk.END, "ID value must be a valid integer")
+            db_display_text.insert(
+                tk.END, "ID value must be a valid integer\n" f"Error: {e}"
+            )
 
 
 show_all_content_button = tk.Button(
@@ -336,9 +346,10 @@ def query():
             try:
                 db_display_text.delete("1.0", tk.END)
                 json_file = os.path.join(usable_real_path, "output.json")
+                query_out = conn._query(query_var)
+                conn.create_all()
                 with open(json_file, "w") as f:
-                    query_out = conn._query(query_var)
-                    conn.create_table()
+                    print(query_out)
                     json_content = json.dumps(
                         {f"query {query_clicks}": query_out}, indent=2
                     )
@@ -348,13 +359,10 @@ def query():
                 db_display_text.insert(
                     tk.END, "The result of the query is in 'output.json' file\n\n"
                 )
-            except BaseException:
+            except BaseException as e:
                 db_display_text.delete("1.0", tk.END)
-                db_display_text.insert(tk.END, "Failed to finish the query!\n\n")
-                db_display_text.insert(
-                    tk.END, "Detected object that is not JSON serializable\n\n"
-                )
-                db_display_text.insert(tk.END, "Use buttons instead if possible")
+                db_display_text.insert(tk.END, "Failed to finish the query!\n\n" f"{e}")
+                db_display_text.insert(tk.END, " Use buttons instead if possible")
         else:
             db_display_text.delete("1.0", tk.END)
             db_display_text.insert(tk.END, "Can't query nothing\n\n")
@@ -446,7 +454,6 @@ def main_db_name():
                 ):
                     db_already_exists_blocker = 1
                     main_db_conn = ld.Database(conn_path_db)
-                    main_db_conn.create_table()
                     main_db_name_result_var.set("CONNECTED")
                     db_display_text.delete("1.0", tk.END)
                     db_display_text.insert(tk.END, f"Connected to {maindbname}..\n\n")
@@ -456,7 +463,6 @@ def main_db_name():
                 else:
                     db_already_exists_blocker = 0
                     main_db_conn = ld.Database(conn_path_db)
-                    main_db_conn.create_table()
                     db_display_text.delete("1.0", tk.END)
                     db_display_text.insert(
                         tk.END,
@@ -493,21 +499,18 @@ def keyd_db_setup():
                 if os.path.isfile(usable_real_path + dbname_keys_win) or os.path.isfile(
                     usable_real_path + dbname_keys_unix
                 ):
-                    keys_db_conn = ld.Database(conn_path_keys)
-                    keys_db_conn.create_table()
+                    keys_db_conn = ld.Database(conn_path_keys, for_keys=True)
                     db_display_text.insert(tk.END, f"Connected to '{keys_db}' ..\n\n")
                     success_keysdb_connection_blocker = 1
                 else:
-                    keys_db_conn = ld.Database(conn_path_keys)
-                    keys_db_conn.create_table()
+                    keys_db_conn = ld.Database(conn_path_keys, for_keys=True)
                     db_display_text.insert(
                         tk.END,
                         f"'{keys_db}' NOT FOUND ! ==> Created and Connected to '{keys_db}' ..\n\n",
                     )
                     success_keysdb_connection_blocker = 1
             else:
-                keys_db_conn = ld.Database(conn_path_keys)
-                keys_db_conn.create_table()
+                keys_db_conn = ld.Database(conn_path_keys, for_keys=True)
                 db_display_text.insert(
                     tk.END, f"Created and Connected to '{keys_db}' ..\n\n"
                 )
@@ -606,7 +609,7 @@ def checkid():
         else:
             conn = main_db_conn
         try:
-            q = conn._query("SELECT ID FROM stash")
+            q = conn._query(f"SELECT ID FROM {conn.current_table}")
             idd = 0
             for e in q:
                 for k, v in e.items():
@@ -769,7 +772,7 @@ def spawn_out():
                     db_display_text.insert(
                         tk.END,
                         f"DUPLICATE FILES DETECTED ! SPAWNING IN '{actual_spawned_path}'"
-                        f" UNDER IGNORE 'DUPLICATES FLAG'\n",
+                        f" UNDER 'IGNORE DUPLICATES FLAG'\n",
                     )
                     try:
                         ld.spawn(
@@ -782,7 +785,7 @@ def spawn_out():
                         )
                     except Exception:
                         db_display_text.insert(
-                            tk.END, f"ERROR OCCURRED DURING FILES RETREIVAL !'\n"
+                            tk.END, f"ERROR OCCURRED DURING FILES RETRIEVAL !'\n"
                         )
                 else:
                     return
