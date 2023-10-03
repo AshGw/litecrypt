@@ -35,6 +35,11 @@ jobs:
           pip install -r scripts/setup/minimal_requirements.txt
           pip install pytest
 
+      - name: Lib setup for testing
+        run: |
+           python -m setup develop
+           rm -rf litecrypt.egg-info
+
       - name: Running crypt tests
         run: pytest tests/crypt
       - name: Running database tests
