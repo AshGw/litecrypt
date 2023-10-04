@@ -2,7 +2,7 @@ from setuptools import find_packages, setup
 
 setup(
     name="litecrypt",
-    version="0.0.8",
+    version="0.0.9",
     author="Ashref Gwader",
     author_email="AshrefGw@proton.me",
     python_requires=">=3.7",
@@ -24,6 +24,7 @@ setup(
         "cryptography==40.0.2",
         "qrcode==7.4.2",
         "ttkbootstrap==1.10.1",
+        "SQLAlchemy==1.4.41",
     ],
     classifiers=[
         "Development Status :: 5 - Production/Stable",
