@@ -1,5 +1,8 @@
 from setuptools import find_packages, setup
 
+with open("scripts/setup/minimal_requirements.txt") as f:
+    requirements = f.read().splitlines()
+
 setup(
     name="litecrypt",
     version="0.0.9",
@@ -19,13 +22,7 @@ setup(
     exclude_package_data={
         "": [".gitignore", "LICENSE", "README.md"],
     },
-    install_requires=[
-        "bcrypt==4.0.1",
-        "cryptography==40.0.2",
-        "qrcode==7.4.2",
-        "ttkbootstrap==1.10.1",
-        "SQLAlchemy==1.4.41",
-    ],
+    install_requires=requirements,
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Intended Audience :: Developers",
