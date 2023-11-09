@@ -14,7 +14,8 @@ class ConstsTesting(unittest.TestCase):
         assert Size.HMAC == 32
         assert Size.MIN_ITERATIONS == 50
         assert Size.MAX_ITERATIONS == 10**6
-
+        assert Size.StructPack.FOR_ITERATIONS == 4
+        assert Size.StructPack.FOR_KDF_SIGNATURE == 4
 
 if __name__ == "__main__":
     unittest.main()

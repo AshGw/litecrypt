@@ -16,6 +16,7 @@ from litecrypt.core.helpers.funcs import (
     cipher_randomizers,
     intensive_KDF,
     parse_message,
+    use_KDF
 )
 from litecrypt.utils import exceptions
 from litecrypt.utils.consts import Size, UseKDF
@@ -43,11 +44,11 @@ class EncBase:
         mainkey: str,
         *,
         iterations: int = Size.MIN_ITERATIONS,
-        compute_intensive: bool = True,
+        compute_intensively: bool = True,
     ) -> None:
         self.message = parse_message(message)
         self.mainkey = mainkey
-        self.compute_intensive = compute_intensive
+        self.compute_intensively = compute_intensively
         self.iterations = iterations
 
         check_iterations(self.iterations)
@@ -55,8 +56,15 @@ class EncBase:
             raise exceptions.dynamic.KeyLengthError()
 
         self.iv, self.salt, self.pepper = cipher_randomizers()
-        self.enc_key = intensive_KDF(self.mainkey, self.salt, self.iterations)
-        self.hmac_key = intensive_KDF(self.mainkey, self.pepper, self.iterations)
+        self.enc_key = use_KDF(compute_intensively=compute_intensively,
+                               key=self.mainkey,
+                               salt_pepper=self.salt,
+                               iterations=self.iterations)
+        self.hmac_key = use_KDF(compute_intensively=compute_intensively,
+                               key=self.mainkey,
+                               salt_pepper=self.pepper,
+                               iterations=self.iterations)
+
 
     @staticmethod
     def gen_key(desired_bytes: int = 32) -> str:
@@ -137,7 +145,7 @@ class EncBase:
         """
         return self._cipher().encryptor()
 
-    def padded_message(self) -> bytes:
+    def _padded_message(self) -> bytes:
         """
         Pad the message to a multiple of the block size using PKCS#7 padding.
 
@@ -147,7 +155,7 @@ class EncBase:
         padder = padding.PKCS7(Size.BLOCK * 8).padder()
         return padder.update(self.message) + padder.finalize()
 
-    def ciphertext(self) -> bytes:
+    def _ciphertext(self) -> bytes:
         """
         Encrypt the padded message using AES and return the ciphertext.
 
@@ -155,11 +163,11 @@ class EncBase:
             bytes: The encrypted ciphertext.
         """
         return (
-            self._cipher_encryptor().update(self.padded_message())
+            self._cipher_encryptor().update(self._padded_message())
             + self._cipher_encryptor().finalize()
         )
 
-    def iterations_bytes(self) -> bytes:
+    def _iterations_bytes(self) -> bytes:
         """
         Pack the number of iterations into bytes using the 'big-endian' format.
 
@@ -169,7 +177,7 @@ class EncBase:
         iters_bytes = struct.pack("!I", self.iterations)
         return iters_bytes
 
-    def signtature_KDF_bytes(self) -> bytes:
+    def _signtature_KDF_bytes(self) -> bytes:
         """
         Pack the signature number of the will soon be used KDF into bytes using the 'big-endian' format.
 
@@ -177,12 +185,12 @@ class EncBase:
             bytes: The packed bytes representing the KDF signature number.
         """
         KDF_singnature = UseKDF.FAST
-        if self.compute_intensive:
+        if self.compute_intensively:
             KDF_singnature = UseKDF.SLOW
         signature_bytes = struct.pack("!I", KDF_singnature)
         return signature_bytes
 
-    def hmac_final(self) -> bytes:
+    def _hmac_final(self) -> bytes:
         """
         Compute the HMAC-SHA256 of the ciphertext bundle.
 
@@ -194,9 +202,9 @@ class EncBase:
             self.iv
             + self.salt
             + self.pepper
-            + self.iterations_bytes()
-            + self.signtature_KDF_bytes()
-            + self.ciphertext()
+            + self._iterations_bytes()
+            + self._signtature_KDF_bytes()
+            + self._ciphertext()
         )
         return hmac_.finalize()
 
@@ -211,13 +219,13 @@ class EncBase:
         :return: Encrypted data as bytes or URL safe base64 encoded string.
         """
         raw = (
-            self.hmac_final()
+            self._hmac_final()
             + self.iv
             + self.salt
             + self.pepper
-            + self.iterations_bytes()
-            + self.signtature_KDF_bytes()
-            + self.ciphertext()
+            + self._iterations_bytes()
+            + self._signtature_KDF_bytes()
+            + self._ciphertext()
         )
         return raw if get_bytes else base64.urlsafe_b64encode(raw).decode("UTF-8")
 
@@ -237,18 +245,14 @@ class DecBase:
     """
 
     def __init__(self, message: Union[str, bytes], mainkey: str) -> None:
-        if isinstance(message, str):
-            mess = message.encode("UTF-8")
-            self.message = base64.urlsafe_b64decode(mess)
-        elif isinstance(message, bytes):
-            self.message = message
-
         _i = Size.IV
         _s = Size.SALT
         _p = Size.PEPPER
         _h = Size.HMAC
         _fi = Size.StructPack.FOR_ITERATIONS
         _fk = Size.StructPack.FOR_KDF_SIGNATURE
+
+        self.message = parse_message(message)
         self.key = mainkey
         self.rec_hmac = self.message[:_h]
         self.rec_iv = self.message[_h : _h + _i]
@@ -263,13 +267,13 @@ class DecBase:
         check_iterations(self.rec_iterations)
         # pause
         self.rec_ciphertext = self.message[_h + _i + _s + _p + _fi + _fk :]
-        self.dec_key = intensive_KDF(self.key, self.rec_salt, self.rec_iterations)
-        self.hmac_k = intensive_KDF(self.key, self.rec_pepper, self.rec_iterations)
+        self.dec_key = use_KDF(compute_intensively=True,key=self.key, salt_pepper=self.rec_salt, iterations=self.rec_iterations)
+        self.hmac_k = use_KDF(compute_intensively=True,key=self.key, salt_pepper=self.rec_pepper, iterations=self.rec_iterations)
 
-        if self.verify_hmac() is False:
+        if self._verify_hmac() is False:
             raise exceptions.fixed.MessageTamperingError()
 
-    def calculated_hmac(self) -> bytes:
+    def _calculated_hmac(self) -> bytes:
         """
         Compute the HMAC-SHA256 of the received ciphertext bundle.
 
@@ -287,7 +291,7 @@ class DecBase:
         )
         return hmac_.finalize()
 
-    def verify_hmac(self) -> bool:
+    def _verify_hmac(self) -> bool:
         """
         Verify the received HMAC-SHA256 against the calculated HMAC.
 
@@ -295,7 +299,7 @@ class DecBase:
             bool: True if the received HMAC matches the calculated HMAC,
              False otherwise.
         """
-        return hmc.compare_digest(self.calculated_hmac(), self.rec_hmac)
+        return hmc.compare_digest(self._calculated_hmac(), self.rec_hmac)
 
     def _mode(self) -> modes.CBC:
         """
@@ -335,7 +339,7 @@ class DecBase:
             + self._cipher_decryptor().finalize()
         )
 
-    def unpadded_message(self) -> bytes:
+    def _unpadded_message(self) -> bytes:
         """
         Unpads the data and returns the original message.
 
@@ -355,5 +359,5 @@ class DecBase:
          Default is False.
         :return: Decrypted data as bytes or URL safe base64 encoded string.
         """
-        raw = self.unpadded_message()
+        raw = self._unpadded_message()
         return raw if get_bytes else raw.decode("UTF-8")

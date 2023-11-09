@@ -10,7 +10,7 @@ from litecrypt.utils.consts import Size, UseKDF
 
 
 def parse_message(message: str | bytes) -> bytes:
-    msg = message
+    msg = message.strip()
     if isinstance(message, str):
         msg = message.encode()
     return msg
@@ -52,7 +52,7 @@ def intensive_KDF(mainkey: str, salt_pepper: bytes, iterations: int) -> bytes:
     )
 
 
-def blazingly_fast_KDF(key: bytes, salt: bytes) -> bytes:
+def blazingly_fast_KDF(key: str, salt: bytes) -> bytes:
     """
     Fast key derivation function.
     Args:
@@ -62,23 +62,14 @@ def blazingly_fast_KDF(key: bytes, salt: bytes) -> bytes:
     Returns:
         bytes: Derived 256-bit  key.
     """
-    if len(key) != 32:
+    use_key = key.encode("UTF-8")
+    if len(use_key) != 32:
         raise ValueError("Key must be 256 bits (32 bytes) long.")
-    key_material = key + salt
+    key_material = use_key + salt
     derived_key = hashlib.sha256(key_material).digest()
     return derived_key
 
-
-def signtature_KDF_bytes(compute_intensive: bool) -> bytes:
-    """
-    Pack the number of iterations into bytes using the 'big-endian' format.
-
-    Returns:
-    bytes: The packed bytes representing the number of iterations.
-    """
-    KDF_singnature = UseKDF.FAST
-    if compute_intensive:
-        KDF_singnature = UseKDF.SLOW
-
-    signature_bytes = struct.pack("!I", KDF_singnature)
-    return signature_bytes
+def use_KDF(*,compute_intensively: bool,key: str, salt_pepper: bytes, iterations: int) -> bytes:
+    if compute_intensively:
+        return intensive_KDF(mainkey=key,salt_pepper=salt_pepper,iterations=iterations)
+    return blazingly_fast_KDF(key=key,salt=salt_pepper)
