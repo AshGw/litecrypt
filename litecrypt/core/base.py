@@ -7,13 +7,18 @@ import os
 import struct
 from typing import Any, Optional, Union
 
-import bcrypt
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, hmac, padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 
+from litecrypt.core.helpers.funcs import (
+    check_iterations,
+    cipher_randomizers,
+    intensive_KDF,
+    parse_message,
+)
 from litecrypt.utils import exceptions
-from litecrypt.utils.consts import Size
+from litecrypt.utils.consts import Size, UseKDF
 
 
 class EncBase:
@@ -37,52 +42,21 @@ class EncBase:
         message: Union[str, bytes],
         mainkey: str,
         *,
-        iterations: int = Size.MIN_ITERATIONS
+        iterations: int = Size.MIN_ITERATIONS,
+        compute_intensive: bool = True,
     ) -> None:
-        if isinstance(message, str):
-            self.message = message.encode()
-        elif isinstance(message, bytes):
-            self.message = message
-
+        self.message = parse_message(message)
         self.mainkey = mainkey
+        self.compute_intensive = compute_intensive
+        self.iterations = iterations
+
+        check_iterations(self.iterations)
         if not self.key_verify(self.mainkey):
             raise exceptions.dynamic.KeyLengthError()
-        self.iv = os.urandom(Size.IV)
-        self.salt = os.urandom(Size.SALT)
-        self.pepper = os.urandom(Size.PEPPER)
-        self.iterations = iterations
-        if (
-            self.iterations < Size.MIN_ITERATIONS
-            or self.iterations > Size.MAX_ITERATIONS
-        ):
-            raise exceptions.dynamic.IterationsOutofRangeError(self.iterations)
 
-        self.enc_key = self.derkey(self.mainkey, self.salt, self.iterations)
-        self.hmac_key = self.derkey(self.mainkey, self.pepper, self.iterations)
-
-    @staticmethod
-    def derkey(mainkey: str, salt_pepper: bytes, iterations: int) -> bytes:
-        """
-        AES Key & HMAC derivation function.
-
-        This method derives encryption and HMAC keys using the specified main key,
-         salt or pepper, and
-        the number of iterations.
-
-        Args:
-            mainkey (str): The main encryption key.
-            salt_pepper (bytes): The salt or pepper for key derivation.
-            iterations (int): The number of iterations for key derivation.
-
-        Returns:
-            bytes: The derived key bytes.
-        """
-        return bcrypt.kdf(
-            password=mainkey.encode("UTF-8"),
-            salt=salt_pepper,
-            desired_key_bytes=Size.AES_KEY,
-            rounds=iterations,
-        )
+        self.iv, self.salt, self.pepper = cipher_randomizers()
+        self.enc_key = intensive_KDF(self.mainkey, self.salt, self.iterations)
+        self.hmac_key = intensive_KDF(self.mainkey, self.pepper, self.iterations)
 
     @staticmethod
     def gen_key(desired_bytes: int = 32) -> str:
@@ -195,6 +169,19 @@ class EncBase:
         iters_bytes = struct.pack("!I", self.iterations)
         return iters_bytes
 
+    def signtature_KDF_bytes(self) -> bytes:
+        """
+        Pack the signature number of the will soon be used KDF into bytes using the 'big-endian' format.
+
+        Returns:
+            bytes: The packed bytes representing the KDF signature number.
+        """
+        KDF_singnature = UseKDF.FAST
+        if self.compute_intensive:
+            KDF_singnature = UseKDF.SLOW
+        signature_bytes = struct.pack("!I", KDF_singnature)
+        return signature_bytes
+
     def hmac_final(self) -> bytes:
         """
         Compute the HMAC-SHA256 of the ciphertext bundle.
@@ -208,6 +195,7 @@ class EncBase:
             + self.salt
             + self.pepper
             + self.iterations_bytes()
+            + self.signtature_KDF_bytes()
             + self.ciphertext()
         )
         return hmac_.finalize()
@@ -228,6 +216,7 @@ class EncBase:
             + self.salt
             + self.pepper
             + self.iterations_bytes()
+            + self.signtature_KDF_bytes()
             + self.ciphertext()
         )
         return raw if get_bytes else base64.urlsafe_b64encode(raw).decode("UTF-8")
@@ -258,22 +247,24 @@ class DecBase:
         _s = Size.SALT
         _p = Size.PEPPER
         _h = Size.HMAC
+        _fi = Size.StructPack.FOR_ITERATIONS
+        _fk = Size.StructPack.FOR_KDF_SIGNATURE
         self.key = mainkey
         self.rec_hmac = self.message[:_h]
         self.rec_iv = self.message[_h : _h + _i]
         self.rec_salt = self.message[_h + _i : _h + _i + _s]
         self.rec_pepper = self.message[_h + _i + _s : _h + _i + _s + _p]
-        self.rec_iters_raw = self.message[_h + _i + _s + _p : _h + _i + _s + _p + 4]
+        self.rec_iters_raw = self.message[_h + _i + _s + _p : _h + _i + _s + _p + _fi]
+        self.rec_KDF_signature_raw = self.message[
+            _h + _i + _s + _p + 4 : _h + _i + _s + _p + _fi + _fk
+        ]
         self.rec_iterations = struct.unpack("!I", self.rec_iters_raw)[0]
-        if (
-            self.rec_iterations < Size.MIN_ITERATIONS
-            or self.rec_iterations > Size.MAX_ITERATIONS
-        ):
-            raise exceptions.dynamic.IterationsOutofRangeError(self.rec_iterations)
-
-        self.rec_ciphertext = self.message[_h + _i + _s + _p + 4 :]
-        self.dec_key = EncBase.derkey(self.key, self.rec_salt, self.rec_iterations)
-        self.hmac_k = EncBase.derkey(self.key, self.rec_pepper, self.rec_iterations)
+        self.rec_KDF_signature = struct.unpack("!I", self.rec_KDF_signature_raw)[0]
+        check_iterations(self.rec_iterations)
+        # pause
+        self.rec_ciphertext = self.message[_h + _i + _s + _p + _fi + _fk :]
+        self.dec_key = intensive_KDF(self.key, self.rec_salt, self.rec_iterations)
+        self.hmac_k = intensive_KDF(self.key, self.rec_pepper, self.rec_iterations)
 
         if self.verify_hmac() is False:
             raise exceptions.fixed.MessageTamperingError()
@@ -291,6 +282,7 @@ class DecBase:
             + self.rec_salt
             + self.rec_pepper
             + self.rec_iters_raw
+            + self.rec_KDF_signature_raw
             + self.rec_ciphertext
         )
         return hmac_.finalize()

@@ -19,6 +19,8 @@ class CoreModuleTesting(unittest.TestCase):
         self.i = Size.IV
         self.p = Size.PEPPER
         self.s = Size.SALT
+        self.fi = Size.StructPack.FOR_ITERATIONS
+        self.fk = Size.StructPack.FOR_KDF_SIGNATURE
 
     def test_HMAC_MismatchError(self):
         tampered_hmac = self.ins1.encrypt(get_bytes=True)[: self.h - 1] + b"1"
@@ -31,7 +33,7 @@ class CoreModuleTesting(unittest.TestCase):
         tampered_message = (
             enb[: self.h + self.i + self.s + self.p]
             + struct.pack("!I", Size.MAX_ITERATIONS + 10)
-            + enb[self.h + self.i + self.s + self.p + 4 :]
+            + enb[self.h + self.i + self.s + self.p + self.fi :]
         )
         with self.assertRaises(exceptions.dynamic.IterationsOutofRangeError):
             lc.DecBase(message=tampered_message, mainkey=self.main_key)
@@ -60,14 +62,14 @@ class CoreModuleTesting(unittest.TestCase):
                 + self.i
                 + self.s
                 + self.p
-                + 4
+                + self.fi
             ]
             == self.ins1.iterations_bytes()
         )
 
     def test_Ciphertext(self):
         self.assertTrue(
-            self.bytes_message[self.h + self.i + self.s + self.p + 4 :]
+            self.bytes_message[self.h + self.i + self.s + self.p + self.fi + self.fk :]
             == self.ins1.ciphertext()
         )
 

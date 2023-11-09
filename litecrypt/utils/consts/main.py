@@ -13,6 +13,16 @@ class Size:
     MIN_ITERATIONS: int = 50
     MAX_ITERATIONS: int = 10**6
 
+    class StructPack:
+        FOR_ITERATIONS: int = 4
+        FOR_KDF_SIGNATURE: int = 4
+
+
+@dataclass
+class UseKDF:
+    SLOW: int = 0
+    FAST: int = 1
+
 
 @dataclass
 class Gui:
