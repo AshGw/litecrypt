@@ -231,20 +231,19 @@ class EncBase:
 
 
 class DecBase:
-    """
-    Class to decrypt data of either type bytes or str.
-
-    This class provides functionality to decrypt data that
-    was previously encrypted using the EncBase class.
-    It handles key derivation, verification, and decryption.
-
-    Args:
-        message (str, bytes): The encrypted message to be decrypted, either as
-         a string or bytes.
-        mainkey (str): The main key to derive the HMAC & decryption key from.
-    """
-
     def __init__(self, message: Union[str, bytes], mainkey: str) -> None:
+        """
+            Class to decrypt data of either type bytes or str.
+
+            This class provides functionality to decrypt data that
+            was previously encrypted using the EncBase class.
+            It handles key derivation, verification, and decryption.
+
+            Args:
+                message (str, bytes): The encrypted message to be decrypted, either as
+                 a string or bytes.
+                mainkey (str): The main key to derive the HMAC & decryption key from.
+        """
         _i = Size.IV
         _s = Size.SALT
         _p = Size.PEPPER
@@ -267,8 +266,13 @@ class DecBase:
         check_iterations(self.rec_iterations)
         # pause
         self.rec_ciphertext = self.message[_h + _i + _s + _p + _fi + _fk :]
-        self.dec_key = use_KDF(compute_intensively=True,key=self.key, salt_pepper=self.rec_salt, iterations=self.rec_iterations)
-        self.hmac_k = use_KDF(compute_intensively=True,key=self.key, salt_pepper=self.rec_pepper, iterations=self.rec_iterations)
+
+        compute_intensively = True
+        if self.rec_KDF_signature == UseKDF.FAST:
+            compute_intensively = False
+
+        self.dec_key = use_KDF(compute_intensively= compute_intensively,key=self.key, salt_pepper=self.rec_salt, iterations=self.rec_iterations)
+        self.hmac_k = use_KDF(compute_intensively= compute_intensively,key=self.key, salt_pepper=self.rec_pepper, iterations=self.rec_iterations)
 
         if self._verify_hmac() is False:
             raise exceptions.fixed.MessageTamperingError()
@@ -361,3 +365,7 @@ class DecBase:
         """
         raw = self._unpadded_message()
         return raw if get_bytes else raw.decode("UTF-8")
+if __name__ == '__main__':
+    packed = struct.pack("!I",0)
+    a = struct.unpack("!I",packed)[0]
+    print(a)
