@@ -63,13 +63,12 @@ def blazingly_fast_KDF(key: str, salt: bytes) -> bytes:
         bytes: Derived 256-bit  key.
     """
     use_key = key.encode("UTF-8")
-    if len(use_key) != 32:
-        raise ValueError("Key must be 256 bits (32 bytes) long.")
     key_material = use_key + salt
     derived_key = hashlib.sha256(key_material).digest()
     return derived_key
 
 def use_KDF(*,compute_intensively: bool,key: str, salt_pepper: bytes, iterations: int) -> bytes:
     if compute_intensively:
-        return intensive_KDF(mainkey=key,salt_pepper=salt_pepper,iterations=iterations)
+        ...
+    #return intensive_KDF(mainkey=key,salt_pepper=salt_pepper,iterations=iterations)
     return blazingly_fast_KDF(key=key,salt=salt_pepper)

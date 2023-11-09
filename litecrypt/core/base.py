@@ -14,7 +14,6 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from litecrypt.core.helpers.funcs import (
     check_iterations,
     cipher_randomizers,
-    intensive_KDF,
     parse_message,
     use_KDF
 )
@@ -184,10 +183,8 @@ class EncBase:
         Returns:
             bytes: The packed bytes representing the KDF signature number.
         """
-        KDF_singnature = UseKDF.FAST
-        if self.compute_intensively:
-            KDF_singnature = UseKDF.SLOW
-        signature_bytes = struct.pack("!I", KDF_singnature)
+        signature_bytes = struct.pack("!I", UseKDF.SLOW)
+
         return signature_bytes
 
     def _hmac_final(self) -> bytes:
@@ -206,6 +203,9 @@ class EncBase:
             + self._signtature_KDF_bytes()
             + self._ciphertext()
         )
+        print('indie enc sug bytes obj ',self._signtature_KDF_bytes())
+        print('indie enc iter bytes obj ',self._iterations_bytes())
+
         return hmac_.finalize()
 
     def encrypt(self, get_bytes: Optional[bool] = False) -> Union[bytes, str]:
@@ -251,18 +251,33 @@ class DecBase:
         _fi = Size.StructPack.FOR_ITERATIONS
         _fk = Size.StructPack.FOR_KDF_SIGNATURE
 
-        self.message = parse_message(message)
+        if isinstance(message, str):
+            mess = message.encode("UTF-8")
+            self.message = base64.urlsafe_b64decode(mess)
+        elif isinstance(message, bytes):
+            self.message = message
+
         self.key = mainkey
         self.rec_hmac = self.message[:_h]
         self.rec_iv = self.message[_h : _h + _i]
         self.rec_salt = self.message[_h + _i : _h + _i + _s]
         self.rec_pepper = self.message[_h + _i + _s : _h + _i + _s + _p]
         self.rec_iters_raw = self.message[_h + _i + _s + _p : _h + _i + _s + _p + _fi]
+        print('iters raw form:',self.rec_iters_raw)
+        print('LENGTH iters raw form:', self.rec_iters_raw.__len__())
         self.rec_KDF_signature_raw = self.message[
-            _h + _i + _s + _p + 4 : _h + _i + _s + _p + _fi + _fk
+            _h + _i + _s + _p + _fi : _h + _i + _s + _p + _fi + _fk
         ]
+        print('iters signatures form:',self.rec_KDF_signature_raw)
+        print('LENGTH iters signatures form:',self.rec_KDF_signature_raw.__len__())
+
+
         self.rec_iterations = struct.unpack("!I", self.rec_iters_raw)[0]
         self.rec_KDF_signature = struct.unpack("!I", self.rec_KDF_signature_raw)[0]
+        print('receved iters:',self.rec_iterations)
+        print('receved sign:',self.rec_KDF_signature)
+
+
         check_iterations(self.rec_iterations)
         # pause
         self.rec_ciphertext = self.message[_h + _i + _s + _p + _fi + _fk :]
@@ -365,7 +380,22 @@ class DecBase:
         """
         raw = self._unpadded_message()
         return raw if get_bytes else raw.decode("UTF-8")
+
+
+
+
 if __name__ == '__main__':
     packed = struct.pack("!I",0)
     a = struct.unpack("!I",packed)[0]
     print(a)
+    key = EncBase.gen_key()
+    print(key)
+    messs = 'hey'
+    encry = EncBase(message=messs,mainkey=key).encrypt()
+    print(encry)
+    print('structs packer',struct.unpack("!I", b'\x00\x00\x002')[0])
+    print('--------------------------------')
+    print(DecBase(mainkey=key,message=encry).decrypt())
+
+
+
