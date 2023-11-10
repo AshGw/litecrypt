@@ -1,4 +1,5 @@
 import os
+import random
 
 from litecrypt.core.datacrypt import Crypt, gen_key, gen_ref
 from litecrypt.core.filecrypt import CryptFile
@@ -31,7 +32,10 @@ class WorkFlow:
         )
 
         self.encrypted_contents = [
-            Crypt(content, self.key,intensive_compute=True).encrypt(get_bytes=True)
+            Crypt(content, self.key,
+                  intensive_compute=True,
+                  iteration_rounds=random.randint(50, 1000)
+                  ).encrypt(get_bytes=True)
             for content in self.file_contents
         ]
         return True
