@@ -10,13 +10,14 @@
 
 **Embed in Code**: Easily integrated into your existing codebase with just a few lines.
 
-**Use the GUI**: Zero coding required! Enjoy the full functionality of the library through the intuitive GUI.
+**Use the GUI**: Enjoy the full functionality of the library through the intuitive GUI.
 
-
-
+## 🧙‍♂️ Installation
+Starting is a breeze. Just use pip:
+```shell
+pip install litecrypt
+```
 ## 🔑 Effortlessly Secure Encryption!
-
-No complex encryption steps, encrypting a file is as simple as can be:
 
 ```python
 from litecrypt import CryptFile, gen_key
@@ -25,6 +26,38 @@ key = gen_key()
 CryptFile('accounts.csv', key).encrypt()
 # Voila! Your file is now called ==> accounts.csv.crypt
 ```
+The encryption process is **blazingly fast** by default, but you can choose to make it computationally intensive
+<details><summary>How ?</summary>
+
+```python
+from litecrypt import CryptFile, gen_key
+
+key = gen_key()
+CryptFile('anyfile.txt',
+          key=key,
+          intensive_compute=True,
+          iteration_rounds=10000
+          ).encrypt()
+```
+To decrypt simply run:
+
+
+```python
+from litecrypt import CryptFile
+
+key = 'THE_KEY_YOU_USED'
+CryptFile('anyfile.txt.crypt',key=key).decrypt()
+```
+</details>
+
+
+
+
+
+
+
+
+
 Need to protect a message?
 ```python
 from litecrypt import Crypt, gen_key
@@ -41,8 +74,6 @@ print(encrypted)  # Check the return value
 Currently supports MySQL, PostgreSQL and SQLite, check the [docs](https://ashgw.github.io/litecrypt) for more info.
 
 <h3>Example Usage</h3>
-Got valuable data to keep safe? litecrypt has your back:
-
 Let's say we have 3 files: `file`, `image.png`, and `notes.txt` in a directory called `test`:
 ```python
 files = ['test/file', 'test/image.png', 'test/notes.txt']
@@ -121,7 +152,7 @@ Done! Your files are still in `test/`, but you now have encrypted copies of them
 ```python
 os.mkdir('spawned')
 ```
-Now, let's retrieve the files:
+Now, retrieve the files:
 ```python
 from litecrypt import spawn
 
@@ -216,8 +247,6 @@ for file, key in zip(spawned["filenames"], spawned["keys"]):
 </details>
 
 That's it! Try this yourself and see the output in your terminal.
-<br>Feeling confused? Read the [docs](https://ashgw.github.io/litecrypt)
-
 
 ## 🚀 Or, Simplify with the GUI
 
@@ -230,23 +259,6 @@ That's it! Try this yourself and see the output in your terminal.
 https://github.com/AshGw/litecrypt/assets/126174609/190b6ab8-3f8a-4656-9525-dbaf5e56db5e
 
 </details>
-
-
-## 🧙‍♂️ Installation Made Easy
-
-Starting is a breeze. If you want to use it as a library, just use pip:
-
-```shell
-pip install litecrypt
-```
-
-For the entire repository? Run this command for auto setup:
-
-```shell
-curl -sSfL https://raw.githubusercontent.com/AshGw/litecrypt/main/scripts/setup/setup.sh | bash
-```
-
-
 
 ## 📚 Dive into the Docs
 
