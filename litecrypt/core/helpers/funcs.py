@@ -1,6 +1,6 @@
 import hashlib
 import os
-from typing import Tuple
+from typing import Tuple, Union
 
 import bcrypt
 
@@ -8,7 +8,7 @@ import litecrypt.utils.exceptions as exceptions
 from litecrypt.utils.consts import Size
 
 
-def parse_message(message: str | bytes) -> bytes:
+def parse_message(message: Union[str,bytes]) -> bytes:
     msg = message.strip()
     if isinstance(message, str):
         msg = message.encode()
