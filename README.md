@@ -246,7 +246,7 @@ for file, key in zip(spawned["filenames"], spawned["keys"]):
 
 </details>
 
-That's it! Try this yourself and see the output in your terminal.
+That's it! Try this yourself and see the output in the terminal.
 
 ## 🚀 Or, Simplify with the GUI
 
@@ -260,9 +260,9 @@ https://github.com/AshGw/litecrypt/assets/126174609/190b6ab8-3f8a-4656-9525-dbaf
 
 </details>
 
-## 📚 Dive into the Docs
+## 📚 Documentation
 
-I designed the library's documentation with simplicity in mind. So check out the **[Docs](https://ashgw.github.io/litecrypt)**.
+Check out the **[Docs](https://ashgw.github.io/litecrypt)**.
 
 
 
