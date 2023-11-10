@@ -13,10 +13,12 @@
 **Use the GUI**: Enjoy the full functionality of the library through the intuitive GUI.
 
 ## 🧙‍♂️ Installation
+
 Starting is a breeze. Just use pip:
 ```shell
 pip install litecrypt
 ```
+
 ## 🔑 Effortlessly Secure Encryption!
 
 ```python
@@ -51,13 +53,6 @@ CryptFile('anyfile.txt.crypt',key=key).decrypt()
 </details>
 
 
-
-
-
-
-
-
-
 Need to protect a message?
 ```python
 from litecrypt import Crypt, gen_key
@@ -71,10 +66,13 @@ print(encrypted)  # Check the return value
 ## 💾 Database Integration
 <h3>Databases</h3>
 
-Currently supports MySQL, PostgreSQL and SQLite, check the [docs](https://ashgw.github.io/litecrypt) for more info.
+Currently, supports MySQL, PostgreSQL and SQLite, check the [docs](https://ashgw.github.io/litecrypt) for more info.
+
 
 <h3>Example Usage</h3>
+
 Let's say we have 3 files: `file`, `image.png`, and `notes.txt` in a directory called `test`:
+
 ```python
 files = ['test/file', 'test/image.png', 'test/notes.txt']
 ```
@@ -259,6 +257,7 @@ That's it! Try this yourself and see the output in the terminal.
 https://github.com/AshGw/litecrypt/assets/126174609/190b6ab8-3f8a-4656-9525-dbaf5e56db5e
 
 </details>
+
 
 ## 📚 Documentation
 

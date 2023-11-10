@@ -127,7 +127,8 @@ class EncBase:
     def encrypt(self, get_bytes: Optional[bool] = False) -> Union[bytes, str]:
         """
         Returns the encrypted data as bytes in the format 'HMAC' -> 'IV'
-        -> 'Salt value' -> 'pepper value' -> 'iterations' -> 'ciphertext'.
+        -> 'Salt value' -> 'pepper value' -> 'iterations' -> 'KDF identifier'
+         -> 'ciphertext'.
         Or as a URL safe base64 encoded string of the encrypted bytes' data.
 
         :param get_bytes: Set to True to get the encrypted data as bytes.
