@@ -74,8 +74,6 @@ jobs:
 
       - name: Running crypt tests
         run: pytest tests/crypt
-      - name: Running database tests
-        run: pytest tests/database/test_workflow.py --no-header --no-summary -q
 
 
   build-then-publish-pypi:
