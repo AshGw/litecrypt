@@ -5,10 +5,9 @@ from dataclasses import dataclass, field
 from typing import Optional, Union
 
 import litecrypt.core.base as core
-from litecrypt.utils.consts import Size
 from litecrypt.core.datacrypt import Crypt
 from litecrypt.utils import exceptions
-from litecrypt.utils.consts import Colors
+from litecrypt.utils.consts import Colors, Size
 
 
 @dataclass
@@ -102,7 +101,12 @@ class CryptFile:
             with open(self.filename, "wb") as f:
                 if file_content:
                     try:
-                        ins = core.EncBase(message=file_content, mainkey=self.key,compute_intensively=self.intensive_compute,iterations=self.iteration_rounds)
+                        ins = core.EncBase(
+                            message=file_content,
+                            mainkey=self.key,
+                            compute_intensively=self.intensive_compute,
+                            iterations=self.iteration_rounds,
+                        )
                         new_content = ins.encrypt(get_bytes=True)
                         f.write(new_content)
                         go_ahead_rename_crypt = 1

@@ -38,7 +38,6 @@ class Database:
     for_keys: Optional[bool] = False
 
     def __post_init__(self) -> None:
-
         self.engine = get_engine(
             engine_for=self.engine_for, echo=self.echo, url=self.url
         )

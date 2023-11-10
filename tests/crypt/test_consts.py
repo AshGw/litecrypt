@@ -17,5 +17,6 @@ class ConstsTesting(unittest.TestCase):
         assert Size.StructPack.FOR_ITERATIONS == 4
         assert Size.StructPack.FOR_KDF_SIGNATURE == 4
 
+
 if __name__ == "__main__":
     unittest.main()

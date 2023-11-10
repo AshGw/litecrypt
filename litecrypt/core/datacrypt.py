@@ -5,9 +5,9 @@ import string
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
-from litecrypt.utils.consts import Size
 from litecrypt.core.base import DecBase, EncBase
 from litecrypt.utils import exceptions
+from litecrypt.utils.consts import Size
 
 
 @dataclass
@@ -77,7 +77,12 @@ class Crypt:
         """
         if self.data:
             try:
-                ins = EncBase(self.data, self.key,iterations=self.iteration_rounds,compute_intensively=self.intensive_compute)
+                ins = EncBase(
+                    self.data,
+                    self.key,
+                    iterations=self.iteration_rounds,
+                    compute_intensively=self.intensive_compute,
+                )
                 return ins.encrypt(get_bytes=True) if get_bytes else ins.encrypt()
             except BaseException as exc:
                 raise exceptions.fixed.CryptError() from exc
@@ -157,4 +162,3 @@ def gen_key() -> str:
         str: A random 256-bit encryption key as a hex string.
     """
     return EncBase.gen_key()
-

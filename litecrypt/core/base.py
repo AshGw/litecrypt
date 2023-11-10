@@ -15,15 +15,15 @@ from litecrypt.core.helpers.funcs import (
     check_iterations,
     cipher_randomizers,
     parse_message,
-    use_KDF
+    use_KDF,
 )
 from litecrypt.utils import exceptions
 from litecrypt.utils.consts import Size, UseKDF
 
 DEFAULT_INTENSIVE_COMPUTE = False
 
-class EncBase:
 
+class EncBase:
     def __init__(
         self,
         message: Union[str, bytes],
@@ -43,21 +43,26 @@ class EncBase:
 
         self.iv, self.salt, self.pepper = cipher_randomizers()
 
-        self.enc_key = use_KDF(compute_intensively=compute_intensively,
-                               key=self.mainkey,
-                               salt_pepper=self.salt,
-                               iterations=self.iterations)
+        self.enc_key = use_KDF(
+            compute_intensively=compute_intensively,
+            key=self.mainkey,
+            salt_pepper=self.salt,
+            iterations=self.iterations,
+        )
 
-        self.hmac_key = use_KDF(compute_intensively=compute_intensively,
-                               key=self.mainkey,
-                               salt_pepper=self.pepper,
-                               iterations=self.iterations)
+        self.hmac_key = use_KDF(
+            compute_intensively=compute_intensively,
+            key=self.mainkey,
+            salt_pepper=self.pepper,
+            iterations=self.iterations,
+        )
 
     @staticmethod
     def gen_key(desired_bytes: int = Size.AES_KEY) -> str:
-
         if desired_bytes < Size.AES_KEY:
-            raise ValueError(f"desired_bytes must be greater than or equal to {Size.AES_KEY}")
+            raise ValueError(
+                f"desired_bytes must be greater than or equal to {Size.AES_KEY}"
+            )
         key = os.urandom(desired_bytes)
         return key.hex()
 
@@ -166,7 +171,6 @@ class DecBase:
             _h + _i + _s + _p + _fi : _h + _i + _s + _p + _fi + _fk
         ]
 
-
         self.rec_iterations = struct.unpack("!I", self.rec_iters_raw)[0]
         self.rec_KDF_signature = struct.unpack("!I", self.rec_KDF_signature_raw)[0]
 
@@ -178,8 +182,18 @@ class DecBase:
         if self.rec_KDF_signature == UseKDF.SLOW:
             compute_intensively = True
 
-        self.dec_key = use_KDF(compute_intensively= compute_intensively,key=self.key, salt_pepper=self.rec_salt, iterations=self.rec_iterations)
-        self.hmac_k = use_KDF(compute_intensively= compute_intensively,key=self.key, salt_pepper=self.rec_pepper, iterations=self.rec_iterations)
+        self.dec_key = use_KDF(
+            compute_intensively=compute_intensively,
+            key=self.key,
+            salt_pepper=self.rec_salt,
+            iterations=self.rec_iterations,
+        )
+        self.hmac_k = use_KDF(
+            compute_intensively=compute_intensively,
+            key=self.key,
+            salt_pepper=self.rec_pepper,
+            iterations=self.rec_iterations,
+        )
 
         if self._verify_hmac() is False:
             raise exceptions.fixed.MessageTamperingError()
@@ -234,4 +248,3 @@ class DecBase:
         """
         raw = self._unpadded_message()
         return raw if get_bytes else raw.decode("UTF-8")
-

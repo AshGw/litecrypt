@@ -6,8 +6,9 @@ from litecrypt.utils import exceptions
 from litecrypt.utils.consts import Size
 
 MESSAGE_TO_TEST: bytes = b'MESSAGE123#"/?.@$%'
-TAMPERING_BYTES_VALUE: bytes = b'1'
+TAMPERING_BYTES_VALUE: bytes = b"1"
 ABOVE_MAX_ITERATIONS_THRESHOLD: int = 10
+
 
 class CoreModuleTesting(unittest.TestCase):
     def setUp(self) -> None:
@@ -26,7 +27,12 @@ class CoreModuleTesting(unittest.TestCase):
         self.fk = Size.StructPack.FOR_KDF_SIGNATURE
 
     def test_HMAC_MismatchError(self):
-        tampered_hmac = self.ins1.encrypt(get_bytes=True)[: self.h - TAMPERING_BYTES_VALUE.__len__()] + TAMPERING_BYTES_VALUE
+        tampered_hmac = (
+            self.ins1.encrypt(get_bytes=True)[
+                : self.h - TAMPERING_BYTES_VALUE.__len__()
+            ]
+            + TAMPERING_BYTES_VALUE
+        )
         # above mans simply altering the last byte
         tampered_message = tampered_hmac + self.ins1.encrypt(get_bytes=True)[self.h :]
         with self.assertRaises(exceptions.fixed.MessageTamperingError):
@@ -78,7 +84,7 @@ class CoreModuleTesting(unittest.TestCase):
                 + self.i
                 + self.s
                 + self.p
-                + self.fi: self.h
+                + self.fi : self.h
                 + self.i
                 + self.s
                 + self.p
@@ -87,7 +93,6 @@ class CoreModuleTesting(unittest.TestCase):
             ]
             == self.ins1._signtature_KDF_bytes()
         )
-
 
     def test_ciphertext(self):
         self.assertTrue(
@@ -114,10 +119,15 @@ class CoreModuleTesting(unittest.TestCase):
         self.assertIs(bytes, type(self.ins1._signtature_KDF_bytes()))
 
     def test_iterations_fixed_size(self):
-        self.assertEqual(Size.StructPack.FOR_ITERATIONS, self.ins1._iterations_bytes().__len__())
+        self.assertEqual(
+            Size.StructPack.FOR_ITERATIONS, self.ins1._iterations_bytes().__len__()
+        )
 
     def test_KDF_signature_fixed_size(self):
-        self.assertEqual(Size.StructPack.FOR_KDF_SIGNATURE, self.ins1._signtature_KDF_bytes().__len__())
+        self.assertEqual(
+            Size.StructPack.FOR_KDF_SIGNATURE,
+            self.ins1._signtature_KDF_bytes().__len__(),
+        )
 
     def test_encryption_output_bytes(self):
         self.assertIs(bytes, type(self.ins1.encrypt(get_bytes=True)))
@@ -146,7 +156,6 @@ class CoreModuleTesting(unittest.TestCase):
     def test_decryption_output_type(self):
         self.assertEqual(bytes, type(self.ins2.decrypt(get_bytes=True)))
         self.assertEqual(str, type(self.ins2.decrypt()))
-
 
 
 if __name__ == "__main__":
