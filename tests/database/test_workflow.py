@@ -31,7 +31,7 @@ class WorkFlow:
         )
 
         self.encrypted_contents = [
-            Crypt(content, self.key).encrypt(get_bytes=True)
+            Crypt(content, self.key,intensive_compute=True).encrypt(get_bytes=True)
             for content in self.file_contents
         ]
         return True
