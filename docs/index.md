@@ -7,14 +7,7 @@
 
 ## Welcome to Litecrypt
 
-Litecrypt is a minimal library that provides a simple solution for encrypting and decrypting data and files. Prioritizing both security and ease of use, by employing AES-256 encryption in CBC mode. The library offers the added benefit of secure storage, ensuring the protection of sensitive information. For those seeking a user-friendly experience, an accompanying graphical user interface is also available.
-
-## Key Features
-- **Minimalism:** No convoluted code, no more wrestling with complex and unintuitive crypto libraries. You can achieve more with less.
-- **User-Friendly App:** Even if you don't want to write code, an app is available.
-- **Built on Proven Security Foundations:** By using well established cryptographic primitives sourced from the renowned 'cryptography' library, ensuring a foundation of rock-solid security.
-- **Great Editor Support:**  Navigating through Litecrypt is a breeze with intuitive code completion, instant contextual documentation, and interactive examples.
-
+Litecrypt is a minimal library that provides a simple solution for encrypting and decrypting data and files. Prioritizing both security and ease of use, by employing AES-256 encryption in CBC mode **blazingly fast** or **compute-intensive**. The library offers the added benefit of secure storage, ensuring the protection of sensitive information. For those seeking a user-friendly experience, an accompanying graphical user interface is also available.
 
 ## Example Usage
 
@@ -127,9 +120,9 @@ You can keep the databases separate (though that might be hard and impractical) 
 
 In this situation, the keys database should be kept safe, preferably encrypted. When you want your files back, get your main database from wherever you stored it. Then, use the keys database to unlock the files you need.
 
-I've made the process of getting files back really simple, actually it's just one function called `spawn()`.
+The process of getting files back really simple, actually it's just one function called `spawn()`.
 
-Here's a complete workflow on how Litecrypt might be used, check this out:
+Here's a complete workflow on how Litecrypt might be used:
 
 ### Demo
 ```py linenums="1"
@@ -196,7 +189,7 @@ for file, key in zip(spawned["filenames"], spawned["keys"]):
     CryptFile(file, key).decrypt(echo=True)
 ```
 
-The demonstration highlights a practical use case of Litecrypt. The process of securing and recovering encrypted files becomes incredibly straightforward. This outlines how to extract and encrypt data from files, establish connections between two databases by associating files and their respective keys using reference values to securely manage keys and file data. It briefly illustrates how  significantly simple the task of safeguarding data is.
+The process of securing and recovering encrypted files becomes incredibly straightforward. This outlines how to extract and encrypt data from files, establish connections between two databases by associating files and their respective keys using reference values to securely manage keys and file data.
 <br>Feel free to copy this demo and observe the output in your terminal.
 
 If you don't want to deal with code here's an
