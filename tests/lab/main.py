@@ -16,7 +16,6 @@ class Names:
     NEW_DIRECTORY = "new"
     FILES = deque(["file.txt", "file", "file.png"], maxlen=3)
 
-
 class Vals:
     MAIN_DB = Database(Names.MAIN_DB)
     KEYS_DB = Database(Names.KEYS_DB, for_keys=True)
