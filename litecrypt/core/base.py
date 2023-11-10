@@ -20,7 +20,7 @@ from litecrypt.core.helpers.funcs import (
 from litecrypt.utils import exceptions
 from litecrypt.utils.consts import Size, UseKDF
 
-DEFAULT_INTENSIVE_COMPUTE = True
+DEFAULT_INTENSIVE_COMPUTE = False
 
 class EncBase:
 
@@ -52,7 +52,6 @@ class EncBase:
                                key=self.mainkey,
                                salt_pepper=self.pepper,
                                iterations=self.iterations)
-
 
     @staticmethod
     def gen_key(desired_bytes: int = Size.AES_KEY) -> str:
