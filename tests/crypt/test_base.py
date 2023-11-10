@@ -4,11 +4,11 @@ import unittest
 import litecrypt.core.base as lc
 from litecrypt.utils import exceptions
 from litecrypt.utils.consts import Size
-
-MESSAGE_TO_TEST: bytes = b'MESSAGE123#"/?.@$%'
-TAMPERING_BYTES_VALUE: bytes = b"1"
-ABOVE_MAX_ITERATIONS_THRESHOLD: int = 10
-
+from ..lab.consts import (
+    MESSAGE_TO_TEST,
+    TAMPERING_BYTES_VALUE,
+    ABOVE_MAX_ITERATIONS_THRESHOLD,
+)
 
 class CoreModuleTesting(unittest.TestCase):
     def setUp(self) -> None:

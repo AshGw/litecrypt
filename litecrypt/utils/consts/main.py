@@ -17,7 +17,6 @@ class Size:
         FOR_ITERATIONS: int = 4
         FOR_KDF_SIGNATURE: int = 4
 
-
 @dataclass
 class UseKDF:
     SLOW: int = 0
