@@ -27,7 +27,7 @@ class StashKeys(StashBase):
 
 class Constructs:
     SQLITE = "sqlite:///"
-    POSTGRES = "postgresql//"
+    POSTGRES = "postgresql://"
     MYSQL = "mysql://"
 
 
