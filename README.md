@@ -1,7 +1,7 @@
 ![alt text](docs/assets/widelogo1.png)
 ![workflow](https://github.com/ashgw/litecrypt/actions/workflows/deploy.yaml/badge.svg)
 [![Static Badge](https://img.shields.io/badge/Docs-latest-%237e56c2)](https://ashgw.github.io/litecrypt)
-[![Python Versions](https://img.shields.io/badge/Python-3.7%7C%203.8%20%7C%203.9%20%7C%203.10%20%7C%203.11-blue)](https://pypi.org/project/litecrypt/)
+[![Python Versions](https://img.shields.io/badge/Python-3.7%7C3.8%7C3.9%7C3.10%7C3.11%7C3.12-blue)](https://pypi.org/project/litecrypt/)
 [![Static Badge](https://img.shields.io/badge/PyPI-latest-brightgreen)](https://pypi.org/project/litecrypt/)
 
 
