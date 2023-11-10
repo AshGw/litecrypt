@@ -1,12 +1,11 @@
 import hashlib
 import os
-import struct
 from typing import Tuple
 
 import bcrypt
 
 import litecrypt.utils.exceptions as exceptions
-from litecrypt.utils.consts import Size, UseKDF
+from litecrypt.utils.consts import Size
 
 
 def parse_message(message: str | bytes) -> bytes:

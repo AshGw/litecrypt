@@ -235,21 +235,3 @@ class DecBase:
         raw = self._unpadded_message()
         return raw if get_bytes else raw.decode("UTF-8")
 
-
-
-
-if __name__ == '__main__':
-    packed = struct.pack("!I",0)
-    a = struct.unpack("!I",packed)[0]
-    print(a)
-    key = EncBase.gen_key()
-    print(key)
-    messs = 'hey'
-    encry = EncBase(message=messs,mainkey=key).encrypt()
-    print(encry)
-    print('structs packer',struct.unpack("!I", b'\x00\x00\x002')[0])
-    print('--------------------------------')
-    print(DecBase(mainkey=key,message=encry).decrypt())
-
-
-
