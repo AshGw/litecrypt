@@ -5,7 +5,7 @@ with open("scripts/setup/minimal_requirements.txt") as f:
 
 setup(
     name="litecrypt",
-    version="0.1.1",
+    version="0.1.2",
     author="Ashref Gwader",
     author_email="AshrefGw@proton.me",
     python_requires=">=3.7",
