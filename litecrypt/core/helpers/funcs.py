@@ -69,6 +69,5 @@ def blazingly_fast_KDF(key: str, salt: bytes) -> bytes:
 
 def use_KDF(*,compute_intensively: bool,key: str, salt_pepper: bytes, iterations: int) -> bytes:
     if compute_intensively:
-        ...
-    #return intensive_KDF(mainkey=key,salt_pepper=salt_pepper,iterations=iterations)
+        return intensive_KDF(mainkey=key, salt_pepper=salt_pepper, iterations=iterations)
     return blazingly_fast_KDF(key=key,salt=salt_pepper)
