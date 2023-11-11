@@ -14,6 +14,7 @@ from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
 from litecrypt.core.helpers.funcs import (
     check_iterations,
     cipher_randomizers,
+    parse_encrypted_message,
     parse_message,
     use_KDF,
 )
@@ -38,8 +39,7 @@ class EncBase:
         self.iterations = iterations
 
         check_iterations(self.iterations)
-        if not self.key_verify(self.mainkey):
-            raise exceptions.dynamic.KeyLengthError()
+        self.key_verify(self.mainkey)
 
         self.iv, self.salt, self.pepper = cipher_randomizers()
 
@@ -67,15 +67,11 @@ class EncBase:
         return key.hex()
 
     @staticmethod
-    def key_verify(key: str) -> int:
-        try:
-            a = bytes.fromhex(key.strip())
-            if len(a) >= Size.MAIN_KEY:
-                return 1
-            else:
-                return 0
-        except ValueError:
-            return -1
+    def key_verify(key: str) -> None:
+        if len(bytes.fromhex(key.strip())) < Size.MAIN_KEY:
+            raise ValueError(
+                f"raw key size must be greater or equal to: {Size.MAIN_KEY} {Size.UNIT}"
+            )
 
     def _mode(self) -> modes.CBC:
         return modes.CBC(self.iv)
@@ -91,7 +87,7 @@ class EncBase:
         return self._cipher().encryptor()
 
     def _padded_message(self) -> bytes:
-        padder = padding.PKCS7(Size.BLOCK * 8).padder()
+        padder = padding.PKCS7(Size.BLOCK).padder()
         return padder.update(self.message) + padder.finalize()
 
     def _ciphertext(self) -> bytes:
@@ -155,13 +151,7 @@ class DecBase:
         _h = Size.HMAC
         _fi = Size.StructPack.FOR_ITERATIONS
         _fk = Size.StructPack.FOR_KDF_SIGNATURE
-
-        if isinstance(message, str):
-            mess = message.encode("UTF-8")
-            self.message = base64.urlsafe_b64decode(mess)
-        elif isinstance(message, bytes):
-            self.message = message
-
+        self.message = parse_encrypted_message(message)
         self.key = mainkey
         self.rec_hmac = self.message[:_h]
         self.rec_iv = self.message[_h : _h + _i]
@@ -234,7 +224,7 @@ class DecBase:
         )
 
     def _unpadded_message(self) -> bytes:
-        unpadder = padding.PKCS7(Size.BLOCK * 8).unpadder()
+        unpadder = padding.PKCS7(Size.BLOCK).unpadder()
         return unpadder.update(self._pre_unpadding()) + unpadder.finalize()
 
     def decrypt(self, get_bytes: Optional[bool] = False) -> Union[bytes, str]:

@@ -1,3 +1,4 @@
+import base64
 import hashlib
 import os
 from typing import Tuple, Union
@@ -8,11 +9,18 @@ import litecrypt.utils.exceptions as exceptions
 from litecrypt.utils.consts import Size
 
 
-def parse_message(message: Union[str,bytes]) -> bytes:
+def parse_message(message: Union[str, bytes]) -> bytes:
     msg = message.strip()
     if isinstance(message, str):
         msg = message.encode()
     return msg
+
+
+def parse_encrypted_message(message: Union[str, bytes]) -> bytes:
+    if isinstance(message, str):
+        return base64.urlsafe_b64decode(message.encode("UTF-8"))
+    elif isinstance(message, bytes):
+        return message
 
 
 def cipher_randomizers() -> Tuple[bytes, bytes, bytes]:

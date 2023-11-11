@@ -5,21 +5,20 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Generator, List, Optional, Union
 
+from sqlalchemy import MetaData
+from sqlalchemy.orm import sessionmaker
+
 from litecrypt.core.filecrypt import CryptFile
 from litecrypt.mapper.consts import Default, EngineFor, Status
 from litecrypt.mapper.engines import get_engine
-from litecrypt.mapper.models import (
-    Base,
+from litecrypt.mapper.interfaces import (
     Columns,
     DatabaseFailure,
     DatabaseResponse,
     DBError,
-    LcMetaData,
-    LcSessionMaker,
     QueryResponse,
-    StashKeys,
-    StashMain,
 )
+from litecrypt.mapper.models import Base, StashKeys, StashMain
 from litecrypt.utils.consts import Colors
 from litecrypt.utils.exceptions.fixed import ColumnDoesNotExist
 
@@ -30,8 +29,8 @@ class Database:
     Represents a database class with various methods to interact with a given database.
 
     This class provides a simplified interface to interact with a database,
-    designed for various database systems (MySQL, PostgreSQL and SQLite). It includes methods to connect to
-    the database, perform basic operations, and more.
+    designed for various database systems (MySQL, PostgreSQL and SQLite).
+    It includes methods to connect to the database, perform basic operations, and more.
 
     :param url: The URL or connection string for the database.
     :param echo: If True, the engine will log all statements as well as a table of execution times.
@@ -51,7 +50,7 @@ class Database:
             engine_for=self.engine_for, echo=self.echo, url=self.url
         )
         self.create_all()
-        Session = LcSessionMaker(bind=self.engine)
+        Session = sessionmaker(bind=self.engine)
         self.session = Session()
         self.columns: list = Columns.list()
         self.Table = StashKeys if self.for_keys else StashMain
@@ -176,7 +175,7 @@ class Database:
     def show_tables(self) -> Union[List[str], DatabaseFailure]:
         """Retrieve a list of table names in the database."""
         try:
-            metadata = LcMetaData()
+            metadata = MetaData()
             metadata.reflect(bind=self.engine)
             return list(metadata.tables.keys())
         except DBError as e:
