@@ -16,6 +16,12 @@ def remove_protocol(engine_string: str):
     return engine_string[:colon_index] if colon_index != -1 else engine_string
 
 
+class EngineFor:
+    SQLITE = remove_protocol(EngineConstructs.SQLITE)
+    MYSQL = remove_protocol(EngineConstructs.MYSQL)
+    POSTGRESQL = remove_protocol(EngineConstructs.POSTGRES)
+
+
 class Status(str):
     SUCCESS = "SUCCESS"
     FAILURE = "FAILURE"
@@ -24,3 +30,4 @@ class Status(str):
 class Default(str):
     KEY = "STANDALONE"
     SPAWN_DIRECTORY = "."
+    ENGINE = EngineFor.SQLITE

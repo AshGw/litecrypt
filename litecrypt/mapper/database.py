@@ -5,18 +5,17 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Generator, List, Optional, Union
 
-from sqlalchemy import MetaData
-from sqlalchemy.orm import sessionmaker
-
 from litecrypt.core.filecrypt import CryptFile
-from litecrypt.mapper.consts import Default, Status
-from litecrypt.mapper.engines import EngineFor, get_engine
+from litecrypt.mapper.consts import Default, EngineFor, Status
+from litecrypt.mapper.engines import get_engine
 from litecrypt.mapper.models import (
     Base,
     Columns,
     DatabaseFailure,
     DatabaseResponse,
     DBError,
+    LcMetaData,
+    LcSessionMaker,
     QueryResponse,
     StashKeys,
     StashMain,
@@ -43,7 +42,7 @@ class Database:
 
     url: str = field()
     echo: bool = field(default=False)
-    engine_for: str = field(default=EngineFor.SQLITE)
+    engine_for: str = field(default=Default.ENGINE)
     for_main: Optional[bool] = True
     for_keys: Optional[bool] = False
 
@@ -52,7 +51,7 @@ class Database:
             engine_for=self.engine_for, echo=self.echo, url=self.url
         )
         self.create_all()
-        Session = sessionmaker(bind=self.engine)
+        Session = LcSessionMaker(bind=self.engine)
         self.session = Session()
         self.columns: list = Columns.list()
         self.Table = StashKeys if self.for_keys else StashMain
@@ -177,7 +176,7 @@ class Database:
     def show_tables(self) -> Union[List[str], DatabaseFailure]:
         """Retrieve a list of table names in the database."""
         try:
-            metadata = MetaData()
+            metadata = LcMetaData()
             metadata.reflect(bind=self.engine)
             return list(metadata.tables.keys())
         except DBError as e:
@@ -530,8 +529,3 @@ def _echo_dict(dictionary: dict, echo: Optional[bool] = False):
                 value_colored = Colors.CYAN + str(value) + Colors.RESET
 
             print(f"{key_colored}: {value_colored}")
-
-
-if __name__ == "__main__":
-    print(Database.__name__)
-    print(Status.__name__.lower())

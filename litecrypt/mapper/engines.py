@@ -3,13 +3,7 @@ from typing import Optional
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
-from litecrypt.mapper.consts import EngineConstructs, remove_protocol
-
-
-class EngineFor:
-    SQLITE = remove_protocol(EngineConstructs.SQLITE)
-    MYSQL = remove_protocol(EngineConstructs.MYSQL)
-    POSTGRESQL = remove_protocol(EngineConstructs.POSTGRES)
+from litecrypt.mapper.consts import EngineConstructs, EngineFor
 
 
 def get_engine(
@@ -27,7 +21,3 @@ def get_engine(
     else:
         raise ValueError(f"Unsupported engine type: {engine}")
     return create_engine(engine_type, echo=echo, **kwargs)
-
-
-if __name__ == "__main__":
-    print(EngineFor.SQLITE)

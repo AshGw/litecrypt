@@ -1,12 +1,21 @@
 from typing import Any, Dict, List, Optional
 
-from sqlalchemy import BLOB, Column, Integer, String
+from sqlalchemy import BLOB, Column, Integer, MetaData, String
 from sqlalchemy.exc import DatabaseError
 from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 from litecrypt.mapper.consts import BaseColumns, Status
 
 Base = declarative_base()
+
+
+class LcMetaData(MetaData):
+    ...
+
+
+class LcSessionMaker(sessionmaker):
+    ...
 
 
 class StashBase(Base):
