@@ -68,8 +68,47 @@ print(encrypted)  # Check the return value
 
 Currently, supports MySQL, PostgreSQL and SQLite, check the [docs](https://ashgw.github.io/litecrypt) for more info.
 
-
 <h3>Example Usage</h3>
+
+```python
+from litecrypt import CryptFile, Database, gen_key, gen_ref
+
+files = ["file", "image.png", "notes.txt"]
+
+encryption_key = gen_key()
+print(encryption_key) # check it out
+
+# encrypt files
+for file in files:
+    CryptFile(file,key=encryption_key).encrypt(echo=True)
+    # each one of these files ends with .crypt now
+
+same_files_but_with_crypt_extension = ["file.crypt",
+                                       "image.png.crypt",
+                                       "notes.txt.crypt"]
+
+# Create & connect to the databases (sqlite for now)
+main_db = Database('xyz_main.db',echo=True)
+keys_db = Database('xyz_keys.db',for_keys=True,echo=True)
+
+# To link up the two databases generate a:
+reference_value = gen_ref()
+print(reference_value) # check it out
+
+for encrypted_file_name in same_files_but_with_crypt_extension:
+    with open(encrypted_file_name,'rb') as f:
+        encrypted_file_binary_content = f.read()
+        # Insert encrypted content and keys into the databases
+        # & link'em up with a ref value
+        main_db.insert(encrypted_file_name,
+                       encrypted_file_binary_content,
+                       ref=reference_value)
+        keys_db.insert(encrypted_file_name,
+                       encryption_key,
+                       ref=reference_value)
+```
+
+Here's what's happening:
 
 Let's say we have 3 files: `file`, `image.png`, and `notes.txt` in a directory called `test`:
 
@@ -95,7 +134,8 @@ for file, content in zip(files, file_contents):
 # The files now exist in the directory test/
 ```
 </details>
-Now we'll leave the files there and take their content, encrypt it, and store it in a database.
+
+Leave the files in there, take a **copy** of their content, encrypt it, and store it in a database.
 <br>You never know when you'll need them.
 <details><summary>Collect the content</summary>
 
@@ -106,7 +146,6 @@ for file in files:
     file_contents.append(file_content)
 
 ```
-Now we have a list containing each of these files' content
 </details>
 
 </details>
@@ -122,19 +161,20 @@ for content in file_contents:
     encrypted_contents.append(encrypted_content)
 ```
 </details>
-Now that we have their content encrypted we need storage
+
+With a **copy** of the content encrypted we need storage
 
 ```python
 from litecrypt import Database, gen_ref
 
-# Create & connect to the databases (sqlite for simplicity)
+# Create & connect to the databases (sqlite for now)
 main_db = Database('secure_vault.db')
-keys_db = Database('secure_vaultKeys.db',for_keys=True) # Specify it's for keys
+keys_db = Database('secure_vaultKeys.db',for_keys=True)
 
 # Generate a key reference value to link up the two databases with
 key_ref = gen_ref()
 
-# Insert encrypted content and keys into databases
+# Insert encrypted content and keys into the databases
 for file, encrypted_content in zip(files, encrypted_contents):
     main_db.insert(filename=f'does-not-matter/{file}.crypt', content=encrypted_content, ref=key_ref)
     keys_db.insert(filename=f'does-not-matter/{file}.crypt', content=key, ref=key_ref)
@@ -216,7 +256,7 @@ keys_db = Database("secure_vaultKeys.db",for_keys=True)  # Specify it's for keys
 # Generate a key reference value to link up the two databases with
 key_ref = gen_ref()
 
-# Insert encrypted content and keys into databases
+# Insert encrypted content and keys into the databases
 for file, encrypted_content in zip(files, encrypted_contents):
     main_db.insert(
         filename=f"does-not-matter/{file}.crypt", content=encrypted_content, ref=key_ref
@@ -250,7 +290,7 @@ That's it! Try this yourself and see the output in the terminal.
 
 ![alt text](docs/assets/GUI.png)
 
-**The place where everything comes together, a user-friendly software that combines the library's power into an easy-to-use application.**
+**The place where everything comes together, a user-friendly graphical user interface that combines the library's power into one easy-to-use app.**
 
 <details><summary>Check the GUI demo</summary>
 
