@@ -1,6 +1,3 @@
-from re import sub
-
-
 class BaseColumns:
     id: str = "id"
     content: str = "content"
@@ -15,8 +12,8 @@ class EngineConstructs:
 
 
 def remove_protocol(engine_string: str):
-    # Use regex to remove ":" and anything after it
-    return sub(r":.*", "", engine_string)
+    colon_index = engine_string.find(":")
+    return engine_string[:colon_index] if colon_index != -1 else engine_string
 
 
 class Status(str):
