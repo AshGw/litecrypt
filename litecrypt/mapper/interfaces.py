@@ -23,7 +23,7 @@ class DatabaseResponse(Dict):
         status: str = None,
         filenames: List[str] = None,
         contents: Any = None,
-        keys: list[str] = None,
+        keys: List[str] = None,
     ):
         super().__init__(
             status=status, filenames=filenames, contents=contents, keys=keys
