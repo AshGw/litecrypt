@@ -322,7 +322,7 @@ def _spawn_single_file(
     key_reference: str,
     directory: Optional[str] = Default.SPAWN_DIRECTORY,
     echo: Optional[bool] = False,
-) -> DatabaseResponse | None:
+) -> Union[DatabaseResponse, None]:
     try:
         content = reference_linker(
             connection=main_connection,
