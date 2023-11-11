@@ -203,13 +203,7 @@ spawned = spawn(main_connection=main_db,
 ```
 
 That's it! They exist now in the 'spawned/' directory, encrypted though like we put them.
-<details><summary>How does it work ?</summary>
-Use your editor you'll get a concise explanation on what each function does:
 
-
-![alt text](docs/assets/spawn-func.png)
-
-</details>
 How about we decrypt them ?
 
 ```python

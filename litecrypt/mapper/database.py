@@ -3,14 +3,22 @@
 import os
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Dict, Generator, List, Optional, Union
+from typing import Any, Generator, List, Optional, Union
 
 from sqlalchemy import MetaData
 from sqlalchemy.orm import sessionmaker
 
 from litecrypt.core.filecrypt import CryptFile
+from litecrypt.mapper.consts import Default, EngineFor, Status
 from litecrypt.mapper.engines import get_engine
-from litecrypt.mapper.models import Base, DatabaseFailure, DBError, StashKeys, StashMain
+from litecrypt.mapper.interfaces import (
+    Columns,
+    DatabaseFailure,
+    DatabaseResponse,
+    DBError,
+    QueryResponse,
+)
+from litecrypt.mapper.models import Base, StashKeys, StashMain
 from litecrypt.utils.consts import Colors
 from litecrypt.utils.exceptions.fixed import ColumnDoesNotExist
 
@@ -21,8 +29,8 @@ class Database:
     Represents a database class with various methods to interact with a given database.
 
     This class provides a simplified interface to interact with a database,
-    designed for various database systems (MySQL, PostgreSQL and SQLite). It includes methods to connect to
-    the database, perform basic operations, and more.
+    designed for various database systems (MySQL, PostgreSQL and SQLite).
+    It includes methods to connect to the database, perform basic operations, and more.
 
     :param url: The URL or connection string for the database.
     :param echo: If True, the engine will log all statements as well as a table of execution times.
@@ -33,7 +41,7 @@ class Database:
 
     url: str = field()
     echo: bool = field(default=False)
-    engine_for: str = field(default="sqlite")
+    engine_for: str = field(default=Default.ENGINE)
     for_main: Optional[bool] = True
     for_keys: Optional[bool] = False
 
@@ -44,15 +52,15 @@ class Database:
         self.create_all()
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
-        self.columns = ["filename", "content", "ref"]
+        self.columns: list = Columns.list()
         self.Table = StashKeys if self.for_keys else StashMain
 
     @property
     def size(self) -> Union[float, DatabaseFailure, None]:
         """Get the size of the SQLite database in megabytes."""
-        if self.engine_for != "sqlite":
+        if self.engine_for != EngineFor.SQLITE:
             if self.echo:
-                print("This function only supports SQLite databases.")
+                print(f"This function only supports {EngineFor.SQLITE} databases.")
                 return
         try:
             raw = "SELECT page_count * page_size FROM pragma_page_count(), pragma_page_size"
@@ -63,9 +71,9 @@ class Database:
     @property
     def last_mod(self) -> Union[datetime, DatabaseFailure, None]:
         """Get the last modification timestamp of the SQLite database file."""
-        if self.engine_for != "sqlite":
+        if self.engine_for != EngineFor.SQLITE:
             if self.echo:
-                print("This function only supports SQLite databases.")
+                print(f"This function only supports {EngineFor.SQLITE} databases.")
             return
         try:
             return datetime.fromtimestamp(os.stat(self.url).st_mtime)
@@ -73,13 +81,13 @@ class Database:
             return DatabaseFailure(failure=1, error=e).get()
 
     @property
-    def current_table(self):
+    def current_table(self) -> str:
         """Returns the table name of the current database"""
         return self.Table.__name__
 
     def end_session(self):
         """
-         Closes the database session and commits pending transactions.
+        Closes the database session and commits pending transactions.
 
         If there is an active session, this method commits any pending
         transactions and then closes the session to the SQLite database.
@@ -94,11 +102,11 @@ class Database:
         self.session.commit()
         self.session.close()
 
-    def create_all(self):
+    def create_all(self) -> None:
         """Creates all the tables in the database."""
         Base.metadata.create_all(bind=self.engine)
 
-    def insert(self, filename: str, content: Union[bytes, str], ref: str):
+    def insert(self, filename: str, content: Union[bytes, str], ref: str) -> None:
         """
         Adds a new record to the current table with the specified
         filename, content, and reference values.
@@ -114,7 +122,7 @@ class Database:
         self.session.add(record)
         self.session.commit()
 
-    def update(self, *, column: str, id: int, value):
+    def update(self, *, column: str, id: int, value) -> None:
         """
         Updates the value of the specified column for a record with
         the given ID in the current table.
@@ -177,7 +185,7 @@ class Database:
         """Drop all defined tables within the database"""
         Base.metadata.drop_all(self.engine)
 
-    def drop_content(self, id_: int) -> Union[int, DatabaseFailure]:
+    def drop_content(self, id_: int) -> Union[None, DatabaseFailure]:
         """Delete a specific record from the current table by its ID."""
         try:
             row = (
@@ -199,26 +207,26 @@ class Database:
             try:
                 rows = self.session.execute(statement=query).fetchall()
                 if len(rows) == 1:
-                    result.append({f"query {i}": ["SUCCESS", rows[0]]})
+                    result.append({f"query {i}": [Status.SUCCESS, rows[0]]})
                 else:
-                    result.append({f"query {i}": ["SUCCESS", rows]})
+                    result.append({f"query {i}": [Status.SUCCESS, rows]})
 
             except DBError as e:
-                result.append({f"query {i}": ("FAILURE", e.__str__())})
+                result.append({f"query {i}": (Status.FAILURE, e.__str__())})
         return result
 
-    def query(self, query: str, params: Optional[tuple] = None) -> dict:
+    def query(self, query: str, params: Optional[tuple] = None) -> QueryResponse:
         try:
             if params:
                 rows = self.session.execute(query, params).fetchall()
             else:
                 rows = self.session.execute(query).fetchall()
             if len(rows) == 1:
-                return {"status": "SUCCESS", "result": rows}
+                return QueryResponse(status=Status.SUCCESS, result=rows)
             else:
-                return {"status": "SUCCESS", "result": rows}
+                return QueryResponse(status=Status.SUCCESS, result=rows)
         except DBError as e:
-            return {"status": "FAILURE", "result": str(e)}
+            return QueryResponse(status=Status.SUCCESS, result=str(e))
 
 
 def reference_linker(
@@ -312,9 +320,9 @@ def _spawn_single_file(
     main_connection: Database,
     keys_connection: Database,
     key_reference: str,
-    directory: Optional[str] = ".",
+    directory: Optional[str] = Default.SPAWN_DIRECTORY,
     echo: Optional[bool] = False,
-) -> Dict[str, Any]:
+) -> Union[DatabaseResponse, None]:
     try:
         content = reference_linker(
             connection=main_connection,
@@ -334,9 +342,9 @@ def _spawn_single_file(
             get_content_or_key=True,
         )
 
-        if CryptFile.key_verify(key) != 1 and key != "STANDALONE":
+        if CryptFile.key_verify(key) != 1 and key != Default.KEY:
             raise ValueError(
-                "Invalid key, check if Database object placement is correct."
+                f"Invalid key, check if {Database.__name__} object placement is correct."
             )
 
         full_path = os.path.join(directory, filename)
@@ -350,14 +358,13 @@ def _spawn_single_file(
                 f"{directory}{Colors.RESET}"
             )
 
-        return {
-            "status": "SUCCESS",
-            "filenames": [
-                os.path.join(directory, filename)
-            ],  # made lists out of them for easy exec
-            "contents": [content],
-            "keys": [key],
-        }
+        return DatabaseResponse(
+            status=Status.SUCCESS,
+            filenames=[os.path.join(directory, filename)],
+            contents=[content],
+            keys=[key],
+        )
+
     except BaseException:
         pass
 
@@ -366,10 +373,10 @@ def _spawn_all_files(
     main_connection: Database,
     keys_connection: Database,
     key_reference: str,
-    directory: Optional[str] = ".",
+    directory: Optional[str] = Default.SPAWN_DIRECTORY,
     ignore_duplicate_files: Optional[bool] = False,
     echo: Optional[bool] = False,
-) -> Dict[str, Any]:
+) -> DatabaseResponse:
     try:
         keys_list = reference_linker(
             connection=keys_connection,
@@ -378,10 +385,10 @@ def _spawn_all_files(
             get_all=True,
         )
         for key in keys_list:
-            if CryptFile.key_verify(key) != 1 and key != "STANDALONE":
+            if CryptFile.key_verify(key) != 1 and key != Default.KEY:
                 raise ValueError(
                     "Invalid key for cryptographic usage detected, mismatch found"
-                    " check if Database object placement is correct."
+                    f" check if {Database.__name__} object placement is correct."
                 )
 
         contents_list = reference_linker(
@@ -439,12 +446,12 @@ def _spawn_all_files(
         files_in_new_directory = [
             os.path.join(directory, file) for file in filenames_list
         ]
-        return {
-            "status": "SUCCESS",
-            "filenames": files_in_new_directory,
-            "contents": contents_list,
-            "keys": keys_list,
-        }
+        return DatabaseResponse(
+            status=Status.SUCCESS,
+            filenames=files_in_new_directory,
+            contents=contents_list,
+            keys=keys_list,
+        )
 
     except Exception as e:
         raise e
@@ -455,11 +462,11 @@ def spawn(
     main_connection: Database,
     keys_connection: Database,
     key_reference: str,
-    directory: Optional[str] = ".",
+    directory: Optional[str] = Default.SPAWN_DIRECTORY,
     get_all: Optional[bool] = False,
     ignore_duplicate_files: Optional[bool] = False,
     echo: Optional[bool] = False,
-) -> Dict[str, List[Union[bytes, str]]]:
+) -> DatabaseResponse:
     """
     Depending on the parameters, this function can fetch a single file or multiple
     files associated with the provided key_reference.
@@ -478,24 +485,14 @@ def spawn(
         echo (bool, optional): Whether to print result information. Default is False.
 
     Returns:
-        dict: A dictionary containing the outcome of the retrieval and creation process.
-            - 'status' (str): The operation status, either 'SUCCESS' or 'FAILURE'.
-            - 'filenames' (List[str]): The names of the created files.
-            - 'contents' (List[bytes]): The contents of the created files.
-            - 'keys' (List[str]): The associated encryption/decryption keys.
-
+            DatabaseResponse Object containing the outcome of the retrieval and creation process.
     """
     if main_connection is keys_connection:
         raise ValueError("Main and keys databases must be different")
 
     elif not os.path.isdir(directory):
-        raise ValueError("Provide a valid directory")
-    result = {
-        "status": "FAILURE",
-        "filenames": None,
-        "contents": None,
-        "keys": None,
-    }
+        raise ValueError(f"{directory} is not a valid directory")
+    result = DatabaseResponse(status=Status.FAILURE)
 
     if get_all:
         result = _spawn_all_files(
@@ -523,9 +520,9 @@ def _echo_dict(dictionary: dict, echo: Optional[bool] = False):
         for key, value in dictionary.items():
             key_colored = Colors.YELLOW + key + Colors.RESET
 
-            if key == "status" and value == "SUCCESS":
+            if key == Status.__name__.lower() and value == Status.SUCCESS:
                 value_colored = Colors.GREEN + str(value) + Colors.RESET
-            elif key == "status" and value == "FAILURE":
+            elif key == Status.__name__.lower() and value == Status.FAILURE:
                 value_colored = Colors.RED + str(value) + Colors.RESET
             else:
                 value_colored = Colors.CYAN + str(value) + Colors.RESET

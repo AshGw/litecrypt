@@ -26,7 +26,7 @@ class CryptFile:
     iteration_rounds: int = field(default=Size.MIN_ITERATIONS)
 
     def __post_init__(self):
-        if self.key_verify(self.key) != 1:
+        if not self.key_verify(self.key):
             raise exceptions.dynamic.KeyLengthError()
 
     @staticmethod
