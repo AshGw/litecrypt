@@ -7,7 +7,7 @@
 
 ## Welcome to Litecrypt
 
-Litecrypt is a minimal library that provides a simple solution for encrypting and decrypting data and files. Prioritizing both security and ease of use, by employing AES-256 encryption in CBC mode **blazingly fast** or **compute-intensive**. The library offers the added benefit of secure storage, ensuring the protection of sensitive information. For those seeking a user-friendly experience, an accompanying graphical user interface is also available.
+Litecrypt is a minimal library that provides a simple solution for encrypting and decrypting data and files. Prioritizing both security and ease of use, by employing AES-256 encryption in CBC mode (**blazingly fast**/**compute-intensive**). The library offers the added benefit of secure storage, ensuring the protection of sensitive information. For those seeking a user-friendly experience, an accompanying graphical user interface is also available.
 
 ## Example Usage
 
