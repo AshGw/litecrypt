@@ -42,6 +42,8 @@ jobs:
 
       - name: Running consts tests
         run: pytest tests/consts
+      - name: Running helpers tests
+        run: pytest tests/helpers
       - name: Running crypt tests
         run: pytest tests/crypt
       - name: Running database tests
