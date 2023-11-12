@@ -40,10 +40,13 @@ jobs:
            python -m setup develop
            rm -rf litecrypt.egg-info
 
+      - name: Running consts tests
+        run: pytest tests/consts
       - name: Running crypt tests
         run: pytest tests/crypt
       - name: Running database tests
         run: pytest tests/database/test_workflow.py --no-header --no-summary -q
+
 
   run-tests-2:
     needs: run-tests
