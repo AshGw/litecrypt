@@ -1,5 +1,7 @@
 import unittest
+
 from litecrypt.core.helpers.funcs import blazingly_fast_KDF
+
 
 class TestFastKDFFunction(unittest.TestCase):
     def test_blazingly_fast_KDF(self):
@@ -11,6 +13,5 @@ class TestFastKDFFunction(unittest.TestCase):
         self.assertEqual(len(derived_key), 32)  # SHA-256 pops a 256-bit hash
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

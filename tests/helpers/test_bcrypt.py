@@ -1,5 +1,7 @@
 import unittest
-from litecrypt.core.helpers.funcs import intensive_KDF, Size
+
+from litecrypt.core.helpers.funcs import Size, intensive_KDF
+
 
 class TestKDFFunction(unittest.TestCase):
     def test_intensive_KDF(self):
@@ -26,5 +28,6 @@ class TestKDFFunction(unittest.TestCase):
         with self.assertRaises(ValueError):
             intensive_KDF(mainkey, salt_pepper, iterations)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()
