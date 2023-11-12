@@ -11,13 +11,8 @@ from sqlalchemy.orm import sessionmaker
 from litecrypt.core.filecrypt import CryptFile
 from litecrypt.mapper.consts import Default, EngineFor, Status
 from litecrypt.mapper.engines import get_engine
-from litecrypt.mapper.interfaces import (
-    Columns,
-    DatabaseFailure,
-    DatabaseResponse,
-    DBError,
-    QueryResponse,
-)
+from litecrypt.mapper.interfaces import (Columns, DatabaseFailure, DatabaseResponse, DBError,
+                                         QueryResponse)
 from litecrypt.mapper.models import Base, StashKeys, StashMain
 from litecrypt.utils.consts import Colors
 from litecrypt.utils.exceptions.fixed import ColumnDoesNotExist

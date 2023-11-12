@@ -16,9 +16,10 @@ class Names:
     NEW_DIRECTORY = "new" + uuid4().hex
     FILES = deque(["file.txt", "file", "file.png"], maxlen=3)
 
+
 class Vals:
-    MAIN_DB = Database(Names.MAIN_DB,echo=True)
-    KEYS_DB = Database(Names.KEYS_DB, for_keys=True,echo=True)
+    MAIN_DB = Database(Names.MAIN_DB, echo=True)
+    KEYS_DB = Database(Names.KEYS_DB, for_keys=True, echo=True)
     FILE_CONTENTS = [uuid4().bytes for _ in range(len(Names.FILES))]
 
 
