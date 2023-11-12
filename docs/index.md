@@ -42,37 +42,181 @@ CryptFile('notes.txt.crypt',key=key).decrypt(echo=True)
 
 ### Database usage
 
-```py linenums="1"
-from litecrypt import Crypt, CryptFile, Database, gen_key, gen_ref
 
-# Create connections to the main and keys databases
-main_conn = Database('vault.db')
-keys_conn = Database('vaultKeys.db',for_keys=True)
+Let's say we have 3 files: `file`, `image.png`, and `notes.txt` in a directory called `test`:
 
-# Specify the filename you want to store in the database
-filename = 'notes.csv'
+```python
+files = ['test/file', 'test/image.png', 'test/notes.txt']
+```
+<details><summary>Click me to make them</summary>
 
-# Get the binary data content of the specified file
-file_data = CryptFile.get_binary(filename)
+```python
+import os
+from litecrypt import CryptFile
 
-# Generate an encryption key and a reference value
-encryption_key = gen_key()
-reference_value = gen_ref()
+# Create a directory for testing
+os.mkdir('test')
 
-# Encrypt the file data using the encryption key
-encrypted_file_data = Crypt(data=file_data, key=encryption_key).encrypt()
+# Create sample files
+files = ['test/file', 'test/image.png', 'test/notes.txt']
+file_contents = [b'some data', b'binary data of some image', b'some notes']
 
-# Insert the encrypted file data, content reference, and encryption key into the main database
-main_conn.insert(filename=filename + '.crypt',
-                 content=encrypted_file_data,
-                 ref=reference_value)
+for file, content in zip(files, file_contents):
+    CryptFile.make_file(filename=file, content=content)
 
-# Insert the encryption key and reference into the keys database
-keys_conn.insert(filename=filename + '.crypt',
-                 content=encryption_key,
-                 ref=reference_value)
+# The files now exist in the directory test/
+```
+</details>
+
+Leave the files in there, take a **copy** of their content, encrypt it, and store it in a database.
+<br>You never know when you'll need them.
+<details><summary>Collect the content</summary>
+
+```python
+file_contents = []
+for file in files:
+    file_content = CryptFile.get_binary(file)
+    file_contents.append(file_content)
 
 ```
+</details>
+
+</details>
+<details><summary>Encrypt each file content</summary>
+
+```python
+from litecrypt import Crypt, gen_key
+
+key = gen_key()
+encrypted_contents = []
+for content in file_contents:
+    encrypted_content = Crypt(content, key).encrypt(get_bytes=True)
+    encrypted_contents.append(encrypted_content)
+```
+</details>
+
+With a **copy** of the content encrypted we need storage
+
+```python
+from litecrypt import Database, gen_ref
+
+# Create & connect to the databases (sqlite for now)
+main_db = Database('secure_vault.db')
+keys_db = Database('secure_vaultKeys.db',for_keys=True)
+
+# Generate a key reference value to link up the two databases with
+key_ref = gen_ref()
+
+# Insert encrypted content and keys into the databases
+for file, encrypted_content in zip(files, encrypted_contents):
+    main_db.insert(filename=f'does-not-matter/{file}.crypt', content=encrypted_content, ref=key_ref)
+    keys_db.insert(filename=f'does-not-matter/{file}.crypt', content=key, ref=key_ref)
+# Add .crypt to indicate they're encrypted
+```
+
+Done! Your files are still in `test/`, but you now have encrypted copies of them in the main database.
+<br>The keys used for encryption are stored in the keys database.
+<br>You can encrypt your keys database too, but for this demo, let it be as is.
+
+**✈️  You're somewhere else now. How do you get the files back?**
+<br>Let's simulate this by creating another directory, which we'll call `spawned`:
+```python
+os.mkdir('spawned')
+```
+Now, retrieve the files:
+
+```py linenums="1"
+from litecrypt import spawn
+
+main_db = ... #  your Database connection instance
+keys_db = ... # Your Database connection instance for keys
+key_ref = ... # The reference value used for the file/key combo used
+
+spawned = spawn(main_connection=main_db,
+                       keys_connection=keys_db,
+                       key_reference=key_ref,
+                       directory='spawned',
+                       get_all=True,
+                       echo=True)
+```
+
+That's it! They exist now in the 'spawned/' directory, encrypted though like we put them.
+
+How about we decrypt them ?
+
+```python
+for file, key in zip(spawned['filenames'], spawned['keys']):
+    CryptFile(file, key).decrypt(echo=True)
+```
+Your files are retrieved and decrypted. Check if the files in `test/` match the files in `spawned/`.
+<details><summary>Here's the full demo</summary>
+
+```py linenums="1"
+import os
+
+from litecrypt import Crypt, CryptFile, Database, gen_key, gen_ref, spawn
+
+# Create a directory for testing
+os.mkdir("test")
+
+# Create sample files
+files = ["test/file", "test/image.png", "test/notes.txt"]
+file_contents = [b"some data", b"binary data of some image", b"some notes"]
+
+for file, content in zip(files, file_contents):
+    CryptFile.make_file(filename=file, content=content)
+
+# The files now exist in the directory test/
+
+# Collect each file's content
+file_contents = []
+for file in files:
+    file_content = CryptFile.get_binary(file)
+    file_contents.append(file_content)
+
+# Encrypt each file's content one by one
+key = gen_key()
+encrypted_contents = []
+for content in file_contents:
+    encrypted_content = Crypt(content, key).encrypt(get_bytes=True)
+    encrypted_contents.append(encrypted_content)
+
+# Initialize the main & the associated keys database
+main_db = Database("secure_vault.db")
+keys_db = Database("secure_vaultKeys.db",for_keys=True)  # Specify it's for keys
+
+# Generate a key reference value to link up the two databases with
+key_ref = gen_ref()
+
+# Insert encrypted content and keys into the databases
+for file, encrypted_content in zip(files, encrypted_contents):
+    main_db.insert(
+        filename=f"does-not-matter/{file}.crypt", content=encrypted_content, ref=key_ref
+    )
+    keys_db.insert(filename=f"does-not-matter/{file}.crypt", content=key, ref=key_ref)
+# Add .crypt to indicate they're encrypted
+
+# Create another directory
+os.mkdir("spawned")
+
+# The files will now pop into existence in this new directory
+spawned = spawn(
+    main_connection=main_db,
+    keys_connection=keys_db,
+    key_reference=key_ref,
+    directory="spawned",
+    get_all=True,
+    echo=True,
+)
+
+# Decrypt them
+for file, key in zip(spawned["filenames"], spawned["keys"]):
+    CryptFile(file, key).decrypt(echo=True)
+```
+
+</details>
+
+
 ### Supported Databases
 
 The library currently supports: MySQL, PostgreSQL and SQLite.
@@ -122,76 +266,5 @@ In this situation, the keys database should be kept safe, preferably encrypted. 
 
 The process of getting files back really simple, actually it's just one function called `spawn()`.
 
-Here's a complete workflow on how Litecrypt might be used:
-
-### Demo
-```py linenums="1"
-import os
-
-from litecrypt import Crypt, CryptFile, Database, gen_key, gen_ref, spawn
-
-# Create a directory for testing
-os.mkdir("test")
-
-# Create sample files
-files = ["test/file", "test/image.png", "test/notes.txt"]
-file_contents = [b"some data", b"binary data of some image", b"some notes"]
-
-for file, content in zip(files, file_contents):
-    CryptFile.make_file(filename=file, content=content)
-
-# The files now exist in the directory test/
-
-# Collect each file's content
-file_contents = []
-for file in files:
-    file_content = CryptFile.get_binary(file)
-    file_contents.append(file_content)
-
-# Encrypt each file's content one by one
-key = gen_key()
-encrypted_contents = []
-for content in file_contents:
-    encrypted_content = Crypt(content, key).encrypt(get_bytes=True)
-    encrypted_contents.append(encrypted_content)
-
-
-# Initialize the main & the associated keys database
-main_db = Database("secure_vault.db")
-keys_db = Database("secure_vaultKeys.db",for_keys=True)  # to hold the keys
-
-# Generate a key reference value to link up the two databases with
-key_ref = gen_ref()
-
-# Insert encrypted content and keys into databases
-for file, encrypted_content in zip(files, encrypted_contents):
-    main_db.insert(
-        filename=f"does-not-matter/{file}.crypt", content=encrypted_content, ref=key_ref
-    )
-    keys_db.insert(filename=f"does-not-matter/{file}.crypt", content=key, ref=key_ref)
-# Add .crypt to indicate they're encrypted
-
-# Create another directory
-os.mkdir("spawned")
-
-# The files will now pop into existence in this new directory
-spawned = spawn(
-    main_connection=main_db,
-    keys_connection=keys_db,
-    key_reference=key_ref,
-    directory="spawned",
-    get_all=True,
-    echo=True,
-)
-
-# Decrypt them
-for file, key in zip(spawned["filenames"], spawned["keys"]):
-    CryptFile(file, key).decrypt(echo=True)
-```
-
-The process of securing and recovering encrypted files becomes incredibly straightforward. This outlines how to extract and encrypt data from files, establish connections between two databases by associating files and their respective keys using reference values to securely manage keys and file data.
-<br>Feel free to copy this demo and observe the output in your terminal.
-
-If you don't want to deal with code here's an
 ## All In One App
 Wait... Install the library first
