@@ -46,8 +46,7 @@ jobs:
         run: pytest tests/helpers
       - name: Running crypt tests
         run: pytest tests/crypt
-      - name: Running database tests
-        run: pytest tests/database/test_workflow.py --no-header --no-summary -q
+
 
 
   run-tests-2:
@@ -79,6 +78,9 @@ jobs:
 
       - name: Running crypt tests
         run: pytest tests/crypt
+
+      - name: Running all tests
+        run: pytest
 
 
   build-then-publish-pypi:
