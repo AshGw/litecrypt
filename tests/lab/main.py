@@ -10,8 +10,8 @@ from litecrypt.utils.consts import Colors
 
 
 class Names:
-    MAIN_DB = "MAIN.db"
-    KEYS_DB = "KEYS.db"
+    MAIN_DB = "main" + uuid4().hex + ".db"
+    KEYS_DB = "keys" + uuid4().hex + ".db"
     ORIGINAL_DIRECTORY = "original" + uuid4().hex
     NEW_DIRECTORY = "new" + uuid4().hex
     FILES = deque(["file.txt", "file", "file.png"], maxlen=3)
