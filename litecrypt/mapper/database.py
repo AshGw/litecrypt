@@ -3,7 +3,7 @@
 import os
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Generator, List, Optional, Union, Dict
+from typing import Any, Generator, List, Optional, Union, Dict, Tuple
 
 from sqlalchemy import MetaData
 from sqlalchemy.orm import sessionmaker
@@ -148,7 +148,7 @@ class Database:
             setattr(row, column, value)
             self.session.commit()
 
-    def content(self) -> Union[Generator, DatabaseFailure]:
+    def content(self) -> Union[Generator, DatabaseResponse]:
         """
         Queries and returns ALL records from the current table.
 
@@ -164,7 +164,7 @@ class Database:
                 return DatabaseFailure(error=e, failure=1).get()
             raise e
 
-    def content_by_id(self, id: int) -> Union[List[Union[str, bytes]], DatabaseFailure]:
+    def content_by_id(self, id: int) -> Union[List[Union[str, bytes]], DatabaseResponse]:
         """
         Retrieve a specific record from the current table by its ID.
 
@@ -181,7 +181,7 @@ class Database:
                 return DatabaseFailure(error=e, failure=1).get()
             raise e
 
-    def show_tables(self) -> Union[List[str], DatabaseFailure]:
+    def show_tables(self) -> Union[List[str], DatabaseResponse]:
         """Retrieve a list of table names in the database."""
         try:
             metadata = MetaData()
@@ -196,7 +196,7 @@ class Database:
         """Drop all defined tables within the database"""
         Base.metadata.drop_all(self.engine)
 
-    def drop_content(self, id_: int) -> Union[None, DatabaseFailure]:
+    def drop_content(self, id_: int) -> Union[None, DatabaseResponse]:
         """Delete a specific record from the current table by its ID."""
         try:
             row = (
@@ -212,7 +212,7 @@ class Database:
                 return DatabaseFailure(error=e, failure=1).get()
             raise e
 
-    def _query(self, *queries: str) -> list:
+    def _query(self, *queries: str) -> List[Any]: # GUI use
         result = []
         for i, query in enumerate(queries):
             if not isinstance(query, str):
@@ -230,7 +230,7 @@ class Database:
                 raise e
         return result
 
-    def query(self, query: str, params: Optional[tuple] = None) -> QueryResponse:
+    def query(self, query: str, params: Optional[Tuple[Any]] = None) -> QueryResponse:
         try:
             if params:
                 rows = self.session.execute(query, params).fetchall()
@@ -242,7 +242,7 @@ class Database:
                 return QueryResponse(status=Status.SUCCESS, result=rows)
         except DBError as e:
             if self.silent_errors:
-                return QueryResponse(status=Status.SUCCESS, result=str(e))
+                return QueryResponse(status=Status.FAILURE, result=str(e))
             raise e
 
 
@@ -392,7 +392,7 @@ def _spawn_all_files(
     main_connection: Database,
     keys_connection: Database,
     key_reference: str,
-    directory: Optional[str] = Default.SPAWN_DIRECTORY,
+    directory: Optional[str],
     ignore_duplicate_files: Optional[bool] = False,
     echo: Optional[bool] = False,
 ) -> DatabaseResponse | None:
@@ -450,10 +450,11 @@ def _spawn_all_files(
                 for index, key in enumerate(keys_list)
                 if index not in duplicate_indexes
             ]
+        dir = directory if directory is not None else Default.SPAWN_DIRECTORY
 
         # The creation of the extracted files in the specified directory
         full_paths_list = [
-            os.path.join(directory, os.path.split(path)[1]) for path in filenames_list
+            os.path.join(dir, os.path.split(path)[1]) for path in filenames_list
         ]
         for full_path, content in zip(full_paths_list, contents_list):
             CryptFile.make_file(filename=full_path, content=content)
@@ -463,7 +464,7 @@ def _spawn_all_files(
                     f" successfully.{Colors.RESET}"
                 )
         files_in_new_directory = [
-            os.path.join(directory, file) for file in filenames_list
+            os.path.join(dir, file) for file in filenames_list
         ]
         return DatabaseResponse(
             status=Status.SUCCESS,
@@ -483,7 +484,7 @@ def spawn(
     main_connection: Database,
     keys_connection: Database,
     key_reference: str,
-    directory: Optional[str] = Default.SPAWN_DIRECTORY,
+    directory: Optional[str],
     get_all: Optional[bool] = False,
     ignore_duplicate_files: Optional[bool] = False,
     echo: Optional[bool] = False,
@@ -508,11 +509,12 @@ def spawn(
     Returns:
             DatabaseResponse Object containing the outcome of the retrieval and creation process.
     """
+    dir = directory if directory is not None else Default.SPAWN_DIRECTORY
     if main_connection is keys_connection:
         raise ValueError("Main and keys databases must be different")
 
-    elif not os.path.isdir(directory):
-        raise ValueError(f"{directory} is not a valid directory")
+    elif not os.path.isdir(dir):
+        raise ValueError(f"{dir} is not a valid directory")
     result = DatabaseResponse(status=Status.FAILURE)
 
     if get_all:

@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from sqlalchemy.exc import DatabaseError
 
@@ -6,7 +6,7 @@ from litecrypt.mapper.consts import BaseColumns, Status
 
 
 class QueryResponse(Dict):
-    def __init__(self, status: Status = None, result: Any = None):
+    def __init__(self, status: type(Status.FAILURE) = None, result: Any = None):
         super().__init__(status=status, result=result)
 
 
@@ -23,7 +23,7 @@ class DatabaseResponse(Dict):
         status: str = None,
         filenames: List[str] = None,
         contents: Any = None,
-        keys: List[str] = None,
+        keys: List[Union[str,bytes]] = None,
     ):
         super().__init__(
             status=status, filenames=filenames, contents=contents, keys=keys
