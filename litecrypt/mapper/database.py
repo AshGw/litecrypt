@@ -53,7 +53,7 @@ class Database:
         self.create_all()
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
-        self.columns: list = Columns.list()
+        self.columns: List[str] = Columns.list()
         self.Table = StashKeys if self.for_keys else StashMain
 
     @property
