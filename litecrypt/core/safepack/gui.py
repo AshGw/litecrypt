@@ -1,3 +1,5 @@
+# type: ignore
+
 import atexit
 import json
 import os.path
