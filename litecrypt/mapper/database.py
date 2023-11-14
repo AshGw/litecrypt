@@ -11,8 +11,13 @@ from sqlalchemy.orm import sessionmaker
 from litecrypt.core.filecrypt import CryptFile
 from litecrypt.mapper.consts import Default, EngineFor, Status
 from litecrypt.mapper.engines import get_engine
-from litecrypt.mapper.interfaces import (Columns, DatabaseFailure, DatabaseResponse, DBError,
-                                         QueryResponse)
+from litecrypt.mapper.interfaces import (
+    Columns,
+    DatabaseFailure,
+    DatabaseResponse,
+    DBError,
+    QueryResponse,
+)
 from litecrypt.mapper.models import Base, StashKeys, StashMain
 from litecrypt.utils.consts import Colors
 from litecrypt.utils.exceptions.fixed import ColumnDoesNotExist
@@ -39,6 +44,7 @@ class Database:
     engine_for: str = field(default=Default.ENGINE)
     for_main: Optional[bool] = True
     for_keys: Optional[bool] = False
+    silent_errors: Optional[bool] = True
 
     def __post_init__(self) -> None:
         self.engine = get_engine(
@@ -61,7 +67,9 @@ class Database:
             raw = "SELECT page_count * page_size FROM pragma_page_count(), pragma_page_size"
             return self.session.execute(statement=raw).fetchall()[0][0] / 1024 / 1024
         except DBError as e:
-            return DatabaseFailure(error=e, failure=1).get()
+            if self.silent_errors:
+                return DatabaseFailure(error=e, failure=1).get()
+            raise e
 
     @property
     def last_mod(self) -> Union[datetime, DatabaseFailure, None]:
@@ -73,7 +81,9 @@ class Database:
         try:
             return datetime.fromtimestamp(os.stat(self.url).st_mtime)
         except OSError as e:
-            return DatabaseFailure(failure=1, error=e).get()
+            if self.silent_errors:
+                return DatabaseFailure(failure=1, error=e).get()
+            raise e
 
     @property
     def current_table(self) -> str:
@@ -150,7 +160,9 @@ class Database:
             for row in result:
                 yield [row.id, row.filename, row.content, row.ref]
         except DBError as e:
-            return DatabaseFailure(error=e, failure=1).get()
+            if self.silent_errors:
+                return DatabaseFailure(error=e, failure=1).get()
+            raise e
 
     def content_by_id(self, id: int) -> Union[List[Union[str, bytes]], DatabaseFailure]:
         """
@@ -165,7 +177,9 @@ class Database:
             result = self.session.query(self.Table).filter_by(id=id).first()
             return [result.id, result.filename, result.content, result.ref]
         except DBError as e:
-            return DatabaseFailure(error=e, failure=1).get()
+            if self.silent_errors:
+                return DatabaseFailure(error=e, failure=1).get()
+            raise e
 
     def show_tables(self) -> Union[List[str], DatabaseFailure]:
         """Retrieve a list of table names in the database."""
@@ -174,7 +188,9 @@ class Database:
             metadata.reflect(bind=self.engine)
             return list(metadata.tables.keys())
         except DBError as e:
-            return DatabaseFailure(error=e, failure=1).get()
+            if self.silent_errors:
+                return DatabaseFailure(error=e, failure=1).get()
+            raise e
 
     def drop_all_tables(self) -> None:
         """Drop all defined tables within the database"""
@@ -192,7 +208,9 @@ class Database:
                 self.session.delete(row)
                 self.session.commit()
         except DBError as e:
-            return DatabaseFailure(error=e, failure=1).get()
+            if self.silent_errors:
+                return DatabaseFailure(error=e, failure=1).get()
+            raise e
 
     def _query(self, *queries: str) -> list:
         result = []
@@ -207,7 +225,9 @@ class Database:
                     result.append({f"query {i}": [Status.SUCCESS, rows]})
 
             except DBError as e:
-                result.append({f"query {i}": (Status.FAILURE, e.__str__())})
+                if self.silent_errors:
+                    result.append({f"query {i}": (Status.FAILURE, e.__str__())})
+                raise e
         return result
 
     def query(self, query: str, params: Optional[tuple] = None) -> QueryResponse:
@@ -221,7 +241,9 @@ class Database:
             else:
                 return QueryResponse(status=Status.SUCCESS, result=rows)
         except DBError as e:
-            return QueryResponse(status=Status.SUCCESS, result=str(e))
+            if self.silent_errors:
+                return QueryResponse(status=Status.SUCCESS, result=str(e))
+            raise e
 
 
 def reference_linker(
@@ -360,8 +382,10 @@ def _spawn_single_file(
             keys=[key],
         )
 
-    except BaseException:
-        pass
+    except Exception as e:
+        if main_connection.silent_errors and keys_connection.silent_errors:
+            return None
+        raise e
 
 
 def _spawn_all_files(
@@ -371,7 +395,7 @@ def _spawn_all_files(
     directory: Optional[str] = Default.SPAWN_DIRECTORY,
     ignore_duplicate_files: Optional[bool] = False,
     echo: Optional[bool] = False,
-) -> DatabaseResponse:
+) -> DatabaseResponse | None:
     try:
         keys_list = reference_linker(
             connection=keys_connection,
@@ -449,6 +473,8 @@ def _spawn_all_files(
         )
 
     except Exception as e:
+        if main_connection.silent_errors and keys_connection.silent_errors:
+            return None
         raise e
 
 

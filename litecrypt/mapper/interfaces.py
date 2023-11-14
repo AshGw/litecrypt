@@ -33,7 +33,7 @@ class DatabaseResponse(Dict):
 class DatabaseFailure:
     def __init__(
         self,
-        error: Any,
+        error: BaseException,
         failure: Optional[int] = None,
         possible_fix: Optional[str] = None,
     ):
