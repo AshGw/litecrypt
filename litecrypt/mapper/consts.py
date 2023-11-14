@@ -11,7 +11,7 @@ class EngineConstructs:
     MYSQL = "mysql://"
 
 
-def remove_protocol(engine_string: str):
+def remove_protocol(engine_string: str) -> str:
     colon_index = engine_string.find(":")
     return engine_string[:colon_index] if colon_index != -1 else engine_string
 

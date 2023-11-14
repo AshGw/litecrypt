@@ -25,7 +25,7 @@ class CryptFile:
     intensive_compute: bool = field(default=False)
     iteration_rounds: int = field(default=Size.MIN_ITERATIONS)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         if not self.key_verify(self.key):
             raise exceptions.dynamic.KeyLengthError()
 
@@ -48,7 +48,7 @@ class CryptFile:
     def make_file(
         filename: str,
         content: Union[bytes, str],
-    ):
+    ) -> None:
         """
         Create a file with the specified content.
 

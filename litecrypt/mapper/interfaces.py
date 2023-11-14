@@ -6,14 +6,14 @@ from litecrypt.mapper.consts import BaseColumns, Status
 
 
 class QueryResponse(Dict):
-    def __init__(self, status: type(Status.FAILURE) = None, result: Any = None):
+    def __init__(self, status: type(Status.FAILURE) = None, result: Any = None) -> None:
         super().__init__(status=status, result=result)
 
 
 class DatabaseFailureResponse(Dict):
     def __init__(
         self, failure: Any = None, error: Any = None, possible_fix: Any = None
-    ):
+    ) -> None:
         super().__init__(failure=failure, error=error, possible_fix=possible_fix)
 
 
@@ -24,7 +24,7 @@ class DatabaseResponse(Dict):
         filenames: List[str] = None,
         contents: Any = None,
         keys: List[Union[str,bytes]] = None,
-    ):
+    ) -> None:
         super().__init__(
             status=status, filenames=filenames, contents=contents, keys=keys
         )
@@ -36,7 +36,7 @@ class DatabaseFailure:
         error: BaseException,
         failure: Optional[int] = None,
         possible_fix: Optional[str] = None,
-    ):
+    ) -> None:
         self.error = error
         self.failure = failure
         self.possible_fix = possible_fix
@@ -46,13 +46,13 @@ class DatabaseFailure:
             failure=self.failure, error=self.error, possible_fix=self.fix()
         )
 
-    def fix(self):
-        return (self.possible_fix,)
+    def fix(self) -> Union[str,None]:
+        return self.possible_fix
 
-    def debug(self):
+    def debug(self) -> None:
         ...
 
-    def additional(self):
+    def additional(self) -> None:
         ...
 
 

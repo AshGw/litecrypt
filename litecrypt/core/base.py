@@ -5,11 +5,16 @@ import base64
 import hmac as hmc
 import os
 import struct
-from typing import Any, Optional, Union
+from typing import Optional, Union
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, hmac, padding
-from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.primitives.ciphers import (
+    Cipher,
+    algorithms,
+    modes,
+    CipherContext
+)
 
 from litecrypt.core.helpers.funcs import (check_iterations, cipher_randomizers, parse_encrypted_message,
                                           parse_message, use_KDF)
@@ -71,14 +76,14 @@ class EncBase:
     def _mode(self) -> modes.CBC:
         return modes.CBC(self.iv)
 
-    def _cipher(self) -> Cipher:
+    def _cipher(self) -> Cipher[modes.CBC]:
         return Cipher(
             algorithms.AES(key=self.enc_key),
             mode=self._mode(),
             backend=default_backend(),
         )
 
-    def _cipher_encryptor(self) -> Any:
+    def _cipher_encryptor(self) -> CipherContext:
         return self._cipher().encryptor()
 
     def _padded_message(self) -> bytes:
@@ -202,14 +207,14 @@ class DecBase:
     def _mode(self) -> modes.CBC:
         return modes.CBC(self.rec_iv)
 
-    def _cipher(self) -> Cipher:
+    def _cipher(self) -> Cipher[modes.CBC]:
         return Cipher(
             algorithms.AES(key=self.dec_key),
             mode=self._mode(),
             backend=default_backend(),
         )
 
-    def _cipher_decryptor(self):
+    def _cipher_decryptor(self) -> CipherContext:
         return self._cipher().decryptor()
 
     def _pre_unpadding(self) -> bytes:
