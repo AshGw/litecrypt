@@ -58,7 +58,7 @@ class DatabaseFailure:
 
 class Columns(BaseColumns):
     @staticmethod
-    def list():
+    def list() -> List[str]:
         l: List[str] = []
         for _, attr_value in BaseColumns.__dict__.items():
             if not _.startswith("__") and not isinstance(attr_value, type):

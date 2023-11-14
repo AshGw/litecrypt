@@ -3,7 +3,7 @@
 import os
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Generator, List, Optional, Union
+from typing import Any, Generator, List, Optional, Union, Dict
 
 from sqlalchemy import MetaData
 from sqlalchemy.orm import sessionmaker
@@ -536,7 +536,7 @@ def spawn(
     return result
 
 
-def _echo_dict(dictionary: dict, echo: Optional[bool] = False):
+def _echo_dict(dictionary: Dict[str, Any], echo: Optional[bool] = False) -> None:
     if echo:
         for key, value in dictionary.items():
             key_colored = Colors.YELLOW + key + Colors.RESET
