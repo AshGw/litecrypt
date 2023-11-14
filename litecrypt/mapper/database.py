@@ -396,7 +396,7 @@ def _spawn_all_files(
     directory: Optional[str],
     ignore_duplicate_files: Optional[bool] = False,
     echo: Optional[bool] = False,
-) -> DatabaseResponse | None:
+) -> Union[DatabaseResponse, None]:
     try:
         keys_list = reference_linker(
             connection=keys_connection,
