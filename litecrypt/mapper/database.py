@@ -3,7 +3,7 @@
 import os
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Generator, List, Optional, Union
+from typing import Any, Generator, List, Optional, Union, Dict, Tuple
 
 from sqlalchemy import MetaData
 from sqlalchemy.orm import sessionmaker
@@ -11,8 +11,14 @@ from sqlalchemy.orm import sessionmaker
 from litecrypt.core.filecrypt import CryptFile
 from litecrypt.mapper.consts import Default, EngineFor, Status
 from litecrypt.mapper.engines import get_engine
-from litecrypt.mapper.interfaces import (Columns, DatabaseFailure, DatabaseResponse, DBError,
-                                         QueryResponse)
+from litecrypt.mapper.interfaces import (
+    Columns,
+    DatabaseResponse,
+    DatabaseFailure,
+    DatabaseFailureResponse,
+    DBError,
+    QueryResponse,
+)
 from litecrypt.mapper.models import Base, StashKeys, StashMain
 from litecrypt.utils.consts import Colors
 from litecrypt.utils.exceptions.fixed import ColumnDoesNotExist
@@ -39,6 +45,7 @@ class Database:
     engine_for: str = field(default=Default.ENGINE)
     for_main: Optional[bool] = True
     for_keys: Optional[bool] = False
+    silent_errors: Optional[bool] = True
 
     def __post_init__(self) -> None:
         self.engine = get_engine(
@@ -47,40 +54,44 @@ class Database:
         self.create_all()
         Session = sessionmaker(bind=self.engine)
         self.session = Session()
-        self.columns: list = Columns.list()
+        self.columns: List[str] = Columns.list()
         self.Table = StashKeys if self.for_keys else StashMain
 
     @property
-    def size(self) -> Union[float, DatabaseFailure, None]:
+    def size(self) -> Union[float, DatabaseFailureResponse, None]:
         """Get the size of the SQLite database in megabytes."""
         if self.engine_for != EngineFor.SQLITE:
             if self.echo:
                 print(f"This function only supports {EngineFor.SQLITE} databases.")
-                return
+                return None
         try:
             raw = "SELECT page_count * page_size FROM pragma_page_count(), pragma_page_size"
             return self.session.execute(statement=raw).fetchall()[0][0] / 1024 / 1024
         except DBError as e:
-            return DatabaseFailure(error=e, failure=1).get()
+            if self.silent_errors:
+                return DatabaseFailure(error=e, failure=1).get()
+            raise e
 
     @property
-    def last_mod(self) -> Union[datetime, DatabaseFailure, None]:
+    def last_mod(self) -> Union[datetime, DatabaseFailureResponse, None]:
         """Get the last modification timestamp of the SQLite database file."""
         if self.engine_for != EngineFor.SQLITE:
             if self.echo:
                 print(f"This function only supports {EngineFor.SQLITE} databases.")
-            return
+            return None
         try:
             return datetime.fromtimestamp(os.stat(self.url).st_mtime)
         except OSError as e:
-            return DatabaseFailure(failure=1, error=e).get()
+            if self.silent_errors:
+                return DatabaseFailure(failure=1, error=e).get()
+            raise e
 
     @property
     def current_table(self) -> str:
         """Returns the table name of the current database"""
         return self.Table.__name__
 
-    def end_session(self):
+    def end_session(self) -> None:
         """
         Closes the database session and commits pending transactions.
 
@@ -138,21 +149,23 @@ class Database:
             setattr(row, column, value)
             self.session.commit()
 
-    def content(self) -> Union[Generator, DatabaseFailure]:
+    def content(self) -> Union[Generator, DatabaseFailureResponse]:
         """
         Queries and returns ALL records from the current table.
 
         :return: A generator yielding lists representing records.
-        :rtype: Union[Generator, DatabaseFailure]
+        :rtype: Union[Generator, DatabaseFailureResponse]
         """
         try:
             result = self.session.query(self.Table).all()
             for row in result:
                 yield [row.id, row.filename, row.content, row.ref]
         except DBError as e:
-            return DatabaseFailure(error=e, failure=1).get()
+            if self.silent_errors:
+                return DatabaseFailure(error=e, failure=1).get()
+            raise e
 
-    def content_by_id(self, id: int) -> Union[List[Union[str, bytes]], DatabaseFailure]:
+    def content_by_id(self, id: int) -> Union[List[Union[str, bytes]], DatabaseFailureResponse]:
         """
         Retrieve a specific record from the current table by its ID.
 
@@ -165,22 +178,26 @@ class Database:
             result = self.session.query(self.Table).filter_by(id=id).first()
             return [result.id, result.filename, result.content, result.ref]
         except DBError as e:
-            return DatabaseFailure(error=e, failure=1).get()
+            if self.silent_errors:
+                return DatabaseFailure(error=e, failure=1).get()
+            raise e
 
-    def show_tables(self) -> Union[List[str], DatabaseFailure]:
+    def show_tables(self) -> Union[List[str], DatabaseFailureResponse]:
         """Retrieve a list of table names in the database."""
         try:
             metadata = MetaData()
             metadata.reflect(bind=self.engine)
             return list(metadata.tables.keys())
         except DBError as e:
-            return DatabaseFailure(error=e, failure=1).get()
+            if self.silent_errors:
+                return DatabaseFailure(error=e, failure=1).get()
+            raise e
 
     def drop_all_tables(self) -> None:
         """Drop all defined tables within the database"""
         Base.metadata.drop_all(self.engine)
 
-    def drop_content(self, id_: int) -> Union[None, DatabaseFailure]:
+    def drop_content(self, id_: int) -> Union[None, DatabaseFailureResponse]:
         """Delete a specific record from the current table by its ID."""
         try:
             row = (
@@ -192,9 +209,11 @@ class Database:
                 self.session.delete(row)
                 self.session.commit()
         except DBError as e:
-            return DatabaseFailure(error=e, failure=1).get()
+            if self.silent_errors:
+                return DatabaseFailure(error=e, failure=1).get()
+            raise e
 
-    def _query(self, *queries: str) -> list:
+    def _query(self, *queries: str) -> List[Any]: # GUI use
         result = []
         for i, query in enumerate(queries):
             if not isinstance(query, str):
@@ -207,10 +226,12 @@ class Database:
                     result.append({f"query {i}": [Status.SUCCESS, rows]})
 
             except DBError as e:
-                result.append({f"query {i}": (Status.FAILURE, e.__str__())})
+                if self.silent_errors:
+                    result.append({f"query {i}": (Status.FAILURE, e.__str__())})
+                raise e
         return result
 
-    def query(self, query: str, params: Optional[tuple] = None) -> QueryResponse:
+    def query(self, query: str, params: Optional[Tuple[Any]] = None) -> QueryResponse:
         try:
             if params:
                 rows = self.session.execute(query, params).fetchall()
@@ -221,7 +242,9 @@ class Database:
             else:
                 return QueryResponse(status=Status.SUCCESS, result=rows)
         except DBError as e:
-            return QueryResponse(status=Status.SUCCESS, result=str(e))
+            if self.silent_errors:
+                return QueryResponse(status=Status.FAILURE, result=str(e))
+            raise e
 
 
 def reference_linker(
@@ -360,18 +383,20 @@ def _spawn_single_file(
             keys=[key],
         )
 
-    except BaseException:
-        pass
+    except Exception as e:
+        if main_connection.silent_errors and keys_connection.silent_errors:
+            return None
+        raise e
 
 
 def _spawn_all_files(
     main_connection: Database,
     keys_connection: Database,
     key_reference: str,
-    directory: Optional[str] = Default.SPAWN_DIRECTORY,
+    directory: Optional[str],
     ignore_duplicate_files: Optional[bool] = False,
     echo: Optional[bool] = False,
-) -> DatabaseResponse:
+) -> Union[DatabaseResponse, None]:
     try:
         keys_list = reference_linker(
             connection=keys_connection,
@@ -426,10 +451,11 @@ def _spawn_all_files(
                 for index, key in enumerate(keys_list)
                 if index not in duplicate_indexes
             ]
+        dir = directory if directory is not None else Default.SPAWN_DIRECTORY
 
         # The creation of the extracted files in the specified directory
         full_paths_list = [
-            os.path.join(directory, os.path.split(path)[1]) for path in filenames_list
+            os.path.join(dir, os.path.split(path)[1]) for path in filenames_list
         ]
         for full_path, content in zip(full_paths_list, contents_list):
             CryptFile.make_file(filename=full_path, content=content)
@@ -439,7 +465,7 @@ def _spawn_all_files(
                     f" successfully.{Colors.RESET}"
                 )
         files_in_new_directory = [
-            os.path.join(directory, file) for file in filenames_list
+            os.path.join(dir, file) for file in filenames_list
         ]
         return DatabaseResponse(
             status=Status.SUCCESS,
@@ -449,6 +475,8 @@ def _spawn_all_files(
         )
 
     except Exception as e:
+        if main_connection.silent_errors and keys_connection.silent_errors:
+            return None
         raise e
 
 
@@ -457,7 +485,7 @@ def spawn(
     main_connection: Database,
     keys_connection: Database,
     key_reference: str,
-    directory: Optional[str] = Default.SPAWN_DIRECTORY,
+    directory: Optional[str],
     get_all: Optional[bool] = False,
     ignore_duplicate_files: Optional[bool] = False,
     echo: Optional[bool] = False,
@@ -482,11 +510,12 @@ def spawn(
     Returns:
             DatabaseResponse Object containing the outcome of the retrieval and creation process.
     """
+    dir = directory if directory is not None else Default.SPAWN_DIRECTORY
     if main_connection is keys_connection:
         raise ValueError("Main and keys databases must be different")
 
-    elif not os.path.isdir(directory):
-        raise ValueError(f"{directory} is not a valid directory")
+    elif not os.path.isdir(dir):
+        raise ValueError(f"{dir} is not a valid directory")
     result = DatabaseResponse(status=Status.FAILURE)
 
     if get_all:
@@ -510,7 +539,7 @@ def spawn(
     return result
 
 
-def _echo_dict(dictionary: dict, echo: Optional[bool] = False):
+def _echo_dict(dictionary: Dict[str, Any], echo: Optional[bool] = False) -> None:
     if echo:
         for key, value in dictionary.items():
             key_colored = Colors.YELLOW + key + Colors.RESET

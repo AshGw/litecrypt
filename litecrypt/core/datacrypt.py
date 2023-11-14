@@ -25,7 +25,7 @@ class Crypt:
     intensive_compute: bool = field(default=False)
     iteration_rounds: int = field(default=Size.MIN_ITERATIONS)
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         """
         Initialize the Crypt object and verify the provided key.
 

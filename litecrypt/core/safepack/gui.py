@@ -1,3 +1,5 @@
+# type: ignore
+
 import atexit
 import json
 import os.path
@@ -453,7 +455,7 @@ def main_db_name():
                     fullpath + f"/{maindbname}"
                 ):
                     db_already_exists_blocker = 1
-                    main_db_conn = ld.Database(conn_path_db)
+                    main_db_conn = ld.Database(conn_path_db,silent_errors=True)
                     main_db_name_result_var.set("CONNECTED")
                     db_display_text.delete("1.0", tk.END)
                     db_display_text.insert(tk.END, f"Connected to {maindbname}..\n\n")
@@ -462,7 +464,7 @@ def main_db_name():
                     decfiletoolbutt.state(["!disabled"])
                 else:
                     db_already_exists_blocker = 0
-                    main_db_conn = ld.Database(conn_path_db)
+                    main_db_conn = ld.Database(conn_path_db,silent_errors=True)
                     db_display_text.delete("1.0", tk.END)
                     db_display_text.insert(
                         tk.END,
@@ -499,18 +501,18 @@ def keyd_db_setup():
                 if os.path.isfile(usable_real_path + dbname_keys_win) or os.path.isfile(
                     usable_real_path + dbname_keys_unix
                 ):
-                    keys_db_conn = ld.Database(conn_path_keys, for_keys=True)
+                    keys_db_conn = ld.Database(conn_path_keys, for_keys=True,silent_errors=True)
                     db_display_text.insert(tk.END, f"Connected to '{keys_db}' ..\n\n")
                     success_keysdb_connection_blocker = 1
                 else:
-                    keys_db_conn = ld.Database(conn_path_keys, for_keys=True)
+                    keys_db_conn = ld.Database(conn_path_keys, for_keys=True,silent_errors=True)
                     db_display_text.insert(
                         tk.END,
                         f"'{keys_db}' NOT FOUND ! ==> Created and Connected to '{keys_db}' ..\n\n",
                     )
                     success_keysdb_connection_blocker = 1
             else:
-                keys_db_conn = ld.Database(conn_path_keys, for_keys=True)
+                keys_db_conn = ld.Database(conn_path_keys, for_keys=True,silent_errors=True)
                 db_display_text.insert(
                     tk.END, f"Created and Connected to '{keys_db}' ..\n\n"
                 )
