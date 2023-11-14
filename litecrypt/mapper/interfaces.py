@@ -41,7 +41,7 @@ class DatabaseFailure:
         self.failure = failure
         self.possible_fix = possible_fix
 
-    def get(self):
+    def get(self) -> DatabaseFailureResponse:
         return DatabaseFailureResponse(
             failure=self.failure, error=self.error, possible_fix=self.fix()
         )

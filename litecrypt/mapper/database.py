@@ -13,8 +13,9 @@ from litecrypt.mapper.consts import Default, EngineFor, Status
 from litecrypt.mapper.engines import get_engine
 from litecrypt.mapper.interfaces import (
     Columns,
-    DatabaseFailure,
     DatabaseResponse,
+    DatabaseFailure,
+    DatabaseFailureResponse,
     DBError,
     QueryResponse,
 )
@@ -57,12 +58,12 @@ class Database:
         self.Table = StashKeys if self.for_keys else StashMain
 
     @property
-    def size(self) -> Union[float, DatabaseFailure, None]:
+    def size(self) -> Union[float, DatabaseFailureResponse, None]:
         """Get the size of the SQLite database in megabytes."""
         if self.engine_for != EngineFor.SQLITE:
             if self.echo:
                 print(f"This function only supports {EngineFor.SQLITE} databases.")
-                return
+                return None
         try:
             raw = "SELECT page_count * page_size FROM pragma_page_count(), pragma_page_size"
             return self.session.execute(statement=raw).fetchall()[0][0] / 1024 / 1024
@@ -72,12 +73,12 @@ class Database:
             raise e
 
     @property
-    def last_mod(self) -> Union[datetime, DatabaseFailure, None]:
+    def last_mod(self) -> Union[datetime, DatabaseFailureResponse, None]:
         """Get the last modification timestamp of the SQLite database file."""
         if self.engine_for != EngineFor.SQLITE:
             if self.echo:
                 print(f"This function only supports {EngineFor.SQLITE} databases.")
-            return
+            return None
         try:
             return datetime.fromtimestamp(os.stat(self.url).st_mtime)
         except OSError as e:
@@ -90,7 +91,7 @@ class Database:
         """Returns the table name of the current database"""
         return self.Table.__name__
 
-    def end_session(self):
+    def end_session(self) -> None:
         """
         Closes the database session and commits pending transactions.
 
@@ -148,12 +149,12 @@ class Database:
             setattr(row, column, value)
             self.session.commit()
 
-    def content(self) -> Union[Generator, DatabaseResponse]:
+    def content(self) -> Union[Generator, DatabaseFailureResponse]:
         """
         Queries and returns ALL records from the current table.
 
         :return: A generator yielding lists representing records.
-        :rtype: Union[Generator, DatabaseFailure]
+        :rtype: Union[Generator, DatabaseFailureResponse]
         """
         try:
             result = self.session.query(self.Table).all()
@@ -164,7 +165,7 @@ class Database:
                 return DatabaseFailure(error=e, failure=1).get()
             raise e
 
-    def content_by_id(self, id: int) -> Union[List[Union[str, bytes]], DatabaseResponse]:
+    def content_by_id(self, id: int) -> Union[List[Union[str, bytes]], DatabaseFailureResponse]:
         """
         Retrieve a specific record from the current table by its ID.
 
@@ -181,7 +182,7 @@ class Database:
                 return DatabaseFailure(error=e, failure=1).get()
             raise e
 
-    def show_tables(self) -> Union[List[str], DatabaseResponse]:
+    def show_tables(self) -> Union[List[str], DatabaseFailureResponse]:
         """Retrieve a list of table names in the database."""
         try:
             metadata = MetaData()
@@ -196,7 +197,7 @@ class Database:
         """Drop all defined tables within the database"""
         Base.metadata.drop_all(self.engine)
 
-    def drop_content(self, id_: int) -> Union[None, DatabaseResponse]:
+    def drop_content(self, id_: int) -> Union[None, DatabaseFailureResponse]:
         """Delete a specific record from the current table by its ID."""
         try:
             row = (
