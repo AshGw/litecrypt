@@ -11,6 +11,6 @@ else
   pip install --upgrade pip
 fi
 pip install -r scripts/setup/requirements.txt
-python setup.py develop
+python -m pip install .
 rm -rf litecrypt.egg-info
 pre-commit install
