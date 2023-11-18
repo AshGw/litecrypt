@@ -6,7 +6,7 @@
 
 
 
-## 🔒 Encryption & Data Storage Made Simple
+## 🔒 Securing Data Made Simple
 ## 🧙‍♂️ Installation
 
 Starting is a breeze. Just use pip:
@@ -20,8 +20,8 @@ pip install litecrypt
 from litecrypt import CryptFile, gen_key
 
 key = gen_key()
-CryptFile('accounts.csv', key).encrypt()
-# Voila! Your file is now called ==> accounts.csv.crypt
+CryptFile('dataset.csv', key).encrypt()
+# Voila! Your file is now called ==> dataset.csv.crypt
 ```
 The encryption process is **blazingly fast** by default, but you can choose to make it computationally intensive
 <details><summary>How ?</summary>
@@ -53,14 +53,14 @@ Need to protect a message?
 from litecrypt import Crypt, gen_key
 
 key = gen_key()
-encrypted = Crypt('any message', key).encrypt()
+encrypted = Crypt('any message', key).encrypt()  # can also be a bytes message
 print(encrypted)  # Check the return value
 ```
 
 ## Details
 
 **Algorithm:** AES-256 CBC
-<br>**Encrypted data layout:**
+<br>**Layout:**
 ````commandline
 +-------------+  +--------+  +------------+  +-------------+  +-------------+  +------------------+
 |    HMAC     | →|   IV   | →|   Salt     | →|  Pepper     | →| Iterations  | →|     KDF ID     |  →
@@ -72,14 +72,16 @@ print(encrypted)  # Check the return value
 
 The main key which is a 32-byte random hex string is provided by `gen_key()` function.
 
-- **AES Key:** 32-byte random value derived from the main key with the KDF, hashed with SHA256 (1 time or [50..100000] times based on chosen number of iterations) mixed with the Salt.
-- **HMAC Key:** 32-byte random value derived from the main key with  the KDF, hashed with SHA256 (1 time or [50..100000] times based on chosen number of iterations) mixed with the Pepper.
-- **IV:** 16-byte random value
-- **Salt:** 16-byte random value
-- **Pepper:** 16-byte random value
-- **Iterations:** 4-byte fixed value (you choose it based on requirements).
+
+- **AES Key:** 32-byte random value derived from the main key with the KDF, hashed with SHA256 (1 time or [50..100000] times based on the chosen number of iterations) mixed with the Salt.
+- **HMAC Key:** 32-byte random value derived from the main key with  the KDF, hashed with SHA256 (1 time or [50..100000] times based on the chosen number of iterations) mixed with the Pepper.
+    - > *The higher the number of iterations, the longer it takes to encrypt/decrypt.*
+
+- **IV:** 16-byte random value.
+- **Salt:** 16-byte random value.
+- **Pepper:** 16-byte random value.
+- **Iterations:** 4-byte fixed value.
 - **KDF ID:** 4-byte fixed value used to auto-determine the Key Derivation Function (KDF) to use.
-- **Version:** 4-byte fixed value used to determine the major version with which the message has been encrypted (current version is 0).
 - **Ciphertext:** Variable size.
 
 
