@@ -36,6 +36,8 @@ CryptFile('anyfile.txt',
           iteration_rounds=10000
           ).encrypt()
 ```
+> Running `intensive_compute` with no `iteration_rounds` sets the rounds to 50 (minimum) by default
+
 To decrypt simply run:
 
 
@@ -57,7 +59,7 @@ encrypted = Crypt('any message', key).encrypt()  # can also be a bytes message
 print(encrypted)  # Check the return value
 ```
 
-## Details
+### Details
 
 **Algorithm:** AES-256 CBC
 <br>**Layout:**
@@ -72,11 +74,10 @@ print(encrypted)  # Check the return value
 
 The main key which is a 32-byte random hex string is provided by `gen_key()` function.
 
+> *The higher the number of iterations, the longer it takes to encrypt/decrypt.*
 
 - **AES Key:** 32-byte random value derived from the main key with the KDF, hashed with SHA256 (1 time or [50..100000] times based on the chosen number of iterations) mixed with the Salt.
 - **HMAC Key:** 32-byte random value derived from the main key with  the KDF, hashed with SHA256 (1 time or [50..100000] times based on the chosen number of iterations) mixed with the Pepper.
-    - > *The higher the number of iterations, the longer it takes to encrypt/decrypt.*
-
 - **IV:** 16-byte random value.
 - **Salt:** 16-byte random value.
 - **Pepper:** 16-byte random value.
