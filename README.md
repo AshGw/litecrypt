@@ -7,11 +7,6 @@
 
 
 ## 🔒 Encryption & Data Storage Made Simple
-
-**Embed in Code**: Easily integrated into your existing codebase with just a few lines.
-
-**Use the GUI**: Enjoy the full functionality of the library through the intuitive GUI.
-
 ## 🧙‍♂️ Installation
 
 Starting is a breeze. Just use pip:
@@ -61,6 +56,31 @@ key = gen_key()
 encrypted = Crypt('any message', key).encrypt()
 print(encrypted)  # Check the return value
 ```
+
+## Details
+
+**Algorithm:** AES-256 CBC
+<br>**Encrypted data layout:**
+````commandline
++-------------+  +--------+  +------------+  +-------------+  +-------------+  +------------------+
+|    HMAC     | →|   IV   | →|   Salt     | →|  Pepper     | →| Iterations  | →|     KDF ID     |  →
++-------------+  +--------+  +------------+  +-------------+  +-------------+  +------------------+
+                              +------------------+
+                              |   Ciphertext    ...
+                              +------------------+
+````
+
+The main key which is a 32-byte random hex string is provided by `gen_key()` function.
+
+- **AES Key:** 32-byte random value derived from the main key with the KDF, hashed with SHA256 (1 time or [50..100000] times based on chosen number of iterations) mixed with the Salt.
+- **HMAC Key:** 32-byte random value derived from the main key with  the KDF, hashed with SHA256 (1 time or [50..100000] times based on chosen number of iterations) mixed with the Pepper.
+- **IV:** 16-byte random value
+- **Salt:** 16-byte random value
+- **Pepper:** 16-byte random value
+- **Iterations:** 4-byte fixed value (you choose it based on requirements).
+- **KDF ID:** 4-byte fixed value used to auto-determine the Key Derivation Function (KDF) to use.
+- **Version:** 4-byte fixed value used to determine the major version with which the message has been encrypted (current version is 0).
+- **Ciphertext:** Variable size.
 
 
 ## 💾 Database Integration
