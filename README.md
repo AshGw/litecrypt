@@ -6,30 +6,36 @@
 
 
 
-## 🔒 Encryption & Data Storage Made Simple
+## What is litecrypt ?
+Just a library I cooked up for personal use to secure some files, you probably don't need this but if you do, here's an overview:
 
-**Embed in Code**: Easily integrated into your existing codebase with just a few lines.
 
-**Use the GUI**: Enjoy the full functionality of the library through the intuitive GUI.
+### Encryption
+AES-256 CBC leveraging primitives from the `cryptography` library with added features supporting both fast & very computationally intensive encryption.
 
-## 🧙‍♂️ Installation
+### Database Integration
+Needed some way to store encrypted files and figure out another way to associate each file with its specific encryption key, which with this setup is automatically done.
+### GUI
+Made to obviate the need to write code.
+
+## Installation
 
 Starting is a breeze. Just use pip:
 ```shell
 pip install litecrypt
 ```
 
-## 🔑 Effortlessly Secure Encryption!
+## Encryption
 
 ```python
 from litecrypt import CryptFile, gen_key
 
 key = gen_key()
-CryptFile('accounts.csv', key).encrypt()
-# Voila! Your file is now called ==> accounts.csv.crypt
+CryptFile('dataset.csv', key).encrypt()
+# Voila! Your file is now called ==> dataset.csv.crypt
 ```
-The encryption process is **blazingly fast** by default, but you can choose to make it computationally intensive
-<details><summary>How ?</summary>
+The encryption process is **blazingly fast** by default, to make it computationally intensive
+<details><summary>Do this</summary>
 
 ```python
 from litecrypt import CryptFile, gen_key
@@ -41,6 +47,8 @@ CryptFile('anyfile.txt',
           iteration_rounds=10000
           ).encrypt()
 ```
+> Running `intensive_compute` with no `iteration_rounds` sets the rounds to 50 (minimum) by default
+
 To decrypt simply run:
 
 
@@ -53,18 +61,46 @@ CryptFile('anyfile.txt.crypt',key=key).decrypt()
 </details>
 
 
-Need to protect a message?
+Need to protect a message? Bet:
 ```python
 from litecrypt import Crypt, gen_key
 
 key = gen_key()
-encrypted = Crypt('any message', key).encrypt()
+encrypted = Crypt('any message', key).encrypt()  # can also be a bytes message
 print(encrypted)  # Check the return value
 ```
 
+### Details
 
-## 💾 Database Integration
-<h3>Databases</h3>
+**Algorithm:** AES-256 CBC
+<br>**Layout:**
+````commandline
++-------------+  +--------+  +------------+  +-------------+  +-------------+  +------------------+
+|    HMAC     | →|   IV   | →|   Salt     | →|  Pepper     | →| Iterations  | →|     KDF ID     |  →
++-------------+  +--------+  +------------+  +-------------+  +-------------+  +------------------+
+                              +------------------+
+                              |   Ciphertext    ...
+                              +------------------+
+````
+
+The main key which is a 32-byte random hex string is provided by `gen_key()` function.
+
+> *The higher the number of iterations, the longer it takes to encrypt/decrypt.*
+
+- **AES Key:** 32-byte random value derived from the main key with the KDF, hashed with SHA256 (1 time or [50..100000] times based on the chosen number of iterations) mixed with the Salt.
+- **HMAC Key:** 32-byte random value derived from the main key with  the KDF, hashed with SHA256 (1 time or [50..100000] times based on the chosen number of iterations) mixed with the Pepper.
+- **IV:** 16-byte random value.
+- **Salt:** 16-byte random value.
+- **Pepper:** 16-byte random value.
+- **Iterations:** 4-byte fixed value.
+- **KDF ID:** 4-byte fixed value used to auto-determine the Key Derivation Function (KDF) to use.
+- **Ciphertext:** Variable size.
+
+
+## Database Integration
+
+
+<h3>Supported Databases</h3>
 
 Currently, supports MySQL, PostgresSQL and SQLite.
 
@@ -108,27 +144,25 @@ for encrypted_file_name in same_files_but_with_crypt_extension:
                        ref=reference_value)
 ```
 
-Confused ? check the **[Docs](https://ashgw.github.io/litecrypt)**.
+Confused huh? check the **[Docs](https://ashgw.github.io/litecrypt)**.
 
-## 🚀 Or, Simplify with the GUI
+##  Or, Simplify with the GUI
 
 ![alt text](docs/assets/GUI.png)
 
-**The place where everything comes together, a user-friendly graphical user interface that combines the library's power into one easy-to-use app.**
-
-<details><summary>Check the GUI demo</summary>
+<details><summary>Here's how it works</summary>
 
 https://github.com/AshGw/litecrypt/assets/126174609/190b6ab8-3f8a-4656-9525-dbaf5e56db5e
 
 </details>
 
 
-## 📚 Documentation
+## Documentation
 
 Check out the **[Docs](https://ashgw.github.io/litecrypt)**.
 
 
 
-## 🔐 License
+## License
 
-Litecrypt is open-source and licensed under the [MIT License](https://github.com/AshGw/litecrypt/blob/main/LICENSE).
+Litecrypt is open-source project & licensed under the [MIT License](https://github.com/AshGw/litecrypt/blob/main/LICENSE).

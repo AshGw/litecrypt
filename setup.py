@@ -3,15 +3,18 @@ from setuptools import find_packages, setup
 with open("scripts/setup/minimal_requirements.txt") as f:
     requirements = f.read().splitlines()
 
+with open("README.md") as f:
+    markdown_description = f.read()
+
 setup(
     name="litecrypt",
-    version="0.2.0",
+    version="0.2.1",
     author="Ashref Gwader",
     author_email="AshrefGw@proton.me",
     python_requires=">=3.7",
     description="Library to Simplify Encryption and Data Protection",
     long_description_content_type="text/markdown",
-    long_description="Visit The [Website](https://ashgw.github.io/litecrypt/)",
+    long_description=markdown_description,
     url="https://github.com/AshGw/litecrypt.git",
     packages=find_packages(
         exclude=["important", "docker-build", ".github", "docs", "tests"]

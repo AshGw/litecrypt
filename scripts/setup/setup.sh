@@ -5,7 +5,7 @@ cd litecrypt || exit
 rm -rf dist
 rm -rf build
 rm -rf litecrypt.egg-info
-if [[ "$OSTYPE" == "win"* ]]; then
+if [[ "$(uname -s)" == "MINGW"* ]]; then
   python.exe -m pip install --upgrade pip
 else
   pip install --upgrade pip

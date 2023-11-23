@@ -7,7 +7,7 @@
 
 ## Welcome to Litecrypt
 
-Litecrypt is a minimal library that provides a simple solution for encrypting and decrypting data and files. Prioritizing both security and ease of use, by employing AES-256 encryption in CBC mode (**blazingly fast**/**compute-intensive**). The library offers the added benefit of secure storage, ensuring the protection of sensitive information. For those seeking a user-friendly experience, an accompanying graphical user interface is also available.
+Litecrypt is a library that provides a simple solution for encrypting and decrypting files, as well as keeping track of them.
 
 ## Example Usage
 
@@ -114,7 +114,7 @@ for file, encrypted_content in zip(files, encrypted_contents):
 # Add .crypt to indicate they're encrypted
 ```
 
-Done! Your files are still in `test/`, but you now have encrypted copies of them in the main database.
+Done! The files are still in `test/`, but you now have encrypted copies of them in the main database.
 <br>The keys used for encryption are stored in the keys database.
 <br>You can encrypt your keys database too, but for this demo, let it be as is.
 
@@ -148,7 +148,7 @@ How about we decrypt them ?
 for file, key in zip(spawned['filenames'], spawned['keys']):
     CryptFile(file, key).decrypt(echo=True)
 ```
-Your files are retrieved and decrypted. Check if the files in `test/` match the files in `spawned/`.
+The files are retrieved and decrypted. Check if the files in `test/` match the files in `spawned/`.
 <details><summary>Here's the full demo</summary>
 
 ```py linenums="1"
@@ -222,7 +222,7 @@ for file, key in zip(spawned["filenames"], spawned["keys"]):
 The library currently supports: MySQL, PostgreSQL and SQLite.
 > **Note:** The GUI only support SQLite
 #### How To Connect ?
-**SQLite**: only specify the file name of the database, it must end with either `.db` or `.sqlite`
+**SQLite**: Specify the file name of the database, it must end with either `.db` or `.sqlite`
 ```Py
 from litecrypt import Database
 main_connection = Database('test.db')
