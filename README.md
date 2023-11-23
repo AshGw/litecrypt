@@ -6,17 +6,17 @@
 
 
 
-## What's litecrypt ?
+## What is litecrypt ?
 Just a library I cooked up for personal use to secure some files, you probably don't need this but if you do, here's an overview:
 
 
-### Cryptography:
-AES-256 CBC leveraging primitives from the `cryptography` library (didn't come up with my own encryption algorithm all of a sudden) supporting both fast & very computationally intensive encryption for data.
+### Encryption
+AES-256 CBC leveraging primitives from the `cryptography` library with added features also supporting both fast & very computationally intensive encryption.
 
-### Database Integration:
-This was totally random but I needed some way to store encrypted files and figure out a way to associate each file with its specific encryption key, which with this setup is automatically done.
-### GUI:
-This is here so I won't have to write code everytime when doing the same process over and over again.
+### Database Integration
+Needed some way to store encrypted files and figure out a way to associate each file with its specific encryption key, which with this setup is automatically done.
+### GUI
+This is here to automate the need to write code everytime when doing the same process over and over
 
 ## Installation
 
@@ -150,19 +150,19 @@ Confused huh? check the **[Docs](https://ashgw.github.io/litecrypt)**.
 
 ![alt text](docs/assets/GUI.png)
 
-<details><summary>Here's a  GUI demo</summary>
+<details><summary>Here's how it works</summary>
 
 https://github.com/AshGw/litecrypt/assets/126174609/190b6ab8-3f8a-4656-9525-dbaf5e56db5e
 
 </details>
 
 
-## 📚 Documentation
+## Documentation
 
 Check out the **[Docs](https://ashgw.github.io/litecrypt)**.
 
 
 
-## 🔐 License
+## License
 
 Litecrypt is open-source project & licensed under the [MIT License](https://github.com/AshGw/litecrypt/blob/main/LICENSE).
