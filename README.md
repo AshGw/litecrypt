@@ -6,15 +6,26 @@
 
 
 
-## 🔒 Securing Data Made Simple
-## 🧙‍♂️ Installation
+## What's litecrypt ?
+Just a library I cooked up for personal use to secure some files, you probably don't need this but if you do, here's an overview:
+
+
+### Cryptography:
+AES-256 CBC leveraging primitives from the `cryptography` library (didn't come up with my own encryption algorithm all of a sudden) supporting both fast & very computationally intensive encryption for data.
+
+### Database Integration:
+This was totally random but I needed some way to store encrypted files and figure out a way to associate each file with its specific encryption key, which with this setup is automatically done.
+### GUI:
+This is here so I won't have to write code everytime when doing the same process over and over again.
+
+## Installation
 
 Starting is a breeze. Just use pip:
 ```shell
 pip install litecrypt
 ```
 
-## 🔑 Effortlessly Secure Encryption!
+## Encryption
 
 ```python
 from litecrypt import CryptFile, gen_key
@@ -23,8 +34,8 @@ key = gen_key()
 CryptFile('dataset.csv', key).encrypt()
 # Voila! Your file is now called ==> dataset.csv.crypt
 ```
-The encryption process is **blazingly fast** by default, but you can choose to make it computationally intensive
-<details><summary>How ?</summary>
+The encryption process is **blazingly fast** by default, to make it computationally intensive
+<details><summary>Do this</summary>
 
 ```python
 from litecrypt import CryptFile, gen_key
@@ -50,7 +61,7 @@ CryptFile('anyfile.txt.crypt',key=key).decrypt()
 </details>
 
 
-Need to protect a message?
+Need to protect a message? Bet:
 ```python
 from litecrypt import Crypt, gen_key
 
@@ -86,8 +97,10 @@ The main key which is a 32-byte random hex string is provided by `gen_key()` fun
 - **Ciphertext:** Variable size.
 
 
-## 💾 Database Integration
-<h3>Databases</h3>
+## Database Integration
+
+
+<h3>Supported Databases</h3>
 
 Currently, supports MySQL, PostgresSQL and SQLite.
 
@@ -131,15 +144,13 @@ for encrypted_file_name in same_files_but_with_crypt_extension:
                        ref=reference_value)
 ```
 
-Confused ? check the **[Docs](https://ashgw.github.io/litecrypt)**.
+Confused huh? check the **[Docs](https://ashgw.github.io/litecrypt)**.
 
-## 🚀 Or, Simplify with the GUI
+##  Or, Simplify with the GUI
 
 ![alt text](docs/assets/GUI.png)
 
-**The place where everything comes together, a user-friendly graphical user interface that combines the library's power into one easy-to-use app.**
-
-<details><summary>Check the GUI demo</summary>
+<details><summary>Here's a  GUI demo</summary>
 
 https://github.com/AshGw/litecrypt/assets/126174609/190b6ab8-3f8a-4656-9525-dbaf5e56db5e
 
@@ -154,4 +165,4 @@ Check out the **[Docs](https://ashgw.github.io/litecrypt)**.
 
 ## 🔐 License
 
-Litecrypt is open-source and licensed under the [MIT License](https://github.com/AshGw/litecrypt/blob/main/LICENSE).
+Litecrypt is open-source project & licensed under the [MIT License](https://github.com/AshGw/litecrypt/blob/main/LICENSE).
