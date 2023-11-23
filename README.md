@@ -11,12 +11,12 @@ Just a library I cooked up for personal use to secure some files, you probably d
 
 
 ### Encryption
-AES-256 CBC leveraging primitives from the `cryptography` library with added features also supporting both fast & very computationally intensive encryption.
+AES-256 CBC leveraging primitives from the `cryptography` library with added features supporting both fast & very computationally intensive encryption.
 
 ### Database Integration
-Needed some way to store encrypted files and figure out a way to associate each file with its specific encryption key, which with this setup is automatically done.
+Needed some way to store encrypted files and figure out another way to associate each file with its specific encryption key, which with this setup is automatically done.
 ### GUI
-This is here to automate the need to write code everytime when doing the same process over and over
+Made to obviate the need to write code.
 
 ## Installation
 
