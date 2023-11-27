@@ -1,4 +1,4 @@
-name: deploy
+name: Deployment
 
 on:
   push:
@@ -44,10 +44,13 @@ jobs:
         run: pytest tests/helpers
       - name: Running crypt tests
         run: pytest tests/crypt
+      - name: Running databse tests
+        run: pytest tests/database
 
 
   run-tests-2:
     runs-on: ubuntu-latest
+    needs: run-tests
     strategy:
       matrix:
         python-version: ["3.10", "3.11", "3.12"]
@@ -70,13 +73,51 @@ jobs:
       - name: Install deps
         run: poetry install
       - name: Running tests
-        run: pytest
+        run: pytest tests/crypt
 
+  docs:
+    if: github.event_name == 'push'
+    needs: run-tests-2
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+      - run: |
+            pip install poetry
+            poetry config virtualenvs.create false
+            poetry install
+      - run: mkdocs gh-deploy --force
+
+  docker:
+    if: github.event_name == 'push'
+    needs: run-tests-2
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Version extraction
+        id: get_version
+        run: echo "::set-output name=version::$(python version.py)"
+      - name: Building & tagging
+        run: docker build -t ashgw/litecrypt:${{ steps.get_version.outputs.version }} scripts/docker-build
+      - name: Login
+        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+      - name: Pushing to the hub
+        run: docker push ashgw/litecrypt:${{ steps.get_version.outputs.version }}
 
   pypi:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    needs: [run-tests-2]
+    needs: docker
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
@@ -99,39 +140,3 @@ jobs:
           python -m poetry config pypi-token.pypi $PYPI_TOKEN
           set -e
           python -m poetry publish --build
-
-  docker:
-    if: github.event_name == 'push'
-    needs: pypi
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - name: Version extraction
-        id: get_version
-        run: echo "::set-output name=version::$(python version.py)"
-      - name: Building & tagging
-        run: docker build -t ashgw/litecrypt:${{ steps.get_version.outputs.version }} scripts/docker-build
-      - name: Login
-        run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
-      - name: Pushing to the hub
-        run: docker push ashgw/litecrypt:${{ steps.get_version.outputs.version }}
-
-  docs:
-    if: github.event_name == 'push'
-    runs-on: ubuntu-latest
-    needs: pypi
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: 3.x
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-      - uses: actions/cache@v3
-        with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: .cache
-          restore-keys: |
-            mkdocs-material-
-      - run: pip install mkdocs-material
-      - run: mkdocs gh-deploy --force

@@ -19,8 +19,6 @@ Needed some way to store encrypted files and figure out another way to associate
 Made to obviate the need to write code.
 
 ## Installation
-
-Starting is a breeze. Just use pip:
 ```shell
 pip install litecrypt
 ```
