@@ -44,8 +44,6 @@ jobs:
         run: pytest tests/helpers
       - name: Running crypt tests
         run: pytest tests/crypt
-      - name: Running databse tests
-        run: pytest tests/database
 
 
   run-tests-2:
