@@ -1,4 +1,4 @@
-name: Deploy
+name: Deployment
 
 on:
   push:
@@ -19,27 +19,25 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.7", "3.8", "3.9"]
+        python-version: ["3.8", "3.9"]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
-          python-version: 3.7
+          python-version: 3.11
 
-      - name: Installing dependencies
+      - name: Setup poetry
         run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/setup/minimal_requirements.txt
-          pip install pytest
+            python -m pip install --upgrade pip
+            python -m pip install poetry
 
-      - name: Lib setup for testing
-        run: |
-           python -m setup develop
-           rm -rf litecrypt.egg-info
-
+      - name: Configure poetry
+        run: poetry config virtualenvs.create false
+      - name: Install deps
+        run: poetry install
       - name: Running consts tests
         run: pytest tests/consts
       - name: Running helpers tests
@@ -48,68 +46,58 @@ jobs:
         run: pytest tests/crypt
 
 
-
   run-tests-2:
-    needs: run-tests
     runs-on: ubuntu-latest
+    needs: run-tests
     strategy:
       matrix:
-        python-version: [3.10", "3.11","3.12"]
+        python-version: ["3.10", "3.11", "3.12"]
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v3
+        uses: actions/setup-python@v4
         with:
-            python-version: 3.11
+          python-version: 3.11
 
-
-      - name: Installing dependencies
+      - name: Setup poetry
         run: |
-          python -m pip install --upgrade pip
-          pip install -r scripts/setup/minimal_requirements.txt
-          pip install pytest
+            python -m pip install --upgrade pip
+            python -m pip install poetry
 
-      - name: Lib setup for testing
-        run: |
-           python -m setup develop
-           rm -rf litecrypt.egg-info
-
-      - name: Running crypt tests
+      - name: Configure poetry
+        run: poetry config virtualenvs.create false
+      - name: Install deps
+        run: poetry install
+      - name: Running tests
         run: pytest tests/crypt
 
-
-  build-then-publish-pypi:
+  docs:
     if: github.event_name == 'push'
     needs: run-tests-2
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-      - name: Environment setup
-        uses: actions/setup-python@v3
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
         with:
-          python-version: 3.7
-      - name: Library setup
-        run: |
-          python -m pip install --upgrade pip
-          pip install wheel twine
-      - name: Build distro
-        run: |
-          rm -rf dist | rm -rf build | rm -rf litecrypt.egg-info
-          python setup.py bdist_wheel sdist
-      - name: Check distro
-        run: twine check dist/*
-      - name: Publish to PyPI
-        env:
-          TWINE_USERNAME: ${{ secrets.TWINE_USERNAME}}
-          TWINE_PASSWORD: ${{ secrets.TWINE_PASSWORD}}
-        run: twine upload dist/* --verbose
+          python-version: 3.x
+      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
+      - uses: actions/cache@v3
+        with:
+          key: mkdocs-material-${{ env.cache_id }}
+          path: .cache
+          restore-keys: |
+            mkdocs-material-
+      - run: |
+            pip install poetry
+            poetry config virtualenvs.create false
+            poetry install
+      - run: mkdocs gh-deploy --force
 
-  build-and-publish-docker:
+  docker:
     if: github.event_name == 'push'
-    needs: build-then-publish-pypi
+    needs: run-tests-2
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repo
@@ -124,21 +112,29 @@ jobs:
       - name: Pushing to the hub
         run: docker push ashgw/litecrypt:${{ steps.get_version.outputs.version }}
 
-  publish-documentation:
+  pypi:
     if: github.event_name == 'push'
     runs-on: ubuntu-latest
-    needs: build-then-publish-pypi
+    needs: docker
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
+      - name: Checkout repo
+        uses: actions/checkout@v3
+      - name: Environment setup
+        uses: actions/setup-python@v3
         with:
-          python-version: 3.x
-      - run: echo "cache_id=$(date --utc '+%V')" >> $GITHUB_ENV
-      - uses: actions/cache@v3
-        with:
-          key: mkdocs-material-${{ env.cache_id }}
-          path: .cache
-          restore-keys: |
-            mkdocs-material-
-      - run: pip install mkdocs-material
-      - run: mkdocs gh-deploy --force
+          python-version: 3.11
+      - name: Install poetry
+        run: |
+          pip install --upgrade pip
+          pip install poetry
+      - name: Configure poetry
+        run: poetry config virtualenvs.create false
+      - name: Install Dependencies
+        run: poetry install
+      - name: Publish
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_TOKEN }}
+        run: |
+          python -m poetry config pypi-token.pypi $PYPI_TOKEN
+          set -e
+          python -m poetry publish --build

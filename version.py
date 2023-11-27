@@ -1,7 +1,7 @@
 import re
 
-with open("setup.py") as f:
+with open("pyproject.toml") as f:
     content = f.read()
 
-version_match = re.search(r'version="(\d+\.\d+\.\d+)"', content)
+version_match = re.search(r'version = "(\d+\.\d+\.\d+)"', content)
 print(version_match.group(1))
