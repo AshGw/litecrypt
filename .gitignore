@@ -12,3 +12,5 @@ site/
 
 # Folder to test stuff
 playground/
+
+poetry.lock
