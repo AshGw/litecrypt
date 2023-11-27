@@ -4,33 +4,21 @@
 [![Python Versions](https://img.shields.io/badge/Python-3.8%7C3.9%7C3.10%7C3.11%7C3.12-blue)](https://pypi.org/project/litecrypt/)
 [![Static Badge](https://img.shields.io/badge/PyPI-latest-brightgreen)](https://pypi.org/project/litecrypt/)
 
-
-
-## What is litecrypt ?
-Just a library I cooked up for personal use to secure some files, you probably don't need this but if you do, here's an overview:
-
-
-### Encryption
-AES-256 CBC leveraging primitives from the `cryptography` library with added features supporting both fast & very computationally intensive encryption.
-
-### Database Integration
-Needed some way to store encrypted files and figure out another way to associate each file with its specific encryption key, which with this setup is automatically done.
-### GUI
-Made to obviate the need to write code.
+## Overview
+I made this library for personal use to secure some files. It provides support for both fast and highly computationally intensive encryption. Also, it includes a database integration system . This system facilitates the restoration of files to their original state if necessary, and a graphical user interface (GUI) is also included to obviate the need to write code.
 
 ## Installation
 ```shell
 pip install litecrypt
 ```
-
-## Encryption
+## Usage
 
 ```python
 from litecrypt import CryptFile, gen_key
 
 key = gen_key()
-CryptFile('dataset.csv', key).encrypt()
-# Voila! Your file is now called ==> dataset.csv.crypt
+CryptFile('file_of_any.type', key).encrypt()
+# the file is now called ==> 'file_of_any.type.crypt
 ```
 The encryption process is **blazingly fast** by default, to make it computationally intensive
 <details><summary>Do this</summary>
@@ -59,7 +47,7 @@ CryptFile('anyfile.txt.crypt',key=key).decrypt()
 </details>
 
 
-Need to protect a message? Bet:
+For messages:
 ```python
 from litecrypt import Crypt, gen_key
 
@@ -69,8 +57,7 @@ print(encrypted)  # Check the return value
 ```
 
 ### Details
-
-**Algorithm:** AES-256 CBC
+<br>**Algorithm:** AES-256 CBC
 <br>**Layout:**
 ````commandline
 +-------------+  +--------+  +------------+  +-------------+  +-------------+  +------------------+
@@ -95,56 +82,12 @@ The main key which is a 32-byte random hex string is provided by `gen_key()` fun
 - **Ciphertext:** Variable size.
 
 
-## Database Integration
-
-
 <h3>Supported Databases</h3>
 
 Currently, supports MySQL, PostgresSQL and SQLite.
+<br>Check the  **[docs](https://ashgw.github.io/litecrypt)** for more info.
 
-<h3>Example Usage</h3>
-
-```python
-from litecrypt import CryptFile, Database, gen_key, gen_ref
-
-files = ["file", "image.png", "notes.txt"]
-
-encryption_key = gen_key()
-print(encryption_key) # check it out
-
-# encrypt files
-for file in files:
-    CryptFile(file,key=encryption_key).encrypt(echo=True)
-    # each one of these files ends with .crypt now
-
-same_files_but_with_crypt_extension = ["file.crypt",
-                                       "image.png.crypt",
-                                       "notes.txt.crypt"]
-
-# Create & connect to the databases (sqlite for now)
-main_db = Database('xyz_main.db',echo=True)
-keys_db = Database('xyz_keys.db',for_keys=True,echo=True)
-
-# To link up the two databases generate a:
-reference_value = gen_ref()
-print(reference_value) # check it out
-
-for encrypted_file_name in same_files_but_with_crypt_extension:
-    with open(encrypted_file_name,'rb') as f:
-        encrypted_file_binary_content = f.read()
-        # Insert encrypted content and keys into the databases
-        # & link'em up with a ref value
-        main_db.insert(encrypted_file_name,
-                       encrypted_file_binary_content,
-                       ref=reference_value)
-        keys_db.insert(encrypted_file_name,
-                       encryption_key,
-                       ref=reference_value)
-```
-
-Confused huh? check the **[Docs](https://ashgw.github.io/litecrypt)**.
-
-##  Or, Simplify with the GUI
+###  GUI
 
 ![alt text](docs/assets/GUI.png)
 
@@ -153,12 +96,6 @@ Confused huh? check the **[Docs](https://ashgw.github.io/litecrypt)**.
 https://github.com/AshGw/litecrypt/assets/126174609/190b6ab8-3f8a-4656-9525-dbaf5e56db5e
 
 </details>
-
-
-## Documentation
-
-Check out the **[Docs](https://ashgw.github.io/litecrypt)**.
-
 
 
 ## License
