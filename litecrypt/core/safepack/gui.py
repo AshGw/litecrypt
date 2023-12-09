@@ -1,4 +1,5 @@
 # type: ignore
+# this is a mess and i don't plan on fixing it just know it works
 
 import atexit
 import json
@@ -10,8 +11,9 @@ import string
 
 import ttkbootstrap as tk
 
-import litecrypt.mapper.database as ld
+from litecrypt.mapper.database import Database
 from litecrypt.core.safepack.replicas import Crypt, CryptFile, tqr
+from litecrypt.mapper.extras import reference_linker, spawn
 from litecrypt.utils.consts import Gui
 
 """--------------------------------HOW TO ?------------------------"""
@@ -161,6 +163,9 @@ else:
     )
 
 
+OUTPUT_JSON = "output.json"
+
+
 def show_all_content():
     global db_enable_blocker, main_db_name_var, usable_real_path, main_db_conn, db_display_text, keys_db_conn
 
@@ -169,7 +174,7 @@ def show_all_content():
         db_display_text.insert(
             tk.END, f"Check 'output.json' in the chosen path : {usable_real_path}\n"
         )
-        json_path = os.path.join(usable_real_path, "output.json")
+        json_path = os.path.join(usable_real_path, OUTPUT_JSON)
         if swich_db_var.get() == 1:
             conn = keys_db_conn
         else:
@@ -347,7 +352,7 @@ def query():
         if len(query_var) > 0:
             try:
                 db_display_text.delete("1.0", tk.END)
-                json_file = os.path.join(usable_real_path, "output.json")
+                json_file = os.path.join(usable_real_path, OUTPUT_JSON)
                 query_out = conn._query(query_var)
                 conn.create_all()
                 with open(json_file, "w") as f:
@@ -455,7 +460,7 @@ def main_db_name():
                     fullpath + f"/{maindbname}"
                 ):
                     db_already_exists_blocker = 1
-                    main_db_conn = ld.Database(conn_path_db,silent_errors=True)
+                    main_db_conn = Database(conn_path_db, silent_errors=True)
                     main_db_name_result_var.set("CONNECTED")
                     db_display_text.delete("1.0", tk.END)
                     db_display_text.insert(tk.END, f"Connected to {maindbname}..\n\n")
@@ -464,7 +469,7 @@ def main_db_name():
                     decfiletoolbutt.state(["!disabled"])
                 else:
                     db_already_exists_blocker = 0
-                    main_db_conn = ld.Database(conn_path_db,silent_errors=True)
+                    main_db_conn = Database(conn_path_db, silent_errors=True)
                     db_display_text.delete("1.0", tk.END)
                     db_display_text.insert(
                         tk.END,
@@ -501,18 +506,24 @@ def keyd_db_setup():
                 if os.path.isfile(usable_real_path + dbname_keys_win) or os.path.isfile(
                     usable_real_path + dbname_keys_unix
                 ):
-                    keys_db_conn = ld.Database(conn_path_keys, for_keys=True,silent_errors=True)
+                    keys_db_conn = Database(
+                        conn_path_keys, for_keys=True, silent_errors=True
+                    )
                     db_display_text.insert(tk.END, f"Connected to '{keys_db}' ..\n\n")
                     success_keysdb_connection_blocker = 1
                 else:
-                    keys_db_conn = ld.Database(conn_path_keys, for_keys=True,silent_errors=True)
+                    keys_db_conn = Database(
+                        conn_path_keys, for_keys=True, silent_errors=True
+                    )
                     db_display_text.insert(
                         tk.END,
                         f"'{keys_db}' NOT FOUND ! ==> Created and Connected to '{keys_db}' ..\n\n",
                     )
                     success_keysdb_connection_blocker = 1
             else:
-                keys_db_conn = ld.Database(conn_path_keys, for_keys=True,silent_errors=True)
+                keys_db_conn = Database(
+                    conn_path_keys, for_keys=True, silent_errors=True
+                )
                 db_display_text.insert(
                     tk.END, f"Created and Connected to '{keys_db}' ..\n\n"
                 )
@@ -754,7 +765,7 @@ def spawn_out():
             tk.END, "ATTEMPTING TO SPAWN OUT FILES IN THE CHOSEN PATH..\n"
         )
 
-        filenames_list = ld.reference_linker(
+        filenames_list = reference_linker(
             connection=main_db_conn,
             key_reference=key_ref_entry_var.get().__str__().strip(),
             get_filename=True,
@@ -777,7 +788,7 @@ def spawn_out():
                         f" UNDER 'IGNORE DUPLICATES FLAG'\n",
                     )
                     try:
-                        ld.spawn(
+                        spawn(
                             main_connection=main_db_conn,
                             keys_connection=keys_db_conn,
                             get_all=True,
@@ -802,7 +813,7 @@ def spawn_out():
                         f"NO DUPLICATE FILES DETECTED SPAWNING IN '{actual_spawned_path}'\n",
                     )
                     try:
-                        ld.spawn(
+                        spawn(
                             main_connection=main_db_conn,
                             keys_connection=keys_db_conn,
                             get_all=True,
@@ -1353,7 +1364,7 @@ keyButton.place(relx=0.671, rely=0.7)
 
 def rm_json():
     global usable_real_path
-    file = os.path.join(usable_real_path, "output.json")
+    file = os.path.join(usable_real_path, OUTPUT_JSON)
     if os.path.exists(file):
         os.remove(file)
 
