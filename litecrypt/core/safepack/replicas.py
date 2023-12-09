@@ -5,7 +5,7 @@ from typing import Union
 
 import qrcode
 
-import litecrypt.core.base as core
+import litecrypt.core.crypt as core
 
 
 def tqr(text: str) -> Union[int, tuple]:

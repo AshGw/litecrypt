@@ -5,7 +5,7 @@ import string
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
-from litecrypt.core.base import Dec, Enc
+from litecrypt.core.crypt import Dec, Enc
 from litecrypt.utils import exceptions
 from litecrypt.utils.consts import Size
 

@@ -1,7 +1,7 @@
 import struct
 import unittest
 
-import litecrypt.core.base as lc
+import litecrypt.core.crypt as lc
 from litecrypt.utils import exceptions
 from litecrypt.utils.consts import Size
 

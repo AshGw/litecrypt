@@ -1,4 +1,4 @@
-from litecrypt.core.base import Dec, Enc
+from litecrypt.core.crypt import Dec, Enc
 from litecrypt.core.datacrypt import Crypt, gen_key, gen_ref
 from litecrypt.core.filecrypt import CryptFile
 from litecrypt.mapper.database import Database
