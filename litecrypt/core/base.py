@@ -74,11 +74,10 @@ class DecBase:
             _h + _i + _s + _p + _fi : _h + _i + _s + _p + _fi + _fk
         ]
 
-        self.rec_iterations = struct.unpack("!I", self.rec_iters_raw)[0]
+        self.rec_iterations = check_iterations(
+            struct.unpack("!I", self.rec_iters_raw)[0]
+        )
         self.rec_KDF_signature = struct.unpack("!I", self.rec_KDF_signature_raw)[0]
-
-        check_iterations(self.rec_iterations)
-        # pause
         self.rec_ciphertext = self.message[_h + _i + _s + _p + _fi + _fk :]
 
         compute_intensively = False
