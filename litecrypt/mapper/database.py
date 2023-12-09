@@ -159,13 +159,15 @@ class Database:
         try:
             result = self.session.query(self.Table).all()
             for row in result:
-                yield [row.id, row.filename, row.content, row.ref]
+                yield [row.id, row.filename, row.content, row.ref]  # type: ignore
         except DBError as e:
             if self.silent_errors:
                 return DatabaseFailure(error=e, failure=1).get()
             raise e
 
-    def content_by_id(self, id: int) -> Union[List[Union[str, bytes]], DatabaseFailureResponse]:
+    def content_by_id(
+        self, id: int
+    ) -> Union[List[Union[str, bytes]], DatabaseFailureResponse]:
         """
         Retrieve a specific record from the current table by its ID.
 
@@ -176,7 +178,7 @@ class Database:
         """
         try:
             result = self.session.query(self.Table).filter_by(id=id).first()
-            return [result.id, result.filename, result.content, result.ref]
+            return [result.id, result.filename, result.content, result.ref]  # type: ignore
         except DBError as e:
             if self.silent_errors:
                 return DatabaseFailure(error=e, failure=1).get()
@@ -213,7 +215,7 @@ class Database:
                 return DatabaseFailure(error=e, failure=1).get()
             raise e
 
-    def _query(self, *queries: str) -> List[Any]: # GUI use
+    def _query(self, *queries: str) -> List[Any]:  # DO NOT USE THIS OUTSIDE OF GUI
         result = []
         for i, query in enumerate(queries):
             if not isinstance(query, str):
@@ -464,9 +466,7 @@ def _spawn_all_files(
                     f"{Colors.GREEN}{full_path} has been spawned"
                     f" successfully.{Colors.RESET}"
                 )
-        files_in_new_directory = [
-            os.path.join(dir, file) for file in filenames_list
-        ]
+        files_in_new_directory = [os.path.join(dir, file) for file in filenames_list]
         return DatabaseResponse(
             status=Status.SUCCESS,
             filenames=files_in_new_directory,
