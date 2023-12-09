@@ -13,4 +13,6 @@ site/
 # Folder to test stuff
 playground/
 
+.ruff_cache/
+
 poetry.lock
