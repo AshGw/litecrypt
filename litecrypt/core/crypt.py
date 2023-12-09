@@ -1,10 +1,10 @@
 """This module provides classes and functions for AES-256 encryption and decryption"""
 
 
-import base64
-import os
-import struct
 from typing import Optional, Union
+from base64 import urlsafe_b64encode
+from os import urandom
+from struct import pack
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, hmac, padding
@@ -42,7 +42,7 @@ class Enc(EncBase):
             raise ValueError(
                 f"desired_bytes must be greater than or equal to {Size.AES_KEY}"
             )
-        key = os.urandom(desired_bytes)
+        key = urandom(desired_bytes)
         return key.hex()
 
     def _mode(self) -> modes.CBC:
@@ -69,14 +69,14 @@ class Enc(EncBase):
         )
 
     def _iterations_bytes(self) -> bytes:
-        iters_bytes = struct.pack("!I", self.iterations)
+        iters_bytes = pack("!I", self.iterations)
         return iters_bytes
 
     def _signtature_KDF_bytes(self) -> bytes:
         KDF_method = UseKDF.FAST
         if self.compute_intensively is True:
             KDF_method = UseKDF.SLOW
-        signature_bytes = struct.pack("!I", KDF_method)
+        signature_bytes = pack("!I", KDF_method)
 
         return signature_bytes
 
@@ -112,7 +112,7 @@ class Enc(EncBase):
             + self._signtature_KDF_bytes()
             + self._ciphertext()
         )
-        return raw if get_bytes else base64.urlsafe_b64encode(raw).decode("UTF-8")
+        return raw if get_bytes else urlsafe_b64encode(raw).decode("UTF-8")
 
 
 class Dec(DecBase):

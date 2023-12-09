@@ -37,24 +37,9 @@ class Crypt:
 
     @staticmethod
     def key_verify(key: str) -> int:
-        """
-        Verify if a given key is valid for usage.
-
-        This function checks whether a given key is valid by attempting
-         to convert it from hexadecimal
-        representation and ensuring its length is the required 32 bytes.
-
-        Args:
-            key (str): The key to be verified.
-
-        Returns:
-            int: 1 if the key is valid, 0 if the key is valid but doesn't meet
-             length requirements,
-            or -1 if the key is not valid.
-        """
         try:
             a = bytes.fromhex(key.strip())
-            return 1 if len(a) == 32 else 0
+            return 1 if len(a) == 32 else 0  # YES. 1 for success and 0 for failure
         except ValueError:
             return -1
 
@@ -132,8 +117,6 @@ def gen_ref(n: int = 6) -> str:
 
     Returns:
         str: The generated key reference value containing a mix of characters.
-
-
 
     """
     ref = "#"
