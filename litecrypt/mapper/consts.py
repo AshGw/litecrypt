@@ -11,16 +11,15 @@ class EngineConstructs:
     MYSQL = "mysql://"
 
 
-def remove_protocol(engine_string: str) -> str:
+def _remove_protocol(engine_string: str) -> str:
     colon_index = engine_string.find(":")
     return engine_string[:colon_index] if colon_index != -1 else engine_string
 
 
 class EngineFor:
-    SQLITE = remove_protocol(EngineConstructs.SQLITE)
-    MYSQL = remove_protocol(EngineConstructs.MYSQL)
-    POSTGRESQL = remove_protocol(EngineConstructs.POSTGRES)
-
+    SQLITE = _remove_protocol(EngineConstructs.SQLITE)
+    MYSQL = _remove_protocol(EngineConstructs.MYSQL)
+    POSTGRESQL = _remove_protocol(EngineConstructs.POSTGRES)
 
 
 class Status(str):

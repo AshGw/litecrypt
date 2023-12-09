@@ -1,18 +1,17 @@
 # type: ignore
+# this is a mess and i don't plan on fixing it just know it works
 
-import os
+from os import path, rename
 from typing import Union
-
-import qrcode
-
-import litecrypt.core.base as core
+from qrcode import QRCode, constants
+from litecrypt.core.crypt import Enc, Dec
 
 
 def tqr(text: str) -> Union[int, tuple]:
     try:
-        qr = qrcode.QRCode(
+        qr = QRCode(
             version=10,
-            error_correction=qrcode.constants.ERROR_CORRECT_L,
+            error_correction=constants.ERROR_CORRECT_L,
             box_size=20,
             border=1,
         )
@@ -36,7 +35,7 @@ class Crypt:
 
     @staticmethod
     def genkey() -> str:
-        return core.EncBase.gen_key()
+        return Enc.gen_key()
 
     @staticmethod
     def keyverify(key: str) -> int:
@@ -54,7 +53,7 @@ class Crypt:
     def encrypt(self) -> tuple:
         if self.text:
             try:
-                ins = core.EncBase(self.text, self.key)
+                ins = Enc(self.text, self.key)
                 new_content = ins.encrypt()
                 return 1, new_content
             except BaseException:
@@ -66,7 +65,7 @@ class Crypt:
     def decrypt(self) -> tuple:
         if self.text:
             try:
-                dec_instance = core.DecBase(message=self.text, mainkey=self.key)
+                dec_instance = Dec(message=self.text, mainkey=self.key)
                 a = dec_instance.decrypt()
                 output = a
                 return 1, output
@@ -88,7 +87,7 @@ class CryptFile:
 
     @staticmethod
     def genkey() -> str:
-        return core.EncBase.gen_key()
+        return Enc.gen_key()
 
     @staticmethod
     def keyverify(key: str) -> int:
@@ -103,15 +102,15 @@ class CryptFile:
             return 2
 
     def encrypt(self) -> int:
-        if os.path.isdir(self.filename):
+        if path.isdir(self.filename):
             return 7
         if self.not_256_bit_key == 1:
             return 5
         try:
-            if not os.path.exists(self.filename):
+            if not path.exists(self.filename):
                 return 3
             else:
-                if os.path.splitext(self.filename)[1] == ".crypt":
+                if path.splitext(self.filename)[1] == ".crypt":
                     return 6
                 else:
                     with open(self.filename, "rb") as f:
@@ -119,9 +118,7 @@ class CryptFile:
                     with open(self.filename, "wb") as f:
                         if filecontent:
                             try:
-                                ins = core.EncBase(
-                                    message=filecontent, mainkey=self.key
-                                )
+                                ins = Enc(message=filecontent, mainkey=self.key)
                                 new_content = ins.encrypt(get_bytes=True)
                                 f.write(new_content)
                                 go_ahead_rename_crypt = 1
@@ -132,21 +129,21 @@ class CryptFile:
                             f.write(filecontent)
                             return 2
                     if go_ahead_rename_crypt == 1:
-                        os.rename(self.filename, self.filename + ".crypt")
+                        rename(self.filename, self.filename + ".crypt")
                         return 1
         except Exception:
             return 4
 
     def decrypt(self) -> int:
-        if os.path.isdir(self.filename):
+        if path.isdir(self.filename):
             return 7
         if self.not_256_bit_key == 1:
             return 5
         try:
-            if not os.path.exists(self.filename):
+            if not path.exists(self.filename):
                 return 3
             else:
-                if os.path.splitext(self.filename)[1] != ".crypt":
+                if path.splitext(self.filename)[1] != ".crypt":
                     return 6
                 else:
                     with open(self.filename, "rb") as f:
@@ -154,9 +151,7 @@ class CryptFile:
                     with open(self.filename, "wb") as f:
                         if enc_content:
                             try:
-                                ins = core.DecBase(
-                                    message=enc_content, mainkey=self.key
-                                )
+                                ins = Dec(message=enc_content, mainkey=self.key)
                                 a = ins.decrypt(get_bytes=True)
                                 f.write(a)
                                 go_ahead_remove_crypt = 1
@@ -167,7 +162,7 @@ class CryptFile:
                             f.write(enc_content)
                             return 2
                     if go_ahead_remove_crypt == 1:
-                        os.rename(self.filename, os.path.splitext(self.filename)[0])
+                        rename(self.filename, path.splitext(self.filename)[0])
                         return 1
         except Exception:
             return 4

@@ -5,7 +5,7 @@ import string
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
-from litecrypt.core.base import DecBase, EncBase
+from litecrypt.core.crypt import Dec, Enc
 from litecrypt.utils import exceptions
 from litecrypt.utils.consts import Size
 
@@ -37,24 +37,9 @@ class Crypt:
 
     @staticmethod
     def key_verify(key: str) -> int:
-        """
-        Verify if a given key is valid for usage.
-
-        This function checks whether a given key is valid by attempting
-         to convert it from hexadecimal
-        representation and ensuring its length is the required 32 bytes.
-
-        Args:
-            key (str): The key to be verified.
-
-        Returns:
-            int: 1 if the key is valid, 0 if the key is valid but doesn't meet
-             length requirements,
-            or -1 if the key is not valid.
-        """
         try:
             a = bytes.fromhex(key.strip())
-            return 1 if len(a) == 32 else 0
+            return 1 if len(a) == 32 else 0  # YES. 1 for success and 0 for failure
         except ValueError:
             return -1
 
@@ -77,7 +62,7 @@ class Crypt:
         """
         if self.data:
             try:
-                ins = EncBase(
+                ins = Enc(
                     self.data,
                     self.key,
                     iterations=self.iteration_rounds,
@@ -107,7 +92,7 @@ class Crypt:
         """
         if self.data:
             try:
-                dec_instance = DecBase(message=self.data, mainkey=self.key)
+                dec_instance = Dec(message=self.data, mainkey=self.key)
                 return (
                     dec_instance.decrypt(get_bytes=True)
                     if get_bytes
@@ -132,8 +117,6 @@ def gen_ref(n: int = 6) -> str:
 
     Returns:
         str: The generated key reference value containing a mix of characters.
-
-
 
     """
     ref = "#"
@@ -161,4 +144,4 @@ def gen_key() -> str:
     Returns:
         str: A random 256-bit encryption key as a hex string.
     """
-    return EncBase.gen_key()
+    return Enc.gen_key()

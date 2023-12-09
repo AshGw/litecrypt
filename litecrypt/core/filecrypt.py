@@ -4,7 +4,7 @@ import os
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
-import litecrypt.core.base as core
+import litecrypt.core.crypt as core
 from litecrypt.core.datacrypt import Crypt
 from litecrypt.utils import exceptions
 from litecrypt.utils.consts import Colors, Size
@@ -101,7 +101,7 @@ class CryptFile:
             with open(self.filename, "wb") as f:
                 if file_content:
                     try:
-                        ins = core.EncBase(
+                        ins = core.Enc(
                             message=file_content,
                             mainkey=self.key,
                             compute_intensively=self.intensive_compute,
@@ -181,7 +181,7 @@ class CryptFile:
                     raise exceptions.fixed.EmptyContentError()
                 else:
                     try:
-                        ins = core.DecBase(message=enc_content, mainkey=self.key)
+                        ins = core.Dec(message=enc_content, mainkey=self.key)
                         a = ins.decrypt(get_bytes=True)
                         f.write(a)
                         go_ahead_remove_crypt = 1
