@@ -1,9 +1,6 @@
 import os
 import random
-
-from litecrypt.core.datacrypt import Crypt, gen_key, gen_ref
-from litecrypt.core.filecrypt import CryptFile
-from litecrypt.mapper.database import spawn
+from litecrypt import CryptFile, Crypt, gen_key, gen_ref, spawn
 
 from ..lab.main import Names, Vals, create_test_grounds, force_remove, verify_exact
 
