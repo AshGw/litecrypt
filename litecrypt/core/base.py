@@ -13,18 +13,23 @@ from cryptography.hazmat.primitives.ciphers import (
     Cipher,
     algorithms,
     modes,
-    CipherContext
+    CipherContext,
 )
 
-from litecrypt.core.helpers.funcs import (check_iterations, cipher_randomizers, parse_encrypted_message,
-                                          parse_message, use_KDF)
+from litecrypt.core.helpers.funcs import (
+    check_iterations,
+    cipher_randomizers,
+    parse_encrypted_message,
+    parse_message,
+    use_KDF,
+)
 from litecrypt.utils import exceptions
 from litecrypt.utils.consts import Size, UseKDF
 
 DEFAULT_INTENSIVE_COMPUTE = False
 
 
-class EncBase:
+class _EncBase:
     def __init__(
         self,
         message: Union[str, bytes],
@@ -36,10 +41,8 @@ class EncBase:
         self.message = parse_message(message)
         self.mainkey = mainkey
         self.compute_intensively = compute_intensively
-        self.iterations = iterations
-
-        check_iterations(self.iterations)
-        self.key_verify(self.mainkey)
+        self.iterations = check_iterations(iterations)
+        self.verify_key(self.mainkey)
 
         self.iv, self.salt, self.pepper = cipher_randomizers()
 
@@ -58,6 +61,30 @@ class EncBase:
         )
 
     @staticmethod
+    def verify_key(key: str) -> None:
+        if len(bytes.fromhex(key.strip())) < Size.MAIN_KEY:
+            raise ValueError(
+                f"raw key size must be greater or equal to: {Size.MAIN_KEY} {Size.UNIT}"
+            )
+
+
+class Enc(_EncBase):
+    def __init__(
+        self,
+        message: Union[str, bytes],
+        mainkey: str,
+        *,
+        iterations: int = Size.MIN_ITERATIONS,
+        compute_intensively: bool = DEFAULT_INTENSIVE_COMPUTE,
+    ) -> None:
+        super().__init__(
+            message=message,
+            mainkey=mainkey,
+            iterations=iterations,
+            compute_intensively=compute_intensively,
+        )
+
+    @staticmethod
     def gen_key(desired_bytes: int = Size.AES_KEY) -> str:
         if desired_bytes < Size.AES_KEY:
             raise ValueError(
@@ -65,13 +92,6 @@ class EncBase:
             )
         key = os.urandom(desired_bytes)
         return key.hex()
-
-    @staticmethod
-    def key_verify(key: str) -> None:
-        if len(bytes.fromhex(key.strip())) < Size.MAIN_KEY:
-            raise ValueError(
-                f"raw key size must be greater or equal to: {Size.MAIN_KEY} {Size.UNIT}"
-            )
 
     def _mode(self) -> modes.CBC:
         return modes.CBC(self.iv)
@@ -143,7 +163,7 @@ class EncBase:
         return raw if get_bytes else base64.urlsafe_b64encode(raw).decode("UTF-8")
 
 
-class DecBase:
+class Dec:
     def __init__(self, message: Union[str, bytes], mainkey: str) -> None:
         _i = Size.IV
         _s = Size.SALT

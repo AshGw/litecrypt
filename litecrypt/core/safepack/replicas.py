@@ -36,7 +36,7 @@ class Crypt:
 
     @staticmethod
     def genkey() -> str:
-        return core.EncBase.gen_key()
+        return core.Enc.gen_key()
 
     @staticmethod
     def keyverify(key: str) -> int:
@@ -54,7 +54,7 @@ class Crypt:
     def encrypt(self) -> tuple:
         if self.text:
             try:
-                ins = core.EncBase(self.text, self.key)
+                ins = core.Enc(self.text, self.key)
                 new_content = ins.encrypt()
                 return 1, new_content
             except BaseException:
@@ -66,7 +66,7 @@ class Crypt:
     def decrypt(self) -> tuple:
         if self.text:
             try:
-                dec_instance = core.DecBase(message=self.text, mainkey=self.key)
+                dec_instance = core.Dec(message=self.text, mainkey=self.key)
                 a = dec_instance.decrypt()
                 output = a
                 return 1, output
@@ -88,7 +88,7 @@ class CryptFile:
 
     @staticmethod
     def genkey() -> str:
-        return core.EncBase.gen_key()
+        return core.Enc.gen_key()
 
     @staticmethod
     def keyverify(key: str) -> int:
@@ -119,9 +119,7 @@ class CryptFile:
                     with open(self.filename, "wb") as f:
                         if filecontent:
                             try:
-                                ins = core.EncBase(
-                                    message=filecontent, mainkey=self.key
-                                )
+                                ins = core.Enc(message=filecontent, mainkey=self.key)
                                 new_content = ins.encrypt(get_bytes=True)
                                 f.write(new_content)
                                 go_ahead_rename_crypt = 1
@@ -154,9 +152,7 @@ class CryptFile:
                     with open(self.filename, "wb") as f:
                         if enc_content:
                             try:
-                                ins = core.DecBase(
-                                    message=enc_content, mainkey=self.key
-                                )
+                                ins = core.Dec(message=enc_content, mainkey=self.key)
                                 a = ins.decrypt(get_bytes=True)
                                 f.write(a)
                                 go_ahead_remove_crypt = 1

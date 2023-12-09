@@ -30,26 +30,27 @@ def cipher_randomizers() -> Tuple[bytes, bytes, bytes]:
     return iv, salt, pepper
 
 
-def check_iterations(iterations: int) -> None:
+def check_iterations(iterations: int) -> int:
     if iterations < Size.MIN_ITERATIONS or iterations > Size.MAX_ITERATIONS:
         raise exceptions.dynamic.IterationsOutofRangeError(iterations)
+    return iterations
 
 
 def intensive_KDF(mainkey: str, salt_pepper: bytes, iterations: int) -> bytes:
     """
-        AES Key & HMAC derivation function.
+    AES Key & HMAC derivation function.
 
-        This method derives encryption and HMAC keys using the specified main key,
-        salt or pepper, and
-        the number of iterations.
+    This method derives encryption and HMAC keys using the specified main key,
+    salt or pepper, and
+    the number of iterations.
 
-        Args:
-        mainkey (str): The main encryption key.
-        salt_pepper (bytes): The salt or pepper for key derivation.
-        iterations (int): The number of iterations for key derivation.
+    Args:
+    mainkey (str): The main encryption key.
+    salt_pepper (bytes): The salt or pepper for key derivation.
+    iterations (int): The number of iterations for key derivation.
 
-        Returns:
-        bytes: The derived key bytes.
+    Returns:
+    bytes: The derived key bytes.
     """
     return bcrypt.kdf(
         password=mainkey.encode("UTF-8"),
@@ -61,13 +62,13 @@ def intensive_KDF(mainkey: str, salt_pepper: bytes, iterations: int) -> bytes:
 
 def blazingly_fast_KDF(key: str, salt: bytes) -> bytes:
     """
-        Fast key derivation function.
-        Args:
-            key (bytes): 256-bit key.
-            salt (bytes): 128-bit salt
+    Fast key derivation function.
+    Args:
+        key (bytes): 256-bit key.
+        salt (bytes): 128-bit salt
 
-        Returns:
-            bytes: Derived 256-bit  key.
+    Returns:
+        bytes: Derived 256-bit  key.
     """
     use_key = key.encode("UTF-8")
     key_material = use_key + salt
