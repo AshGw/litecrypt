@@ -10,6 +10,7 @@ from ..lab.main import (
     force_remove,
     verify_exact,
     Database,
+    deque,
 )
 
 
@@ -17,12 +18,12 @@ class WorkFlow:
     def __init__(self) -> None:
         self.key: str = gen_key()
         self.ref: str = gen_ref()
-        self.main_conn: Database = Vals.MAIN_DB
-        self.keys_conn: Database = Vals.KEYS_DB
-        self.original_dir: str = Names.ORIGINAL_DIRECTORY
-        self.new_dir: str = Names.NEW_DIRECTORY
-        self.files: str = Names.FILES
-        self.file_contents: List[bytes] = Vals.FILE_CONTENTS
+        self.main_conn: Database = Vals.main_conn
+        self.keys_conn: Database = Vals.keys_conn
+        self.original_dir: str = Names.original_dir
+        self.new_dir: str = Names.new_dir
+        self.files: deque = Names.files
+        self.file_contents: List[bytes] = Vals.file_contents
 
     def setup(self) -> bool:
         create_test_grounds(
@@ -139,9 +140,9 @@ def test_workflow():
     assert workflow_output["files compatibility"]
     assert workflow_output["database connection"]
     force_remove(
-        Names.KEYS_DB,
-        Names.MAIN_DB,
-        Names.NEW_DIRECTORY,
-        Names.ORIGINAL_DIRECTORY,
+        Names.keys_db,
+        Names.main_db,
+        Names.new_dir,
+        Names.original_dir,
         echo=True,
     )
