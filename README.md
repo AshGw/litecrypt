@@ -5,7 +5,7 @@
 [![Static Badge](https://img.shields.io/badge/PyPI-latest-brightgreen)](https://pypi.org/project/litecrypt/)
 
 ## Overview
-So I made this library for personal use to secure some files. It provides support for both fast and highly computationally intensive encryption. Also, it includes a database integration system . This system facilitates the restoration of files to their original state if necessary, and a graphical user interface (GUI) is also included to obviate the need to write code.
+So I made this library for personal use to secure some files. It provides support for both fast and highly computationally intensive encryption. Also, it includes a database integration system which facilitates the restoration of files to their original state if necessary, and a graphical user interface (GUI) is also included to obviate the need to write code.
 
 ## Installation
 ```shell
@@ -67,7 +67,7 @@ print(encrypted)  # Check the return value
                               |   Ciphertext    ...
                               +------------------+
 ````
-AES and HMAC keys, each 32 bytes, are derived from the main key (`gen_key()`) using the chosen KDF with SHA256. Iterations range from 50 to 100,000 the higher they go the more time it takes to compute, that's 4 bytes. IV that's, Salt, and Pepper are also 16 bytes random values, both mixed with the KDF. The ciphertext size varies, with the crypto process employing PKCS7 padding.
+AES and HMAC keys, each 32 bytes, are derived from the main key (`gen_key()`) using the chosen KDF with SHA256. Iterations range from 50 to 100,000 the higher they go the more time it takes to compute, that's 4 bytes. IV that's 16, Salt, and Pepper are also 16 byte random values, both mixed with the KDF. The ciphertext size varies, with the crypto process employing PKCS7 padding.
 
 <h3>Supported Databases</h3>
 
