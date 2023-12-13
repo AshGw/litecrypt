@@ -21,7 +21,6 @@ class EncBase:
         self,
         message: Union[str, bytes],
         mainkey: str,
-        *,
         iterations: int = Size.MIN_ITERATIONS,
         compute_intensively: bool = DEFAULT_INTENSIVE_COMPUTE,
     ) -> None:
