@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Union
 from sqlalchemy.exc import DatabaseError
-from litecrypt.mapper.consts import BaseColumns, Status
+from litecrypt.mapper._consts import BaseColumns, Status
 
 
 class Columns(BaseColumns):

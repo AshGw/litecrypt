@@ -15,7 +15,7 @@ from cryptography.hazmat.primitives.ciphers import (
     CipherContext,
 )
 from litecrypt.utils.consts import Size, UseKDF
-from litecrypt.core.base import DecBase, EncBase
+from litecrypt.core._base import DecBase, EncBase
 
 DEFAULT_INTENSIVE_COMPUTE = False
 
