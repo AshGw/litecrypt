@@ -10,19 +10,19 @@ class DataTesting(unittest.TestCase):
         self.message = "fixed message"
         self.bytes_message = self.message.encode("UTF-8")
 
-    def test_strings(self):
+    def test_strings(self) -> None:
         mess = Crypt(self.message, self.key).encrypt()
         Crypt(mess, self.key).decrypt()
 
-    def test_bytes(self):
+    def test_bytes(self) -> None:
         mess = Crypt(self.bytes_message, self.key).encrypt(get_bytes=False)
         Crypt(mess, self.key).decrypt()
 
-    def test_void_message(self):
+    def test_void_message(self) -> None:
         with self.assertRaises(EmptyContentError):
             Crypt("", self.key).encrypt()
 
-    def test_crypt_err(self):
+    def test_crypt_err(self) -> None:
         with self.assertRaises(CryptError):
             Crypt(self.message, self.key).decrypt()
 
