@@ -1,7 +1,7 @@
 import os
 import shutil
 from collections import deque
-from typing import Optional
+from typing import Optional, List
 from uuid import uuid4
 
 from litecrypt.core.filecrypt import CryptFile
@@ -10,17 +10,17 @@ from litecrypt.utils.consts import Colors
 
 
 class Names:
-    MAIN_DB = "main" + uuid4().hex + ".db"
-    KEYS_DB = "keys" + uuid4().hex + ".db"
-    ORIGINAL_DIRECTORY = "original" + uuid4().hex
-    NEW_DIRECTORY = "new" + uuid4().hex
-    FILES = deque(["file.txt", "file", "file.png"], maxlen=3)
+    main_db = "main" + uuid4().hex + ".db"
+    keys_db = "keys" + uuid4().hex + ".db"
+    original_dir = "original" + uuid4().hex
+    new_dir = "new" + uuid4().hex
+    files: deque = deque(["file.txt", "file", "file.png"], maxlen=3)
 
 
 class Vals:
-    MAIN_DB = Database(Names.MAIN_DB, echo=True)
-    KEYS_DB = Database(Names.KEYS_DB, for_keys=True, echo=True)
-    FILE_CONTENTS = [uuid4().bytes for _ in range(len(Names.FILES))]
+    main_conn = Database(Names.main_db, echo=True)
+    keys_conn = Database(Names.keys_db, for_keys=True, echo=True)
+    file_contents: List[bytes] = [uuid4().bytes for _ in range(len(Names.files))]
 
 
 def create_test_grounds(
@@ -48,13 +48,12 @@ def verify_exact(filepath1: str, filepath2: str) -> bool:
         with open(filepath1, "rb") as file1, open(filepath2, "rb") as file2:
             content1 = file1.read()
             content2 = file2.read()
-
             return content1 == content2
     except IOError:
         return False
 
 
-def force_remove(*paths: str, echo: Optional[bool] = False):
+def force_remove(*paths: str, echo: Optional[bool] = False) -> None:
     for path in paths:
         try:
             if os.path.isdir(path):

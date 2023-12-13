@@ -13,7 +13,7 @@ import ttkbootstrap as tk
 
 from litecrypt.mapper.database import Database
 from litecrypt.core.safepack.replicas import Crypt, CryptFile, tqr
-from litecrypt.mapper.extras import reference_linker, spawn
+from litecrypt.mapper._extras import reference_linker, spawn
 from litecrypt.utils.consts import Gui
 
 """--------------------------------HOW TO ?------------------------"""
@@ -762,7 +762,7 @@ def spawn_out():
     if db_enable_blocker:
         db_display_text.delete("1.0", tk.END)
         db_display_text.insert(
-            tk.END, "ATTEMPTING TO SPAWN OUT FILES IN THE CHOSEN PATH..\n"
+            tk.END, "ATTEMPTING TO SPAWN OUT files IN THE CHOSEN PATH..\n"
         )
 
         filenames_list = reference_linker(
@@ -772,9 +772,9 @@ def spawn_out():
             get_all=True,
         )
         if len(filenames_list) == 0:
-            db_display_text.insert(tk.END, "NO FILES FOUND WITH THIS REFERENCE\n")
+            db_display_text.insert(tk.END, "NO files FOUND WITH THIS REFERENCE\n")
         elif not len(filenames_list) == 0:
-            db_display_text.insert(tk.END, "FILES FOUND WITH THE GIVEN REFERENCE: \n")
+            db_display_text.insert(tk.END, "files FOUND WITH THE GIVEN REFERENCE: \n")
             for file in filenames_list:
                 db_display_text.insert(tk.END, f"{file}\n")
             if len(filenames_list) != len(set(filenames_list)):
@@ -784,7 +784,7 @@ def spawn_out():
                 if spawn_out_blocker:
                     db_display_text.insert(
                         tk.END,
-                        f"DUPLICATE FILES DETECTED ! SPAWNING IN '{actual_spawned_path}'"
+                        f"DUPLICATE files DETECTED ! SPAWNING IN '{actual_spawned_path}'"
                         f" UNDER 'IGNORE DUPLICATES FLAG'\n",
                     )
                     try:
@@ -798,7 +798,7 @@ def spawn_out():
                         )
                     except Exception:
                         db_display_text.insert(
-                            tk.END, f"ERROR OCCURRED DURING FILES RETRIEVAL !'\n"
+                            tk.END, f"ERROR OCCURRED DURING files RETRIEVAL !'\n"
                         )
                 else:
                     return
@@ -810,7 +810,7 @@ def spawn_out():
                 if spawn_out_blocker:
                     db_display_text.insert(
                         tk.END,
-                        f"NO DUPLICATE FILES DETECTED SPAWNING IN '{actual_spawned_path}'\n",
+                        f"NO DUPLICATE files DETECTED SPAWNING IN '{actual_spawned_path}'\n",
                     )
                     try:
                         spawn(
@@ -822,7 +822,7 @@ def spawn_out():
                         )
                     except Exception:
                         db_display_text.insert(
-                            tk.END, f"ERROR OCCURRED DURING FILES RETREIVAL !'\n"
+                            tk.END, f"ERROR OCCURRED DURING files RETREIVAL !'\n"
                         )
                 else:
                     return

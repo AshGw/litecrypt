@@ -5,9 +5,9 @@
 [![Static Badge](https://img.shields.io/badge/PyPI-v0.0.1-brightgreen)](https://pypi.org/project/litecrypt/)
 ---
 
-## Welcome to Litecrypt
+## Litecrypt
 
-Litecrypt is a library that provides a simple solution for encrypting and decrypting files, as well as keeping track of them.
+Library that provides a simple solution for encrypting and decrypting files, as well as keeping track of them.
 
 ## Example Usage
 
@@ -228,7 +228,7 @@ from litecrypt import Database
 main_connection = Database('test.db')
 keys_connection = Database('somekeysdatabase.db',for_keys=True)
 ```
-By default, every database connection defaults to main, set the parameter `for_keys=True` to let the underlying process know this is used for keys so that it doesn't bring conflicts when you try to retrieve files by references.
+By default, every database connection defaults to main, set the parameter `for_keys=True` to let the underlying process know this is used for keys, this is mando to retrieve files based on reference.
 
 **PostgreSQL**:
 <br>

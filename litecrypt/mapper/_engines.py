@@ -3,7 +3,7 @@ from typing import Optional, Any
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
-from litecrypt.mapper.consts import EngineConstructs, EngineFor
+from litecrypt.mapper._consts import EngineConstructs, EngineFor
 
 
 def get_engine(

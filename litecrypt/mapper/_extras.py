@@ -2,11 +2,11 @@ import os
 from typing import Any, List, Optional, Union, Dict
 from litecrypt.mapper.database import Database
 from litecrypt.core.filecrypt import CryptFile
-from litecrypt.mapper.consts import Default, Status
-from litecrypt.mapper.interfaces import (
+from litecrypt.mapper._consts import Default, Status
+from litecrypt.mapper._interfaces import (
     DatabaseResponse,
 )
-from litecrypt.mapper.models import StashKeys, StashMain
+from litecrypt.mapper._models import StashKeys, StashMain
 from litecrypt.utils.consts import Colors
 
 

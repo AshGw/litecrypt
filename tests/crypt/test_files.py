@@ -5,9 +5,15 @@ import unittest
 from unittest.mock import mock_open, patch
 
 from litecrypt import CryptFile, gen_key
-from litecrypt.utils.exceptions.fixed import (AlreadyDecryptedError, AlreadyEncryptedError,
-                                              EmptyContentError, FileCryptError, FileDoesNotExistError,
-                                              GivenDirectoryError, SysError)
+from litecrypt.utils.exceptions.fixed import (
+    AlreadyDecryptedError,
+    AlreadyEncryptedError,
+    EmptyContentError,
+    FileCryptError,
+    FileDoesNotExistError,
+    GivenDirectoryError,
+    SysError,
+)
 
 
 class CryptFileModuleTesting(unittest.TestCase):
@@ -27,45 +33,45 @@ class CryptFileModuleTesting(unittest.TestCase):
             f.write(os.urandom(64))
 
     @patch("builtins.open", new_callable=mock_open, create=True)
-    def test_empty_file(self, mock_file):
+    def test_empty_file(self, mock_file) -> None:
         mock_file.return_value.read.return_value = b""
         with self.assertRaises(EmptyContentError):
             CryptFile(self.empty_file, self.key1).encrypt()
 
     @patch("os.path.isfile", return_value=False)
-    def test_does_not_exist(self, mock_isfile):
+    def test_does_not_exist(self, mock_isfile) -> None:
         with self.assertRaises(FileDoesNotExistError):
-            CryptFile(self.filename + "x", self.key2).encrypt()
+            CryptFile(self.filename + "_", self.key2).encrypt()
 
     @patch("litecrypt.CryptFile.decrypt")
-    def test_already_decrypted(self, mock_decrypt):
+    def test_already_decrypted(self, mock_decrypt) -> None:
         mock_decrypt.side_effect = AlreadyDecryptedError
         with self.assertRaises(AlreadyDecryptedError):
             CryptFile(self.filename, self.key2).decrypt()
 
     @patch("litecrypt.CryptFile.encrypt")
-    def test_already_encrypted(self, mock_encrypt):
+    def test_already_encrypted(self, mock_encrypt) -> None:
         mock_encrypt.side_effect = AlreadyEncryptedError
         with self.assertRaises(AlreadyEncryptedError):
             CryptFile(self.filename_crypt, self.key2).encrypt()
 
     @patch("litecrypt.CryptFile.decrypt")
-    def test_crypt_error(self, mock_decrypt):
+    def test_crypt_error(self, mock_decrypt) -> None:
         mock_decrypt.side_effect = FileCryptError
         with self.assertRaises(FileCryptError):
             CryptFile(self.filename_crypt, self.key2).decrypt()
 
     @patch("litecrypt.CryptFile.encrypt", return_value=1)
-    def test_success(self, mock_encrypt):
+    def test_success(self, mock_encrypt) -> None:
         self.assertEqual(1, CryptFile(self.filename, self.key1).encrypt())
 
     @patch("os.path.isdir", return_value=True)
-    def test_directory_input(self, mock_isdir):
+    def test_directory_input(self, mock_isdir) -> None:
         with self.assertRaises(GivenDirectoryError):
             CryptFile(".", self.key1).encrypt()
 
     @patch("builtins.open", new_callable=mock_open, create=True)
-    def test_os_error(self, mock_file):
+    def test_os_error(self, mock_file) -> None:
         mock_file.side_effect = SysError
         with self.assertRaises(SysError):
             CryptFile(self.filename, self.key1).encrypt()

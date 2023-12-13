@@ -1,1 +1,1 @@
-### Hold on champ, docs coming soon..
+### Hold on champ..

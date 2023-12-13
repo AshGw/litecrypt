@@ -1,22 +1,31 @@
 import os
 import random
+from typing import Tuple, List
 from litecrypt import CryptFile, Crypt, gen_key, gen_ref, spawn
 
-from ..lab.main import Names, Vals, create_test_grounds, force_remove, verify_exact
+from ..lab.main import (
+    Names,
+    Vals,
+    create_test_grounds,
+    force_remove,
+    verify_exact,
+    Database,
+    deque,
+)
 
 
 class WorkFlow:
     def __init__(self) -> None:
-        self.key = gen_key()
-        self.ref = gen_ref()
-        self.main_conn = Vals.MAIN_DB
-        self.keys_conn = Vals.KEYS_DB
-        self.original_dir = Names.ORIGINAL_DIRECTORY
-        self.new_dir = Names.NEW_DIRECTORY
-        self.files = Names.FILES
-        self.file_contents = Vals.FILE_CONTENTS
+        self.key: str = gen_key()
+        self.ref: str = gen_ref()
+        self.main_conn: Database = Vals.main_conn
+        self.keys_conn: Database = Vals.keys_conn
+        self.original_dir: str = Names.original_dir
+        self.new_dir: str = Names.new_dir
+        self.files: deque = Names.files
+        self.file_contents: List[bytes] = Vals.file_contents
 
-    def setup(self):
+    def setup(self) -> bool:
         create_test_grounds(
             original_directory=self.original_dir,
             new_directory=self.new_dir,
@@ -39,7 +48,7 @@ class WorkFlow:
         ]
         return True
 
-    def database_insertion(self):
+    def database_insertion(self) -> bool:
         for file, encrypted_content in zip(self.files, self.encrypted_contents):
             self.main_conn.insert(
                 filename=f"does-not-matter/{file}.crypt",
@@ -51,7 +60,7 @@ class WorkFlow:
             )
         return True
 
-    def spawn_out(self):
+    def spawn_out(self) -> bool:
         self.spawned = spawn(
             main_connection=self.main_conn,
             keys_connection=self.keys_conn,
@@ -62,12 +71,12 @@ class WorkFlow:
         )
         return True
 
-    def check_spawning(self):
+    def check_spawning(self) -> bool:
         for file, key in zip(self.spawned["filenames"], self.spawned["keys"]):
             CryptFile(file, key).decrypt(echo=True)
         return True
 
-    def verify_compatability(self):
+    def verify_compatability(self) -> Tuple[bool, bool, bool]:
         is_file1_truthy = verify_exact(
             os.path.join(self.original_dir, self.files[0]),
             os.path.join(self.new_dir, self.files[0]),
@@ -83,7 +92,7 @@ class WorkFlow:
 
         return is_file1_truthy, is_file2_truthy, is_file3_truthy
 
-    def end_connection(self):
+    def end_connection(self) -> bool:
         self.main_conn.end_session()
         self.keys_conn.end_session()
         return True
@@ -99,7 +108,7 @@ workflow_output = {
 }
 
 
-def run_workflow():
+def run_workflow() -> None:
     workflow = WorkFlow()
 
     is_setup = workflow.setup()
@@ -131,9 +140,9 @@ def test_workflow():
     assert workflow_output["files compatibility"]
     assert workflow_output["database connection"]
     force_remove(
-        Names.KEYS_DB,
-        Names.MAIN_DB,
-        Names.NEW_DIRECTORY,
-        Names.ORIGINAL_DIRECTORY,
+        Names.keys_db,
+        Names.main_db,
+        Names.new_dir,
+        Names.original_dir,
         echo=True,
     )
