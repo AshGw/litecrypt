@@ -5,7 +5,7 @@
 [![Static Badge](https://img.shields.io/badge/PyPI-latest-brightgreen)](https://pypi.org/project/litecrypt/)
 
 ## Overview
-I made this library for personal use to secure some files. It provides support for both fast and highly computationally intensive encryption. Also, it includes a database integration system . This system facilitates the restoration of files to their original state if necessary, and a graphical user interface (GUI) is also included to obviate the need to write code.
+So I made this library for personal use to secure some files. It provides support for both fast and highly computationally intensive encryption. Also, it includes a database integration system . This system facilitates the restoration of files to their original state if necessary, and a graphical user interface (GUI) is also included to obviate the need to write code.
 
 ## Installation
 ```shell
@@ -67,20 +67,7 @@ print(encrypted)  # Check the return value
                               |   Ciphertext    ...
                               +------------------+
 ````
-
-The main key which is a 32-byte random hex string is provided by `gen_key()` function.
-
-> *The higher the number of iterations, the longer it takes to encrypt/decrypt.*
-
-- **AES Key:** 32-byte random value derived from the main key with the KDF, hashed with SHA256 (1 time or [50..100000] times based on the chosen number of iterations) mixed with the Salt.
-- **HMAC Key:** 32-byte random value derived from the main key with  the KDF, hashed with SHA256 (1 time or [50..100000] times based on the chosen number of iterations) mixed with the Pepper.
-- **IV:** 16-byte random value.
-- **Salt:** 16-byte random value.
-- **Pepper:** 16-byte random value.
-- **Iterations:** 4-byte fixed value.
-- **KDF ID:** 4-byte fixed value used to auto-determine the Key Derivation Function (KDF) to use.
-- **Ciphertext:** Variable size.
-
+AES and HMAC keys, each 32 bytes, are derived from the main key (`gen_key()`) using the chosen KDF with SHA256. Iterations range from 50 to 100,000 the higher they go the more time it takes to compute, that's 4 bytes. IV that's, Salt, and Pepper are also 16 bytes random values, both mixed with the KDF. The ciphertext size varies, with the crypto process employing PKCS7 padding.
 
 <h3>Supported Databases</h3>
 
