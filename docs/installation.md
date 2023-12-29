@@ -12,6 +12,6 @@ pip install litecrypt
 python -m litecrypt
 ```
 
-> **Note:** Make sure you have Python 3.7 or higher for the app & library to work properly.
+> **Note:** Make sure you have Python 3.8 or newer for the app & library to work properly.
 >
 > ![alt text](assets/GUI.png)
