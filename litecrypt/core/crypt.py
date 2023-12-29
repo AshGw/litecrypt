@@ -1,5 +1,6 @@
 """This module provides classes and functions for AES-256 encryption and decryption"""
 
+from __future__ import annotations
 
 from typing import Optional, Union
 from base64 import urlsafe_b64encode

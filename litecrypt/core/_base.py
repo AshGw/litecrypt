@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import hmac as hmc
-import struct
 
 from typing import Union
+from struct import unpack
 from cryptography.hazmat.primitives import hashes, hmac
 from litecrypt.core.helpers.funcs import (
     check_iterations,
@@ -74,9 +76,9 @@ class DecBase:
         ]
 
         self.rec_iterations = check_iterations(
-            struct.unpack("!I", self.rec_iters_raw)[0]
+            unpack("!I", self.rec_iters_raw)[0]
         )
-        self.rec_KDF_signature = struct.unpack("!I", self.rec_KDF_signature_raw)[0]
+        self.rec_KDF_signature = unpack("!I", self.rec_KDF_signature_raw)[0]
         self.rec_ciphertext = self.message[_h + _i + _s + _p + _fi + _fk :]
 
         compute_intensively = False

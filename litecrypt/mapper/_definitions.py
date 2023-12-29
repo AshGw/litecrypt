@@ -1,3 +1,4 @@
+from __future__ import annotations
 from typing import Any, Dict, List, Optional, Union
 from sqlalchemy.exc import DatabaseError
 from litecrypt.mapper._consts import BaseColumns, Status

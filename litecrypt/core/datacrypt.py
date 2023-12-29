@@ -1,5 +1,6 @@
 """This module is used to encrypt and decrypt data."""
 
+from __future__ import annotations
 import secrets
 import string
 
