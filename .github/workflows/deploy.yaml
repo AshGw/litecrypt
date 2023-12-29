@@ -15,8 +15,21 @@ permissions:
   contents: write
 
 jobs:
+
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: pre-commit/action@v3.0.0
+      with:
+        extra_args: --all-files --verbose
+      env:
+        PRE_COMMIT_COLOR: always
+        SKIP: test
+
   run-tests:
     runs-on: ubuntu-latest
+    needs: lint
     strategy:
       matrix:
         python-version: ["3.8", "3.9"]
