@@ -1,6 +1,5 @@
 exclude = [
     "__init__.py",
-    ".bzr",
     ".direnv",
     ".eggs",
     ".git",
@@ -19,7 +18,6 @@ exclude = [
     "buck-out",
     "build",
     "dist",
-    "node_modules",
     "venv",
 ]
 line-length = 88
