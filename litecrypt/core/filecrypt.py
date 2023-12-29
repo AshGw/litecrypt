@@ -1,5 +1,7 @@
 """This module is used to encrypt and decrypt files"""
 
+from __future__ import annotations
+
 import os
 from dataclasses import dataclass, field
 from typing import Optional, Union

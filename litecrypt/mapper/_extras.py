@@ -1,9 +1,11 @@
+from __future__ import annotations
 import os
+
 from typing import Any, List, Optional, Union, Dict
 from litecrypt.mapper.database import Database
 from litecrypt.core.filecrypt import CryptFile, KeyCheckResult
 from litecrypt.mapper._consts import Default, Status
-from litecrypt.mapper._interfaces import (
+from litecrypt.mapper._definitions import (
     DatabaseResponse,
 )
 from litecrypt.mapper._models import StashKeys, StashMain

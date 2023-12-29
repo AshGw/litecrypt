@@ -1,12 +1,14 @@
-import base64
-import hashlib
-import os
-import bcrypt
+from __future__ import annotations
 
-import litecrypt.utils.exceptions as exceptions
-
-from litecrypt.utils.consts import Size
 from typing import Tuple, Union
+
+from os import urandom
+from base64 import  urlsafe_b64decode
+from hashlib import sha256
+from bcrypt import kdf as b_kdf
+
+from litecrypt.utils import exceptions
+from litecrypt.utils.consts import Size
 
 
 def parse_message(message: Union[str, bytes]) -> bytes:
@@ -18,15 +20,15 @@ def parse_message(message: Union[str, bytes]) -> bytes:
 
 def parse_encrypted_message(message: Union[str, bytes]) -> bytes:
     if isinstance(message, str):
-        return base64.urlsafe_b64decode(message.encode("UTF-8"))
+        return urlsafe_b64decode(message.encode("UTF-8"))
     elif isinstance(message, bytes):
         return message
 
 
 def cipher_randomizers() -> Tuple[bytes, bytes, bytes]:
-    iv = os.urandom(Size.IV)
-    salt = os.urandom(Size.SALT)
-    pepper = os.urandom(Size.PEPPER)
+    iv = urandom(Size.IV)
+    salt = urandom(Size.SALT)
+    pepper = urandom(Size.PEPPER)
     return iv, salt, pepper
 
 
@@ -52,7 +54,7 @@ def intensive_KDF(mainkey: str, salt_pepper: bytes, iterations: int) -> bytes:
     Returns:
     bytes: The derived key bytes.
     """
-    return bcrypt.kdf(
+    return b_kdf(
         password=mainkey.encode("UTF-8"),
         salt=salt_pepper,
         desired_key_bytes=Size.AES_KEY,
@@ -72,7 +74,7 @@ def blazingly_fast_KDF(key: str, salt: bytes) -> bytes:
     """
     use_key = key.encode("UTF-8")
     key_material = use_key + salt
-    derived_key = hashlib.sha256(key_material).digest()
+    derived_key = sha256(key_material).digest()
     return derived_key
 
 

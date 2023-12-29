@@ -1,5 +1,7 @@
 """Module to interact with a database for litecrypt"""
 
+from __future__ import annotations
+
 import os
 from dataclasses import dataclass, field
 from datetime import datetime
@@ -10,7 +12,7 @@ from sqlalchemy.orm import sessionmaker
 
 from litecrypt.mapper._consts import Default, EngineFor, Status
 from litecrypt.mapper._engines import get_engine
-from litecrypt.mapper._interfaces import (
+from litecrypt.mapper._definitions import (
     Columns,
     DatabaseFailure,
     DatabaseFailureResponse,
