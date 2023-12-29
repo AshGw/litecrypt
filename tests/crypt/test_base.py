@@ -5,7 +5,11 @@ from litecrypt.core.crypt import Dec, Enc
 from litecrypt.utils import exceptions
 from litecrypt.utils.consts import Size
 
-from ..lab.consts import ABOVE_MAX_ITERATIONS_THRESHOLD, MESSAGE_TO_TEST, TAMPERING_BYTES_VALUE
+from ..lab.consts import (
+    ABOVE_MAX_ITERATIONS_THRESHOLD,
+    MESSAGE_TO_TEST,
+    TAMPERING_BYTES_VALUE,
+)
 
 
 class CoreModuleTesting(unittest.TestCase):
