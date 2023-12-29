@@ -9,7 +9,12 @@ from typing import Optional, Union
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, hmac, padding
-from cryptography.hazmat.primitives.ciphers import Cipher, CipherContext, algorithms, modes
+from cryptography.hazmat.primitives.ciphers import (
+    Cipher,
+    CipherContext,
+    algorithms,
+    modes,
+)
 
 from litecrypt.core._base import DecBase, EncBase
 from litecrypt.utils.consts import Size, UseKDF
