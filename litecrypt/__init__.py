@@ -5,4 +5,4 @@ from litecrypt.mapper._engines import get_engine
 from litecrypt.mapper._extras import reference_linker, spawn
 from litecrypt.mapper.database import Database
 
-__version__ = "0.2.6"
+__version__ = "0.2.7"
