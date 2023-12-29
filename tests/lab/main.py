@@ -1,7 +1,7 @@
 import os
 import shutil
 from collections import deque
-from typing import Optional, List
+from typing import List, Optional
 from uuid import uuid4
 
 from litecrypt.core.filecrypt import CryptFile

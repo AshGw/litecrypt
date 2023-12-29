@@ -5,20 +5,15 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Any, Generator, List, Optional, Union, Tuple
+from typing import Any, Generator, List, Optional, Tuple, Union
 
 from sqlalchemy import MetaData
 from sqlalchemy.orm import sessionmaker
 
 from litecrypt.mapper._consts import Default, EngineFor, Status
+from litecrypt.mapper._definitions import (Columns, DatabaseFailure, DatabaseFailureResponse, DBError,
+                                           QueryResponse)
 from litecrypt.mapper._engines import get_engine
-from litecrypt.mapper._definitions import (
-    Columns,
-    DatabaseFailure,
-    DatabaseFailureResponse,
-    DBError,
-    QueryResponse,
-)
 from litecrypt.mapper._models import Base, StashKeys, StashMain
 from litecrypt.utils.exceptions.fixed import ColumnDoesNotExist
 

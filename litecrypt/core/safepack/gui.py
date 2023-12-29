@@ -11,9 +11,9 @@ import string
 
 import ttkbootstrap as tk
 
-from litecrypt.mapper.database import Database
 from litecrypt.core.safepack.replicas import Crypt, CryptFile, tqr
 from litecrypt.mapper._extras import reference_linker, spawn
+from litecrypt.mapper.database import Database
 from litecrypt.utils.consts import Gui
 
 """--------------------------------HOW TO ?------------------------"""

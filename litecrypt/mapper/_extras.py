@@ -1,14 +1,13 @@
 from __future__ import annotations
-import os
 
-from typing import Any, List, Optional, Union, Dict
-from litecrypt.mapper.database import Database
+import os
+from typing import Any, Dict, List, Optional, Union
+
 from litecrypt.core.filecrypt import CryptFile, KeyCheckResult
 from litecrypt.mapper._consts import Default, Status
-from litecrypt.mapper._definitions import (
-    DatabaseResponse,
-)
+from litecrypt.mapper._definitions import DatabaseResponse
 from litecrypt.mapper._models import StashKeys, StashMain
+from litecrypt.mapper.database import Database
 from litecrypt.utils.consts import Colors
 
 
@@ -125,7 +124,10 @@ def _spawn_single_file(
             get_content_or_key=True,
         )
 
-        if CryptFile.key_verify(key) != KeyCheckResult.VALID_LENGTH and key != Default.KEY:
+        if (
+            CryptFile.key_verify(key) != KeyCheckResult.VALID_LENGTH
+            and key != Default.KEY
+        ):
             raise ValueError(
                 f"Invalid key, check if {Database.__name__} object placement is correct."
             )
@@ -170,7 +172,10 @@ def _spawn_all_files(
             get_all=True,
         )
         for key in keys_list:
-            if CryptFile.key_verify(key) != KeyCheckResult.VALID_LENGTH and key != Default.KEY:
+            if (
+                CryptFile.key_verify(key) != KeyCheckResult.VALID_LENGTH
+                and key != Default.KEY
+            ):
                 raise ValueError(
                     "Invalid key for cryptographic usage detected, mismatch found"
                     f" check if {Database.__name__} object placement is correct."
