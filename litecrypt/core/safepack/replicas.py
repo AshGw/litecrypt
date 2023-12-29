@@ -3,8 +3,10 @@
 
 from os import path, rename
 from typing import Union
+
 from qrcode import QRCode, constants
-from litecrypt.core.crypt import Enc, Dec
+
+from litecrypt.core.crypt import Dec, Enc
 
 
 def tqr(text: str) -> Union[int, tuple]:

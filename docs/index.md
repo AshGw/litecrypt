@@ -7,7 +7,7 @@
 
 ## Litecrypt
 
-Library that provides a simple solution for encrypting and decrypting files, as well as keeping track of them.
+Library that provides a simple solution for encrypting and decrypting files and messages, as well as keeping track of them.
 
 ## Example Usage
 

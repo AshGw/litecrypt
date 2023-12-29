@@ -1,13 +1,23 @@
 """This module is used to encrypt and decrypt data."""
 
+from __future__ import annotations
+
 import secrets
 import string
 from dataclasses import dataclass, field
+from enum import Enum, unique
 from typing import Optional, Union
 
 from litecrypt.core.crypt import Dec, Enc
 from litecrypt.utils import exceptions
 from litecrypt.utils.consts import Size
+
+
+@unique
+class KeyCheckResult(Enum):
+    BAD_LENGTH = 0
+    VALID_LENGTH = 1
+    NON_CONVERTIBLE_TYPE = -1
 
 
 @dataclass
@@ -32,16 +42,20 @@ class Crypt:
         Raises:
             exceptions.dynamic.KeyLengthError: If the provided key is invalid.
         """
-        if self.key_verify(self.key) != 1:
+        if self.key_verify(self.key) != KeyCheckResult.VALID_LENGTH:
             raise exceptions.dynamic.KeyLengthError()
 
     @staticmethod
-    def key_verify(key: str) -> int:
+    def key_verify(key: str) -> KeyCheckResult:
         try:
             a = bytes.fromhex(key.strip())
-            return 1 if len(a) == 32 else 0  # YES. 1 for success and 0 for failure
+            return (
+                KeyCheckResult.VALID_LENGTH
+                if len(a) == Size.AES_KEY
+                else KeyCheckResult.BAD_LENGTH
+            )
         except ValueError:
-            return -1
+            return KeyCheckResult.NON_CONVERTIBLE_TYPE
 
     def encrypt(self, get_bytes: Optional[bool] = False) -> Union[str, bytes]:
         """

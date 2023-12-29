@@ -1,16 +1,20 @@
+from __future__ import annotations
+
 from typing import Any, Dict, List, Optional, Union
+
 from sqlalchemy.exc import DatabaseError
+
 from litecrypt.mapper._consts import BaseColumns, Status
 
 
 class Columns(BaseColumns):
     @staticmethod
     def list() -> List[str]:
-        l: List[str] = []
+        columns_list: List[str] = []
         for _, attr_value in BaseColumns.__dict__.items():
             if not _.startswith("__") and not isinstance(attr_value, type):
-                l.append(attr_value)
-        return l
+                columns_list.append(attr_value)
+        return columns_list
 
 
 class DatabaseResponse(Dict):

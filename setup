@@ -1,0 +1,5 @@
+#!/bin/bash
+
+git clone git@github.com:AshGw/litecrypt.git
+cd litecrypt
+curl -sSfL https://raw.githubusercontent.com/AshGw/litecrypt/main/scripts/setup/setup.sh | bash

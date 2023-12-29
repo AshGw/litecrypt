@@ -1,16 +1,19 @@
-from typing import Optional, Any
+from __future__ import annotations
+
+from typing import Optional
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 
 from litecrypt.mapper._consts import EngineConstructs, EngineFor
+from litecrypt.mapper._types import EngineParams
 
 
 def get_engine(
     url: str,
     engine_for: Optional[str] = EngineFor.SQLITE,
     echo: Optional[bool] = False,
-    **kwargs: Any,
+    **kwargs: EngineParams,
 ) -> Engine:
     engine = engine_for.lower().strip()
     if engine == EngineFor.SQLITE:

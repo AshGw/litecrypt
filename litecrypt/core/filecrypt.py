@@ -1,11 +1,13 @@
 """This module is used to encrypt and decrypt files"""
 
+from __future__ import annotations
+
 import os
 from dataclasses import dataclass, field
 from typing import Optional, Union
 
 import litecrypt.core.crypt as core
-from litecrypt.core.datacrypt import Crypt
+from litecrypt.core.datacrypt import Crypt, KeyCheckResult
 from litecrypt.utils import exceptions
 from litecrypt.utils.consts import Colors, Size
 
@@ -62,7 +64,7 @@ class CryptFile:
             file.write(content)
 
     @staticmethod
-    def key_verify(key: str) -> int:
+    def key_verify(key: str) -> KeyCheckResult:
         """Method to verify if the key is valid for usage"""
         return Crypt.key_verify(key)
 
@@ -109,14 +111,14 @@ class CryptFile:
                         )
                         new_content = ins.encrypt(get_bytes=True)
                         f.write(new_content)
-                        go_ahead_rename_crypt = 1
+                        _go_ahead_rename_crypt = 1
                     except BaseException:
                         f.write(file_content)
                         raise exceptions.fixed.FileCryptError()
                 elif not file_content:
                     f.write(file_content)
                     raise exceptions.fixed.EmptyContentError()
-            if go_ahead_rename_crypt == 1:
+            if _go_ahead_rename_crypt == 1:
                 new_filename = self.filename + ".crypt"
                 os.rename(self.filename, new_filename)
                 if echo:

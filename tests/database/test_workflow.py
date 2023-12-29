@@ -1,16 +1,17 @@
 import os
 import random
-from typing import Tuple, List
-from litecrypt import CryptFile, Crypt, gen_key, gen_ref, spawn
+from typing import List, Tuple
+
+from litecrypt import Crypt, CryptFile, gen_key, gen_ref, spawn
 
 from ..lab.main import (
+    Database,
     Names,
     Vals,
     create_test_grounds,
+    deque,
     force_remove,
     verify_exact,
-    Database,
-    deque,
 )
 
 
