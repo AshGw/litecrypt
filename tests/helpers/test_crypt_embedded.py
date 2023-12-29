@@ -1,11 +1,6 @@
 import unittest
 
-from litecrypt.core.helpers.funcs import (
-    Size,
-    check_iterations,
-    cipher_randomizers,
-    exceptions,
-)
+from litecrypt.core.helpers.funcs import Size, check_iterations, cipher_randomizers, exceptions
 
 
 class TestCipherFunctions(unittest.TestCase):

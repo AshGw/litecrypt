@@ -1,10 +1,4 @@
-from litecrypt.mapper._consts import (
-    BaseColumns,
-    Default,
-    EngineConstructs,
-    EngineFor,
-    Status,
-)
+from litecrypt.mapper._consts import BaseColumns, Default, EngineConstructs, EngineFor, Status
 
 
 def test_engines():

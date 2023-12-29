@@ -2,21 +2,17 @@
 
 from __future__ import annotations
 
-from typing import Optional, Union
 from base64 import urlsafe_b64encode
 from os import urandom
 from struct import pack
+from typing import Optional, Union
 
 from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes, hmac, padding
-from cryptography.hazmat.primitives.ciphers import (
-    Cipher,
-    algorithms,
-    modes,
-    CipherContext,
-)
-from litecrypt.utils.consts import Size, UseKDF
+from cryptography.hazmat.primitives.ciphers import Cipher, CipherContext, algorithms, modes
+
 from litecrypt.core._base import DecBase, EncBase
+from litecrypt.utils.consts import Size, UseKDF
 
 DEFAULT_INTENSIVE_COMPUTE = False
 

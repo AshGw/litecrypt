@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+from base64 import urlsafe_b64decode
+from hashlib import sha256
+from os import urandom
 from typing import Tuple, Union
 
-from os import urandom
-from base64 import  urlsafe_b64decode
-from hashlib import sha256
 from bcrypt import kdf as b_kdf
 
 from litecrypt.utils import exceptions

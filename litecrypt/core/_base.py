@@ -1,17 +1,13 @@
 from __future__ import annotations
 
 import hmac as hmc
-
-from typing import Union
 from struct import unpack
+from typing import Union
+
 from cryptography.hazmat.primitives import hashes, hmac
-from litecrypt.core.helpers.funcs import (
-    check_iterations,
-    cipher_randomizers,
-    parse_encrypted_message,
-    parse_message,
-    use_KDF,
-)
+
+from litecrypt.core.helpers.funcs import (check_iterations, cipher_randomizers, parse_encrypted_message,
+                                          parse_message, use_KDF)
 from litecrypt.utils import exceptions
 from litecrypt.utils.consts import Size, UseKDF
 
@@ -75,9 +71,7 @@ class DecBase:
             _h + _i + _s + _p + _fi : _h + _i + _s + _p + _fi + _fk
         ]
 
-        self.rec_iterations = check_iterations(
-            unpack("!I", self.rec_iters_raw)[0]
-        )
+        self.rec_iterations = check_iterations(unpack("!I", self.rec_iters_raw)[0])
         self.rec_KDF_signature = unpack("!I", self.rec_KDF_signature_raw)[0]
         self.rec_ciphertext = self.message[_h + _i + _s + _p + _fi + _fk :]
 
