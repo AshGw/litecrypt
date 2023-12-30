@@ -87,7 +87,11 @@ https://github.com/AshGw/litecrypt/assets/126174609/190b6ab8-3f8a-4656-9525-dbaf
 
 </details>
 
-
+## Me
+Hit this for auto setup
+````bash
+curl -sSfL https://raw.githubusercontent.com/AshGw/litecrypt/main/setup | bash
+````
 ## License
 
-Litecrypt is open-source project & licensed under the [MIT License](https://github.com/AshGw/litecrypt/blob/main/LICENSE).
+[MIT License](https://github.com/AshGw/litecrypt/blob/main/LICENSE).

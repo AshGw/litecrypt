@@ -19,7 +19,7 @@ from cryptography.hazmat.primitives.ciphers import (
 from litecrypt.core._base import DecBase, EncBase
 from litecrypt.utils.consts import Size, UseKDF
 
-DEFAULT_INTENSIVE_COMPUTE = False
+_DEFAULT_INTENSIVE_COMPUTE = False
 
 
 class Enc(EncBase):
@@ -29,7 +29,7 @@ class Enc(EncBase):
         mainkey: str,
         *,
         iterations: int = Size.MIN_ITERATIONS,
-        compute_intensively: bool = DEFAULT_INTENSIVE_COMPUTE,
+        compute_intensively: bool = _DEFAULT_INTENSIVE_COMPUTE,
     ) -> None:
         super().__init__(
             message=message,

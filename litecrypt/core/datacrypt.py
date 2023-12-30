@@ -5,7 +5,7 @@ from __future__ import annotations
 import secrets
 import string
 from dataclasses import dataclass, field
-from enum import Enum, unique
+from enum import Enum, unique, auto
 from typing import Optional, Union
 
 from litecrypt.core.crypt import Dec, Enc
@@ -15,9 +15,9 @@ from litecrypt.utils.consts import Size
 
 @unique
 class KeyCheckResult(Enum):
-    BAD_LENGTH = 0
-    VALID_LENGTH = 1
-    NON_CONVERTIBLE_TYPE = -1
+    BAD_LENGTH = auto()
+    VALID_LENGTH = auto()
+    NON_CONVERTIBLE_TYPE = auto()
 
 
 @dataclass
