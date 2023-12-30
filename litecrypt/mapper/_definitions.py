@@ -23,7 +23,7 @@ class DatabaseResponse(Dict):
         self,
         status: Optional[str] = None,
         filenames: Optional[List[str]] = None,
-        contents: Optional[FileContent,Union[List[FileContent]]] = None,
+        contents: Optional[FileContent, Union[List[FileContent]]] = None,
         keys: Optional[List[Union[str, bytes]]] = None,
     ) -> None:
         super().__init__(

@@ -12,10 +12,9 @@ from litecrypt.utils.consts import Size
 
 
 def parse_message(message: Union[str, bytes]) -> bytes:
-    msg = message.strip()
     if isinstance(message, str):
-        msg = message.encode()
-    return msg
+        return message.encode().strip()
+    return message.strip()
 
 
 def parse_encrypted_message(message: Union[str, bytes]) -> bytes:

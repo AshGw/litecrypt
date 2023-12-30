@@ -63,7 +63,7 @@ class CryptFileModuleTesting(unittest.TestCase):
 
     @patch("litecrypt.CryptFile.encrypt", return_value=1)
     def test_success(self, mock_encrypt) -> None:
-        self.assertEqual(1, CryptFile(self.filename, self.key1).encrypt())
+        CryptFile(self.filename, self.key1).encrypt()
 
     @patch("os.path.isdir", return_value=True)
     def test_directory_input(self, mock_isdir) -> None:

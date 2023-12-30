@@ -67,10 +67,7 @@ class CoreModuleTesting(unittest.TestCase):
     def test_iterations(self) -> None:
         self.assertTrue(
             self.bytes_message[
-                self.h
-                + self.i
-                + self.s
-                + self.p : self.h
+                self.h + self.i + self.s + self.p : self.h
                 + self.i
                 + self.s
                 + self.p
@@ -82,11 +79,7 @@ class CoreModuleTesting(unittest.TestCase):
     def test_KDF_signature(self) -> None:
         self.assertTrue(
             self.bytes_message[
-                self.h
-                + self.i
-                + self.s
-                + self.p
-                + self.fi : self.h
+                self.h + self.i + self.s + self.p + self.fi : self.h
                 + self.i
                 + self.s
                 + self.p

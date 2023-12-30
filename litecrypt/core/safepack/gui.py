@@ -6,13 +6,13 @@ import json
 import os.path
 import platform
 import re
-import secrets
-import string
 
 import ttkbootstrap as tk
+import litecrypt.utils.exceptions as excs
 
-from litecrypt.core.safepack.replicas import Crypt, CryptFile, tqr
-from litecrypt.mapper._extras import reference_linker, spawn
+from litecrypt import Crypt, CryptFile, KeyCheckResult, gen_key, gen_ref
+from litecrypt.mapper._spawn import reference_linker, spawn
+from litecrypt.core.safepack import qr
 from litecrypt.mapper.database import Database
 from litecrypt.utils.consts import Gui
 
@@ -113,8 +113,8 @@ main_object.title(Gui.TITLE)
 main_object.geometry(Gui.DIMENSIONS)
 
 
-databaseFrame = tk.Frame(master=main_object, width=500, height=800)
-databaseFrame.place(x=0, y=0)
+db_frame = tk.Frame(master=main_object, width=500, height=800)
+db_frame.place(x=0, y=0)
 
 frameFile1 = tk.Frame(master=main_object, width=500, height=250)
 frameFile1.place(x=500, y=0)
@@ -128,18 +128,20 @@ textFrame1.place(x=1000, y=0)
 textFrame2 = tk.Frame(master=main_object, width=500, height=250)
 textFrame2.place(x=1000, y=250)
 
-lowerFrame = tk.Frame(master=main_object, width=1000, height=260)
-lowerFrame.place(x=500, y=540)
-
+lower_frame = tk.Frame(master=main_object, width=1000, height=260)
+lower_frame.place(x=500, y=540)
+"""----------------CONSTS-----------------------------------------"""
+OUTPUT_JSON = "output.json"
+MAX_TEXT_LENGTH = 200
 """---------------DATABASE FRAME STARTED-----------------------"""
 
 
-databaseFrame = tk.Frame(master=main_object, height=800, width=500)
-databaseFrame.place(rely=0, relx=0)
+db_frame = tk.Frame(master=main_object, height=800, width=500)
+db_frame.place(rely=0, relx=0)
 
 if platform.system() == "Windows":
     console_label = tk.Label(
-        master=databaseFrame, text="DATABASE OUTPUT CONSOLE", font="Calibre 15"
+        master=db_frame, text="DATABASE OUTPUT CONSOLE", font="Calibre 15"
     )
     console_label.place(relx=0.12, rely=0.04)
 
@@ -152,7 +154,7 @@ if platform.system() == "Windows":
     )
 else:
     console_label = tk.Label(
-        master=databaseFrame, text="DATABASE OUTPUT CONSOLE", font="Calibre 15 bold"
+        master=db_frame, text="DATABASE OUTPUT CONSOLE", font="Calibre 15 bold"
     )
     console_label.place(relx=0.115, rely=0.04)
 
@@ -163,11 +165,14 @@ else:
     )
 
 
-OUTPUT_JSON = "output.json"
-
-
 def show_all_content():
-    global db_enable_blocker, main_db_name_var, usable_real_path, main_db_conn, db_display_text, keys_db_conn
+    global \
+        db_enable_blocker, \
+        main_db_name_var, \
+        usable_real_path, \
+        main_db_conn, \
+        db_display_text, \
+        keys_db_conn
 
     if db_enable_blocker != 0:
         db_display_text.delete("1.0", tk.END)
@@ -175,7 +180,7 @@ def show_all_content():
             tk.END, f"Check 'output.json' in the chosen path : {usable_real_path}\n"
         )
         json_path = os.path.join(usable_real_path, OUTPUT_JSON)
-        if swich_db_var.get() == 1:
+        if switch_db_var.get() == 1:
             conn = keys_db_conn
         else:
             conn = main_db_conn
@@ -203,11 +208,16 @@ def show_all_content():
 
 
 def show_content_by_id():
-    global db_enable_blocker, main_db_conn, keys_db_conn, content_id_entry_var, usable_real_path
+    global \
+        db_enable_blocker, \
+        main_db_conn, \
+        keys_db_conn, \
+        content_id_entry_var, \
+        usable_real_path
     idd = content_id_entry_var.get().strip()
-    last_id = checkid()
+    last_id = check_id()
     if db_enable_blocker != 0:
-        if swich_db_var.get() == 1:
+        if switch_db_var.get() == 1:
             conn = keys_db_conn
         else:
             conn = main_db_conn
@@ -284,9 +294,9 @@ def show_content_by_id():
 def drop_content_by_id():
     global db_enable_blocker, main_db_conn, keys_db_conn, content_id_entry_var
     idd = content_id_entry_var.get().strip()
-    last_id = checkid()
+    last_id = check_id()
     if db_enable_blocker != 0:
-        if swich_db_var.get() == 1:
+        if switch_db_var.get() == 1:
             conn = keys_db_conn
         else:
             conn = main_db_conn
@@ -330,7 +340,7 @@ def drop_content_by_id():
 
 
 show_all_content_button = tk.Button(
-    master=databaseFrame,
+    master=db_frame,
     text="SHOW ALL CONTENT",
     command=show_all_content,
     bootstyle="light outline",
@@ -344,7 +354,7 @@ query_clicks = 1
 def query():
     global db_enable_blocker, main_db_conn, keys_db_conn, usable_real_path, query_clicks
     if db_enable_blocker != 0:
-        if swich_db_var.get() == 1:
+        if switch_db_var.get() == 1:
             conn = keys_db_conn
         else:
             conn = main_db_conn
@@ -377,13 +387,13 @@ def query():
 
 query_entry_var = tk.StringVar()
 query_entry = tk.Entry(
-    master=databaseFrame, width=38, font="Calibre 13 bold", textvariable=query_entry_var
+    master=db_frame, width=38, font="Calibre 13 bold", textvariable=query_entry_var
 )
 
 query_entry.place(relx=0.043, rely=0.742)
 
 query_button = tk.Button(
-    master=databaseFrame,
+    master=db_frame,
     text="RUN RAW SQL QUERY",
     command=query,
     bootstyle="light outline",
@@ -393,7 +403,7 @@ query_button.place(relx=0.28, rely=0.81)
 
 
 drop_content_by_id_button = tk.Button(
-    master=databaseFrame,
+    master=db_frame,
     text="DROP CONTENT BY ID",
     command=drop_content_by_id,
     bootstyle="light outline",
@@ -402,12 +412,12 @@ drop_content_by_id_button.place(relx=0.08, rely=0.93)
 
 content_id_entry_var = tk.StringVar(value=" ID")
 content_id_entry = tk.Entry(
-    master=databaseFrame, textvariable=content_id_entry_var, width=3, font="Calibre 11"
+    master=db_frame, textvariable=content_id_entry_var, width=3, font="Calibre 11"
 )
 content_id_entry.place(relx=0.45, rely=0.93)
 
 show_content_by_id_button = tk.Button(
-    master=databaseFrame,
+    master=db_frame,
     text="SHOW CONTENT BY ID",
     command=show_content_by_id,
     bootstyle="light outline",
@@ -418,8 +428,8 @@ show_content_by_id_button.place(relx=0.562, rely=0.93)
 """----------------------LOWER FRAME STARTED------------------"""
 
 
-lowerFrame = tk.Frame(master=main_object, width=1000, height=260)
-lowerFrame.place(x=500, y=540)
+lower_frame = tk.Frame(master=main_object, width=1000, height=260)
+lower_frame.place(x=500, y=540)
 
 
 db_path_blocker = 0
@@ -441,29 +451,36 @@ def set_db_path():
 
 main_db_name_blocker = 0
 db_already_exists_blocker = 0
-maindbname = ""
+maindb_name = ""
 
 
 def main_db_name():
-    global main_db_name_blocker, db_already_exists_blocker, usable_real_path, db_path_blocker, success_maindb_connection_blocker, main_db_conn, maindbname
+    global \
+        main_db_name_blocker, \
+        db_already_exists_blocker, \
+        usable_real_path, \
+        db_path_blocker, \
+        success_maindb_connection_blocker, \
+        main_db_conn, \
+        maindb_name
 
     dbname = main_db_name_var.get().strip()
     if re.match(r"((^[\w(-.)?]+\.db$)|(^[\w?(-.)]\.db$))", dbname):
         try:
-            maindbname = dbname
+            maindb_name = dbname
             main_db_name_blocker = 1
             main_db_name_result_var.set("SET")
             if db_path_blocker == 1:
                 fullpath = usable_real_path
-                conn_path_db = os.path.join(usable_real_path, maindbname)
-                if os.path.isfile(fullpath + f"\\{maindbname}") or os.path.isfile(
-                    fullpath + f"/{maindbname}"
+                conn_path_db = os.path.join(usable_real_path, maindb_name)
+                if os.path.isfile(fullpath + f"\\{maindb_name}") or os.path.isfile(
+                    fullpath + f"/{maindb_name}"
                 ):
                     db_already_exists_blocker = 1
                     main_db_conn = Database(conn_path_db, silent_errors=True)
                     main_db_name_result_var.set("CONNECTED")
                     db_display_text.delete("1.0", tk.END)
-                    db_display_text.insert(tk.END, f"Connected to {maindbname}..\n\n")
+                    db_display_text.insert(tk.END, f"Connected to {maindb_name}..\n\n")
                     success_maindb_connection_blocker = 1
                     encfiletoolbutt.state(["!disabled"])
                     decfiletoolbutt.state(["!disabled"])
@@ -473,7 +490,7 @@ def main_db_name():
                     db_display_text.delete("1.0", tk.END)
                     db_display_text.insert(
                         tk.END,
-                        f"Created and Connected to '{maindbname}'.. in the directory '{fullpath}'\n\n",
+                        f"Created and Connected to '{maindb_name}'.. in the directory '{fullpath}'\n\n",
                     )
                     success_maindb_connection_blocker = 1
                     encfiletoolbutt.state(["!disabled"])
@@ -493,7 +510,7 @@ def main_db_name():
         main_db_name_blocker = 0
 
 
-def keyd_db_setup():
+def keys_db_setup():
     global usable_real_path, success_keysdb_connection_blocker, keys_db_conn
     if db_path_blocker == 1 and main_db_name_blocker == 1:
         try:
@@ -541,25 +558,28 @@ db_enable_blocker = 0
 def path_name_wrapper():
     set_db_path()
     main_db_name()
-    keyd_db_setup()
-    global db_enable_blocker, success_keysdb_connection_blocker, success_keysdb_connection_blocker
+    keys_db_setup()
+    global \
+        db_enable_blocker, \
+        success_keysdb_connection_blocker, \
+        success_keysdb_connection_blocker
     if success_keysdb_connection_blocker and success_keysdb_connection_blocker:
         db_enable_blocker = 1
-        swich_db_toggle.state(["!disabled"])
+        switch_db_toggle.state(["!disabled"])
     else:
         db_enable_blocker = 0
-        swich_db_toggle.state(["disabled"])
+        switch_db_toggle.state(["disabled"])
 
 
 db_path_var = tk.StringVar()
 db_path_entry = tk.Entry(
-    master=lowerFrame, width=31, font="Calibre 14 bold", textvariable=db_path_var
+    master=lower_frame, width=31, font="Calibre 14 bold", textvariable=db_path_var
 )
 db_path_entry.place(relx=0.03, rely=0.005)
 
 db_path_result_var = tk.StringVar(value="")
 db_path_result_entry = tk.Label(
-    master=lowerFrame,
+    master=lower_frame,
     font="Calibre 13 bold",
     bootstyle="light",
     textvariable=db_path_result_var,
@@ -567,17 +587,17 @@ db_path_result_entry = tk.Label(
 db_path_result_entry.place(relx=0.7, rely=0.022)
 
 path_label = tk.Label(
-    master=lowerFrame, font="Calibre 13", bootstyle="light", text="PATH"
+    master=lower_frame, font="Calibre 13", bootstyle="light", text="PATH"
 )
 path_label.place(relx=0.47, rely=0.022)
 
 main_database_label = tk.Label(
-    master=lowerFrame, font="Calibre 13", bootstyle="light", text="MAIN DATABASE"
+    master=lower_frame, font="Calibre 13", bootstyle="light", text="MAIN DATABASE"
 )
 main_database_label.place(relx=0.47, rely=0.205)
 
 set_db_path_button = tk.Button(
-    master=lowerFrame,
+    master=lower_frame,
     text="SUBMIT PATH AND NAME",
     width=49,
     command=path_name_wrapper,
@@ -586,10 +606,10 @@ set_db_path_button = tk.Button(
 set_db_path_button.place(relx=0.031, rely=0.38)
 
 
-def checksize():
+def check_size():
     global db_enable_blocker, main_db_conn, keys_db_conn
     if db_enable_blocker != 0:
-        if swich_db_var.get() == 1:
+        if switch_db_var.get() == 1:
             conn = keys_db_conn
         else:
             conn = main_db_conn
@@ -605,19 +625,19 @@ def checksize():
 
 
 size_button = tk.Button(
-    master=lowerFrame,
+    master=lower_frame,
     text="SIZE",
     width=22,
-    command=checksize,
+    command=check_size,
     bootstyle="light outline",
 )
 size_button.place(relx=0.031, rely=0.58)
 
 
-def checkid():
+def check_id():
     global db_enable_blocker, main_db_conn, keys_db_conn
     if db_enable_blocker != 0:
-        if swich_db_var.get() == 1:
+        if switch_db_var.get() == 1:
             conn = keys_db_conn
         else:
             conn = main_db_conn
@@ -637,10 +657,10 @@ def checkid():
 
 
 id_button = tk.Button(
-    master=lowerFrame,
+    master=lower_frame,
     text="LAST ID",
     width=22,
-    command=checkid,
+    command=check_id,
     bootstyle="light outline",
 )
 id_button.place(relx=0.247, rely=0.58)
@@ -649,7 +669,7 @@ id_button.place(relx=0.247, rely=0.58)
 def check_las_mod():
     global db_enable_blocker, main_db_conn, keys_db_conn
     if db_enable_blocker != 0:
-        if swich_db_var.get() == 1:
+        if switch_db_var.get() == 1:
             conn = keys_db_conn
         else:
             conn = main_db_conn
@@ -658,7 +678,7 @@ def check_las_mod():
 
 
 las_mod_button = tk.Button(
-    master=lowerFrame,
+    master=lower_frame,
     text="LAST MODIFICATION",
     width=49,
     command=check_las_mod,
@@ -669,41 +689,41 @@ las_mod_button.place(relx=0.031, rely=0.74)
 
 main_db_name_var = tk.StringVar()
 main_db_name_entry = tk.Entry(
-    master=lowerFrame, width=31, font="Calibre 14 bold", textvariable=main_db_name_var
+    master=lower_frame, width=31, font="Calibre 14 bold", textvariable=main_db_name_var
 )
 main_db_name_entry.place(relx=0.03, rely=0.192)
 
 
 main_db_name_result_var = tk.StringVar(value="")
 main_db_name_result_entry = tk.Label(
-    master=lowerFrame,
+    master=lower_frame,
     font="Calibre 13 bold",
     bootstyle="light",
     textvariable=main_db_name_result_var,
 )
 main_db_name_result_entry.place(relx=0.7, rely=0.205)
 
-current_working_db = maindbname
+current_working_db = maindb_name
 
 
-def swich_db():
+def switch_db():
     global current_working_db
     if db_enable_blocker != 0:
-        if swich_db_var.get() == 1:
+        if switch_db_var.get() == 1:
             switch_db_label_var.set("ON KEYS")
             db_display_text.delete("1.0", tk.END)
             db_display_text.insert(tk.END, "Switched to keys database\n")
-            current_working_db = maindbname
+            current_working_db = maindb_name
         else:
             switch_db_label_var.set("ON MAIN")
             db_display_text.delete("1.0", tk.END)
             db_display_text.insert(tk.END, "Back to default main database\n")
-            current_working_db = maindbname[:-3] + "Keys.db"
+            current_working_db = maindb_name[:-3] + "Keys.db"
 
 
 switch_db_label_var = tk.StringVar(value="SWITCH DATABASE")
 switch_db_label = tk.Label(
-    master=lowerFrame,
+    master=lower_frame,
     textvariable=switch_db_label_var,
     bootstyle="light",
     font="Calibre 13",
@@ -711,19 +731,19 @@ switch_db_label = tk.Label(
 switch_db_label.place(relx=0.52, rely=0.39)
 
 
-swich_db_var = tk.IntVar(value=0)
-swich_db_toggle = tk.Checkbutton(
+switch_db_var = tk.IntVar(value=0)
+switch_db_toggle = tk.Checkbutton(
     bootstyle="light,squared-toggle",
-    master=lowerFrame,
-    variable=swich_db_var,
+    master=lower_frame,
+    variable=switch_db_var,
     offvalue=0,
     onvalue=1,
-    command=swich_db,
+    command=switch_db,
 )
-swich_db_toggle.state(["disabled"])
+switch_db_toggle.state(["disabled"])
 
 
-swich_db_toggle.place(relx=0.47, rely=0.413)
+switch_db_toggle.place(relx=0.47, rely=0.413)
 
 spawning_try_count = 1
 actual_spawned_path = ""
@@ -757,7 +777,15 @@ spawn_out_blocker = 1
 
 
 def spawn_out():
-    global db_enable_blocker, keySelectionFlag, main_db_conn, keys_db_conn, key_ref_entry_var, usable_real_path, actual_spawned_path, spawn_out_blocker
+    global \
+        db_enable_blocker, \
+        key_selection_flag, \
+        main_db_conn, \
+        keys_db_conn, \
+        key_ref_entry_var, \
+        usable_real_path, \
+        actual_spawned_path, \
+        spawn_out_blocker
 
     if db_enable_blocker:
         db_display_text.delete("1.0", tk.END)
@@ -822,7 +850,7 @@ def spawn_out():
                         )
                     except Exception:
                         db_display_text.insert(
-                            tk.END, f"ERROR OCCURRED DURING files RETREIVAL !'\n"
+                            tk.END, f"ERROR OCCURRED DURING files RETRIEVAL !'\n"
                         )
                 else:
                     return
@@ -830,12 +858,12 @@ def spawn_out():
 
 key_ref_entry_var = tk.StringVar()
 key_ref_entry = tk.Entry(
-    master=lowerFrame, width=11, font="calibre 10 bold", textvariable=key_ref_entry_var
+    master=lower_frame, width=11, font="calibre 10 bold", textvariable=key_ref_entry_var
 )
 key_ref_entry.place(relx=0.484, rely=0.575)
 
 spawn_ref_label = tk.Label(
-    master=lowerFrame,
+    master=lower_frame,
     text="#KEYREF",
     bootstyle="secondary",
     font="Calibre 13",
@@ -843,7 +871,7 @@ spawn_ref_label = tk.Label(
 spawn_ref_label.place(relx=0.62, rely=0.58)
 
 spawn_me_button = las_mod_button = tk.Button(
-    master=lowerFrame,
+    master=lower_frame,
     text="SPAWN",
     width=15,
     command=spawn_out,
@@ -859,7 +887,7 @@ def how_this_works_func():
 
 
 how_to_button = tk.Button(
-    master=lowerFrame,
+    master=lower_frame,
     text="?",
     command=how_this_works_func,
     bootstyle="info outline",
@@ -872,30 +900,41 @@ how_to_button.place(relx=0.95, rely=0.8)
 
 def encryption():
     m = text_encryption_var.get()
-    if CryptFile.keyverify(mainkeyvar.get()) == 1 and keySelectionFlag.get() == 1:
-        if len(m) > 200:
+    if (
+        CryptFile.key_verify(mainkeyvar.get()) == KeyCheckResult.VALID_LENGTH
+        and key_selection_flag.get() == 1
+    ):
+        if len(m) > MAX_TEXT_LENGTH:
             text_encryption_output_var.set("Too Long")
         else:
             if text_encryption_var.get():
                 progressbar_enc.start()
-                a = Crypt(m, mainkeyvar.get())
-                b = a.encrypt()[1]
-                text_encryption_output_var.set(b.__str__())
-                if qr_enc_var.get() == 1:
-                    tqr(b)
+                try:
+                    a = Crypt(m, mainkeyvar.get()).encrypt()
+                    text_encryption_output_var.set(a.__str__())
+                    if qr_dec_var.get() == 1:
+                        if not len(a) > MAX_TEXT_LENGTH:
+                            qr.tqr(a)
+                except Exception:
+                    pass
 
 
 def decryption():
     n = text_decryption_var.get()
-    if CryptFile.keyverify(mainkeyvar.get()) == 1 and keySelectionFlag.get() == 1:
+    if (
+        CryptFile.key_verify(mainkeyvar.get()) == KeyCheckResult.VALID_LENGTH
+        and key_selection_flag.get() == 1
+    ):
         if text_decryption_var.get():
             progressbar_dec.start()
-            a = Crypt(n, mainkeyvar.get())
-            b = a.decrypt()[1]
-            text_decryption_output_var.set(b.__str__())
-            if qr_dec_var.get() == 1:
-                if not len(b) > 200:
-                    tqr(b)
+            try:
+                a = Crypt(n, mainkeyvar.get()).decrypt()
+                text_decryption_output_var.set(a.__str__())
+                if qr_dec_var.get() == 1:
+                    if not len(a) > MAX_TEXT_LENGTH:
+                        qr.tqr(a)
+            except Exception:
+                pass
 
 
 def qr_enc_func():
@@ -1029,47 +1068,46 @@ progressbar_dec.place(relx=0.05, rely=0.42)
 
 
 if platform.system() == "Windows":
-    filepathlabel = tk.Label(
+    file_path_label = tk.Label(
         master=frameFile1,
         text="F I L E S",
         font="Calibre 20",
     )
-    filepathlabel.place(relx=0.385, rely=0.10)
+    file_path_label.place(relx=0.385, rely=0.10)
 
-    resultvarfile = tk.StringVar(value="     -----------------------------------")
-    resultLabelfile = tk.Label(
-        master=frameFile1, textvariable=resultvarfile, font="terminal 13 bold"
+    res_var_file = tk.StringVar(value="     -----------------------------------")
+    result_label_file = tk.Label(
+        master=frameFile1, textvariable=res_var_file, font="terminal 13 bold"
     )
-    resultLabelfile.place(rely=0.55)
+    result_label_file.place(rely=0.55)
 else:
-    filepathlabel = tk.Label(
+    file_path_label = tk.Label(
         master=frameFile1,
         text="FILE PATH",
         font="Calibre 20 bold",
     )
-    filepathlabel.place(relx=0.335, rely=0.10)
-    resultvarfile = tk.StringVar(value="                    ..........")
-    resultLabelfile = tk.Label(
-        master=frameFile1, textvariable=resultvarfile, font="terminal 13 bold"
+    file_path_label.place(relx=0.335, rely=0.10)
+    res_var_file = tk.StringVar(value="                    ..........")
+    result_label_file = tk.Label(
+        master=frameFile1, textvariable=res_var_file, font="terminal 13 bold"
     )
-    resultLabelfile.place(rely=0.55)
+    result_label_file.place(rely=0.55)
 
 
 def enc_file():
     global add_enc_to_db, main_db_conn, mainkey
     if 1:
-        if keySelectionFlag.get() != 0:
-            filename = filenameStringVar.get().strip()
+        if key_selection_flag.get() != 0:
+            filename = filename_var.get().strip()
             key = mainkey
-            target = CryptFile(filename, key)
-            a = target.encrypt()
-            if a == 1:
+            try:
+                CryptFile(filename, key).encrypt()
                 filename = filename + ".crypt"
-                filenameStringVar.set(filename)
+                filename_var.set(filename)
                 if platform.system() == "Windows":
-                    resultvarfile.set("    Encrypted Successfully / added .crypt")
+                    res_var_file.set("    Encrypted Successfully / added .crypt")
                 else:
-                    resultvarfile.set("      Encrypted Successfully / added .crypt")
+                    res_var_file.set("      Encrypted Successfully / added .crypt")
                 if encfiletoolbuttvar.get() == 1:
                     with open(filename, "rb") as f:
                         file_content = f.read()
@@ -1082,54 +1120,57 @@ def enc_file():
                         db_display_text.insert(
                             tk.END, "ERROR \n\nDatabase might be distorted\n"
                         )
-            if platform.system() == "Windows":
-                if a == 2:
-                    resultvarfile.set("                 File is Empty")
-                if a == 3:
-                    resultvarfile.set("               File Doesn't Exist")
-                if a == 0:
-                    resultvarfile.set("                  Can't Encrypt")
-                if a == 4:
-                    resultvarfile.set("                     ERROR")
-                if a == 5:
-                    resultvarfile.set("          ERROR : Key is Not 512-bit")
-                if a == 6:
-                    resultvarfile.set("       ERROR : File is already encrypted")
-                elif a == 7:
-                    resultvarfile.set(" ERROR : Given a directory instead of a file")
-            else:
-                if a == 2:
-                    resultvarfile.set("                   File is Empty")
-                if a == 3:
-                    resultvarfile.set("                 File Doesn't Exist")
-                if a == 0:
-                    resultvarfile.set("                    Can't Encrypt")
-                if a == 4:
-                    resultvarfile.set("                       ERROR")
-                if a == 5:
-                    resultvarfile.set("            ERROR : Key is Not 512-bit")
-                if a == 6:
-                    resultvarfile.set("         ERROR : File is already encrypted")
-                elif a == 7:
-                    resultvarfile.set("   ERROR : Given a directory instead of a file")
+            except Exception as e:
+                if platform.system() == "Windows":
+                    if isinstance(e, excs.fixed.EmptyContentError):
+                        res_var_file.set("                 File is Empty")
+                    if isinstance(e, excs.fixed.FileDoesNotExistError):
+                        res_var_file.set("               File Doesn't Exist")
+                    if isinstance(e, excs.fixed.CryptError):
+                        res_var_file.set("                  Can't Encrypt")
+                    if isinstance(e, excs.fixed.SysError):
+                        res_var_file.set("                     ERROR")
+                    if isinstance(e, excs.dynamic.KeyLengthError):
+                        res_var_file.set("          ERROR : Key is Not 512-bit")
+                    if isinstance(e, excs.fixed.AlreadyEncryptedError):
+                        res_var_file.set("       ERROR : File is already encrypted")
+                        if isinstance(e, excs.fixed.GivenDirectoryError):
+                            res_var_file.set(
+                                " ERROR : Given a directory instead of a file"
+                            )
+                else:
+                    if isinstance(e, excs.fixed.EmptyContentError):
+                        res_var_file.set("                   File is Empty")
+                    if isinstance(e, excs.fixed.FileDoesNotExistError):
+                        res_var_file.set("                 File Doesn't Exist")
+                    if isinstance(e, excs.fixed.CryptError):
+                        res_var_file.set("                    Can't Encrypt")
+                    if isinstance(e, excs.fixed.SysError):
+                        res_var_file.set("                       ERROR")
+                    if isinstance(e, excs.dynamic.KeyLengthError):
+                        res_var_file.set("            ERROR : Key is Not 512-bit")
+                    if isinstance(e, excs.fixed.AlreadyEncryptedError):
+                        res_var_file.set("         ERROR : File is already encrypted")
+                    if isinstance(e, excs.fixed.GivenDirectoryError):
+                        res_var_file.set(
+                            "   ERROR : Given a directory instead of a file"
+                        )
 
 
 def decfile():
     global add_dec_to_db, main_db_conn, mainkey
     if 1:
-        if keySelectionFlag.get() != 0:
-            filename = filenameStringVar.get().strip()
-            key = mainkey
-            target = CryptFile(filename, key)
-            a = target.decrypt()
-            if a == 1:
+        if key_selection_flag.get() != 0:
+            filename = filename_var.get().strip()
+            try:
+                CryptFile(filename, mainkey).decrypt()
                 filename = os.path.splitext(filename)[0]
-                filenameStringVar.set(filename)
+                filename_var.set(filename)
                 if platform.system() == "Windows":
-                    resultvarfile.set("    Decrypted Successfully + removed .crypt")
+                    res_var_file.set("    Decrypted Successfully + removed .crypt")
                 else:
-                    resultvarfile.set("     Decrypted Successfully + removed .crypt")
-                if decfiletoolbuttvar.get() == 1:
+                    res_var_file.set("     Decrypted Successfully + removed .crypt")
+                if decfile_tool_butt_var.get() == 1:
                     with open(filename, "rb") as f:
                         file_content = f.read()
                     try:
@@ -1141,36 +1182,39 @@ def decfile():
                         db_display_text.insert(
                             tk.END, "ERROR \n\nDatabase might be distorted\n"
                         )
-            if platform.system() == "Windows":
-                if a == 2:
-                    resultvarfile.set("                 File is Empty")
-                if a == 3:
-                    resultvarfile.set("               File Doesn't Exist")
-                if a == 0:
-                    resultvarfile.set("                 Can't Decrypt")
-                if a == 4:
-                    resultvarfile.set("                     ERROR")
-                elif a == 5:
-                    resultvarfile.set("          ERROR : Key is Not 512-bit")
-                if a == 6:
-                    resultvarfile.set("       ERROR : File is already decrypted")
-                elif a == 7:
-                    resultvarfile.set(" ERROR : Given a directory instead of a file")
-            else:
-                if a == 2:
-                    resultvarfile.set("                   File is Empty")
-                if a == 3:
-                    resultvarfile.set("                 File Doesn't Exist")
-                if a == 0:
-                    resultvarfile.set("                   Can't Decrypt")
-                if a == 4:
-                    resultvarfile.set("                       ERROR")
-                elif a == 5:
-                    resultvarfile.set("            ERROR : Key is Not 512-bit")
-                if a == 6:
-                    resultvarfile.set("         ERROR : File is already decrypted")
-                elif a == 7:
-                    resultvarfile.set("   ERROR : Given a directory instead of a file")
+            except Exception as e:
+                if platform.system() == "Windows":
+                    if isinstance(e, excs.fixed.EmptyContentError):
+                        res_var_file.set("                 File is Empty")
+                    if isinstance(e, excs.fixed.FileDoesNotExistError):
+                        res_var_file.set("               File Doesn't Exist")
+                    if isinstance(e, excs.fixed.CryptError):
+                        res_var_file.set("                 Can't Decrypt")
+                    if isinstance(e, excs.fixed.SysError):
+                        res_var_file.set("                     ERROR")
+                    if isinstance(e, excs.dynamic.KeyLengthError):
+                        res_var_file.set("          ERROR : Key is Not 512-bit")
+                    if isinstance(e, excs.fixed.AlreadyDecryptedError):
+                        res_var_file.set("       ERROR : File is already decrypted")
+                    if isinstance(e, excs.fixed.GivenDirectoryError):
+                        res_var_file.set(" ERROR : Given a directory instead of a file")
+                else:
+                    if isinstance(e, excs.fixed.EmptyContentError):
+                        res_var_file.set("                   File is Empty")
+                    if isinstance(e, excs.fixed.FileDoesNotExistError):
+                        res_var_file.set("                 File Doesn't Exist")
+                    if isinstance(e, excs.fixed.CryptError):
+                        res_var_file.set("                   Can't Decrypt")
+                    if isinstance(e, excs.fixed.SysError):
+                        res_var_file.set("                       ERROR")
+                    if isinstance(e, excs.dynamic.KeyLengthError):
+                        res_var_file.set("            ERROR : Key is Not 512-bit")
+                    if isinstance(e, excs.fixed.AlreadyDecryptedError):
+                        res_var_file.set("         ERROR : File is already decrypted")
+                    if isinstance(e, excs.fixed.GivenDirectoryError):
+                        res_var_file.set(
+                            "   ERROR : Given a directory instead of a file"
+                        )
 
 
 encryptionfilebutton = tk.Button(
@@ -1186,10 +1230,10 @@ decryptionfilebutton = tk.Button(
 )
 decryptionfilebutton.place(relx=0.53, rely=0.73)
 
-filenameStringVar = tk.StringVar(value="")
+filename_var = tk.StringVar(value="")
 
 filenametext = tk.Entry(
-    master=frameFile1, width=31, font="Calibre 15 bold", textvariable=filenameStringVar
+    master=frameFile1, width=31, font="Calibre 15 bold", textvariable=filename_var
 )
 filenametext.place(relx=0.05, rely=0.30)
 
@@ -1215,7 +1259,7 @@ add_dec_to_db = 0
 
 def dec_toggle_func():
     global add_dec_to_db
-    if decfiletoolbuttvar == 1:
+    if decfile_tool_butt_var == 1:
         add_dec_to_db = 1
     else:
         add_dec_to_db = 0
@@ -1234,11 +1278,11 @@ encfiletoolbutt.state(["disabled"])
 encfiletoolbutt.place(relx=0.25, rely=0.92)
 
 
-decfiletoolbuttvar = tk.IntVar()
+decfile_tool_butt_var = tk.IntVar()
 decfiletoolbutt = tk.Checkbutton(
     bootstyle="warning , round-toggle",
     master=frameFile1,
-    variable=decfiletoolbuttvar,
+    variable=decfile_tool_butt_var,
     offvalue=0,
     command=dec_toggle_func,
 )
@@ -1246,32 +1290,32 @@ decfiletoolbutt.state(["disabled"])
 decfiletoolbutt.place(relx=0.7, rely=0.92)
 
 
-keySelectionFlag = tk.IntVar(value=0)
+key_selection_flag = tk.IntVar(value=0)
 
 
 def main_key_wrapper():
     global success_keysdb_connection_blocker, mainkey
-    if CryptFile.keyverify(mainkeyvar.get().strip()) == 1:
+    if CryptFile.key_verify(mainkeyvar.get().strip()) == KeyCheckResult.VALID_LENGTH:
         mainkey = mainkeyvar.get().strip()
         keyref_gen()
         keyselectionvar.set("       SELECTED")
-        keySelectionFlag.set(1)
+        key_selection_flag.set(1)
         try:
             if success_keysdb_connection_blocker and os.path.isfile(
-                filenameStringVar.get().strip()
+                filename_var.get().strip()
             ):
                 keys_db_conn.insert(
-                    filenameStringVar.get().strip(), mainkey, outputKeyref.get()
+                    filename_var.get().strip(), mainkey, outputKeyref.get()
                 )
             if success_keysdb_connection_blocker and not os.path.isfile(
-                filenameStringVar.get().strip()
+                filename_var.get().strip()
             ):
                 keys_db_conn.insert("STANDALONE", mainkey, outputKeyref.get())
         except BaseException:
             db_display_text.delete("1.0", tk.END)
             db_display_text.insert(tk.END, "Faulty Database\n")
     else:
-        keySelectionFlag.set(0)
+        key_selection_flag.set(0)
         keyselectionvar.set("     NOT SELECTED")
 
 
@@ -1301,21 +1345,7 @@ mainkeyEntry.place(relx=0.09, rely=0.29)
 
 
 def keyref_gen():
-    ref = "#"
-    for _ in range(6):
-        character = secrets.choice(
-            string.ascii_letters
-            + string.digits
-            + "$"
-            + "?"
-            + "&"
-            + "@"
-            + "!"
-            + "-"
-            + "+"
-        )
-        ref += character
-    outputKeyref.set(ref)
+    outputKeyref.set(gen_ref())
 
 
 outputKeyref = tk.StringVar(value="#KEYREF")
@@ -1347,7 +1377,7 @@ keyselectionLabel.place(relx=0.15, rely=0.465, height=50)
 
 
 def genkey():
-    keyGenVar.set(CryptFile.genkey())
+    keyGenVar.set(gen_key())
 
 
 keyGenVar = tk.StringVar(value="")

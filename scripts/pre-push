@@ -1,0 +1,26 @@
+#!/bin/bash
+
+read -p "Would you like to run tests before you push remotely ? (y/n): " choice
+if [ "$choice" != "y" ]; then
+    echo "pre-push hook will not be installed"
+    exit 0
+else
+    cat <<EOF >> .git/hooks/pre-push
+#!/bin/bash
+set -e
+
+echo "Before pushing, did you tie your shoes right ?"
+echo "Running tests.."
+
+./scripts/coverage
+
+if [ \$? -ne 0 ]; then
+    echo "hook failed. Push aborted."
+    exit 1
+fi
+exit 0
+
+EOF
+    chmod +x .git/hooks/pre-push
+    printf "\e[33mpre-push hook installed![0m\n"
+fi

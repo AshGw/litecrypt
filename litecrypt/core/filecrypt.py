@@ -65,32 +65,9 @@ class CryptFile:
 
     @staticmethod
     def key_verify(key: str) -> KeyCheckResult:
-        """Method to verify if the key is valid for usage"""
         return Crypt.key_verify(key)
 
-    def encrypt(self, echo: Optional[bool] = False) -> int:
-        """
-        Encrypt a given file.
-
-        This method attempts to encrypt the specified file using the provided key. If the encryption
-        process is successful, it will return 1. Otherwise,
-        it will raise an exception specifying the problem.
-
-        Args:
-            echo (bool, optional): Whether to print a success message after encryption. Default is False.
-
-        Returns:
-            int: 1 if the encryption process was successful.
-
-        Raises:
-            exceptions.fixed.GivenDirectoryError: If the provided path is a directory.
-            exceptions.fixed.FileDoesNotExistError: If the specified file does not exist.
-            exceptions.fixed.AlreadyEncryptedError: If the file is already encrypted.
-            exceptions.fixed.FileCryptError: If an error occurs during the encryption process.
-            exceptions.fixed.EmptyContentError: If the file's content is empty.
-            exceptions.fixed.SysError: If a system error occurs during the encryption process.
-        """
-
+    def encrypt(self, echo: Optional[bool] = False) -> None:
         if os.path.isdir(self.filename):
             raise exceptions.fixed.GivenDirectoryError()
         if not os.path.exists(self.filename):
@@ -110,7 +87,7 @@ class CryptFile:
                             iterations=self.iteration_rounds,
                         )
                         new_content = ins.encrypt(get_bytes=True)
-                        f.write(new_content)
+                        f.write(new_content)  # type: ignore
                         _go_ahead_rename_crypt = 1
                     except BaseException:
                         f.write(file_content)
@@ -126,7 +103,6 @@ class CryptFile:
                         f"{Colors.GREEN}{self.filename} encrypted successfully! "
                         f"==> {new_filename}{Colors.RESET}"
                     )
-                return 1
             else:
                 if echo:
                     print(
@@ -135,39 +111,10 @@ class CryptFile:
                         f"{Colors.YELLOW}Filename left unchanged,"
                         f" could not rename it for some rare reason{Colors.RESET}"
                     )
-                return -1
         except OSError:
             raise exceptions.fixed.SysError()
 
-    def decrypt(self, echo: Optional[bool] = False) -> int:
-        """
-        Decrypt a given file.
-
-        This method attempts to decrypt the specified encrypted file using
-         the provided key.
-        If the decryption process is successful, it will return 1.
-        Otherwise, it will raise an exception specifying the problem.
-
-        Args:
-            echo (bool, optional): Whether to print a success message after decryption.
-             Default is False.
-
-        Returns:
-            int: 1 if the decryption process was successful.
-
-        Raises:
-            exceptions.fixed.GivenDirectoryError: If the provided path is a directory.
-            exceptions.fixed.FileDoesNotExistError: If the specified file does not
-             exist.
-            exceptions.fixed.AlreadyDecryptedError: If the file is not encrypted.
-            exceptions.fixed.EmptyContentError: If the file's encrypted content
-             is empty.
-            exceptions.fixed.FileCryptError: If an error occurs during
-             the decryption process.
-            exceptions.fixed.SysError: If a system error occurs during
-             the decryption process.
-        """
-
+    def decrypt(self, echo: Optional[bool] = False) -> None:
         if os.path.isdir(self.filename):
             raise exceptions.fixed.GivenDirectoryError()
         if not os.path.exists(self.filename):
@@ -185,7 +132,7 @@ class CryptFile:
                     try:
                         ins = core.Dec(message=enc_content, mainkey=self.key)
                         a = ins.decrypt(get_bytes=True)
-                        f.write(a)
+                        f.write(a)  # type: ignore
                         go_ahead_remove_crypt = 1
                     except Exception:
                         f.write(enc_content)
@@ -199,7 +146,6 @@ class CryptFile:
                         f"{Colors.GREEN}{self.filename} decrypted successfully! "
                         f"==> {new_filename}{Colors.RESET}"
                     )
-                return 1
             else:
                 if echo:
                     print(
@@ -208,6 +154,5 @@ class CryptFile:
                         f"{Colors.YELLOW}Filename left unchanged,"
                         f" could not rename it for some rare reason{Colors.RESET}"
                     )
-                return -1
         except OSError:
             raise exceptions.fixed.SysError()

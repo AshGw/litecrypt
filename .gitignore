@@ -16,3 +16,5 @@ playground/
 .ruff_cache/
 
 poetry.lock
+.venv/
+venv/
