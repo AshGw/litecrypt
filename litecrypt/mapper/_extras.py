@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Union
 
 from litecrypt.core.filecrypt import CryptFile, KeyCheckResult
 from litecrypt.mapper._consts import Default, Status
+from litecrypt.mapper._types import FileContent
 from litecrypt.mapper._definitions import DatabaseResponse
 from litecrypt.mapper._models import StashKeys, StashMain
 from litecrypt.mapper.database import Database
@@ -18,7 +19,7 @@ def reference_linker(
     get_filename: Optional[bool] = False,
     get_content_or_key: Optional[bool] = False,
     get_all: Optional[bool] = False,
-) -> Union[str, bytes, List[Any]]:
+) -> Union[FileContent, List[FileContent]]:
     """
     Retrieve specific information from the database linked with a key_reference value.
 
