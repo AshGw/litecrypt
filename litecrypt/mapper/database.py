@@ -8,8 +8,16 @@ from datetime import datetime
 from typing import Any, Generator, List, Optional, Tuple, Union
 
 from sqlalchemy import MetaData
+from sqlalchemy.engine.row import Row
 from sqlalchemy.orm import sessionmaker
 
+from litecrypt.mapper._types import (
+    KeysContent,
+    MainContent,
+    QueryResult,
+    SqliteSize,
+    LastMod,
+)
 from litecrypt.mapper._consts import Default, EngineFor, Status
 from litecrypt.mapper._definitions import (
     Columns,
@@ -57,7 +65,7 @@ class Database:
         self.Table = StashKeys if self.for_keys else StashMain
 
     @property
-    def size(self) -> Union[float, DatabaseFailureResponse, None]:
+    def size(self) -> Union[SqliteSize, DatabaseFailureResponse]:
         """Get the size of the SQLite database in megabytes."""
         if self.engine_for != EngineFor.SQLITE:
             if self.echo:
@@ -72,7 +80,7 @@ class Database:
             raise e
 
     @property
-    def last_mod(self) -> Union[datetime, DatabaseFailureResponse, None]:
+    def last_mod(self) -> Union[LastMod, DatabaseFailureResponse]:
         """Get the last modification timestamp of the SQLite database file."""
         if self.engine_for != EngineFor.SQLITE:
             if self.echo:
@@ -111,7 +119,12 @@ class Database:
         """Creates all the tables in the database."""
         Base.metadata.create_all(bind=self.engine)
 
-    def insert(self, filename: str, content: Union[bytes, str], ref: str) -> None:
+    def insert(
+        self,
+        filename: str,
+        content: Union[MainContent, KeysContent],
+        ref: str,
+    ) -> None:
         """
         Adds a new record to the current table with the specified
         filename, content, and reference values.
@@ -148,7 +161,7 @@ class Database:
             setattr(row, column, value)
             self.session.commit()
 
-    def content(self) -> Union[Generator, DatabaseFailureResponse]:
+    def content(self) -> Union[Generator[QueryResult], DatabaseFailureResponse]:
         """
         Queries and returns ALL records from the current table.
 
@@ -166,7 +179,7 @@ class Database:
 
     def content_by_id(
         self, id: int
-    ) -> Union[List[Union[str, bytes]], DatabaseFailureResponse]:
+    ) -> Union[List[Union[MainContent, KeysContent]], DatabaseFailureResponse]:
         """
         Retrieve a specific record from the current table by its ID.
 
@@ -235,14 +248,14 @@ class Database:
     def query(self, query: str, params: Optional[Tuple[Any]] = None) -> QueryResponse:
         try:
             if params:
-                rows = self.session.execute(query, params).fetchall()
+                rows: List[Row] = self.session.execute(query, params).fetchall()
             else:
-                rows = self.session.execute(query).fetchall()
+                rows: List[Row] = self.session.execute(query).fetchall()
             if len(rows) == 1:
                 return QueryResponse(status=Status.SUCCESS, result=rows)
             else:
                 return QueryResponse(status=Status.SUCCESS, result=rows)
         except DBError as e:
             if self.silent_errors:
-                return QueryResponse(status=Status.FAILURE, result=str(e))
+                return QueryResponse(status=Status.FAILURE, result=[str(e)])
             raise e

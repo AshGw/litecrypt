@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional, Union
 from sqlalchemy.exc import DatabaseError
 
 from litecrypt.mapper._consts import BaseColumns, Status
+from litecrypt.mapper._types import QueryResult, FileContent
 
 
 class Columns(BaseColumns):
@@ -22,7 +23,7 @@ class DatabaseResponse(Dict):
         self,
         status: Optional[str] = None,
         filenames: Optional[List[str]] = None,
-        contents: Optional[Any] = None,
+        contents: Optional[FileContent,Union[List[FileContent]]] = None,
         keys: Optional[List[Union[str, bytes]]] = None,
     ) -> None:
         super().__init__(
@@ -34,7 +35,7 @@ class QueryResponse(Dict):
     def __init__(
         self,
         status: Optional[type(Status.FAILURE)] = None,
-        result: Optional[Any] = None,
+        result: Optional[QueryResult] = None,
     ) -> None:
         super().__init__(status=status, result=result)
 
@@ -43,8 +44,8 @@ class DatabaseFailureResponse(Dict):
     def __init__(
         self,
         failure: Optional[Any] = None,
-        error: Optional[Any] = None,
-        possible_fix: Optional[Any] = None,
+        error: Optional[BaseException] = None,
+        possible_fix: Optional[str] = None,
     ) -> None:
         super().__init__(failure=failure, error=error, possible_fix=possible_fix)
 
