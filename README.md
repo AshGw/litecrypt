@@ -5,7 +5,7 @@
 [![Static Badge](https://img.shields.io/badge/PyPI-latest-brightgreen)](https://pypi.org/project/litecrypt/)
 
 ## Overview
-So I made this library for personal use to secure some of my personal files & hit the [connect](https://tf-g-who-u-searching-for.com) from time to time.
+So I made this library for personal use to secure some of my personal files.
 It provides support for both fast and highly computationally intensive encryption. Also, it includes a database integration system which facilitates the restoration of files to their original state if necessary, and a GUI is also included to obviate the need to write code.
 <br>
 The docs can be accessed **[here](https://ashgw.github.io/litecrypt)**, I made it so I don't forget tf I was yapping about a couple of months ago, probably not so useful for visitors.
@@ -87,11 +87,6 @@ https://github.com/AshGw/litecrypt/assets/126174609/190b6ab8-3f8a-4656-9525-dbaf
 
 </details>
 
-## Me
-Hit this for auto setup
-````bash
-curl -sSfL https://raw.githubusercontent.com/AshGw/litecrypt/main/setup | bash
-````
 ## License
 
 [MIT License](https://github.com/AshGw/litecrypt/blob/main/LICENSE).
