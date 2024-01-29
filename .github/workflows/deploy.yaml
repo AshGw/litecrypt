@@ -105,7 +105,7 @@ jobs:
         id: get_version
         run: echo "::set-output name=version::$(python version.py)"
       - name: Building & tagging
-        run: docker build -t ashgw/litecrypt:${{ steps.get_version.outputs.version }} scripts/docker-build
+        run: docker build -t ashgw/litecrypt:${{ steps.get_version.outputs.version }} scripts/docker
       - name: Login
         run: echo ${{ secrets.DOCKERHUB_PASSWORD }} | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
       - name: Pushing to the hub
