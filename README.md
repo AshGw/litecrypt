@@ -5,10 +5,10 @@
 [![Static Badge](https://img.shields.io/badge/PyPI-latest-brightgreen)](https://pypi.org/project/litecrypt/)
 
 ## Overview
-So I made this library for personal use to secure some of my personal files & hit the [connect](https://wtf-g-who-u-searching-for-champ.com) from time to time.
+So I made this library for personal use to secure some of my personal files & hit the [connect](https://tf-g-who-u-searching-for.com) from time to time.
 It provides support for both fast and highly computationally intensive encryption. Also, it includes a database integration system which facilitates the restoration of files to their original state if necessary, and a GUI is also included to obviate the need to write code.
 <br>
-The docs can be accessed **[here](https://ashgw.github.io/litecrypt)**, I made it so I don't forget wtf I was yapping about a couple of months ago, probably not so useful for visitors.
+The docs can be accessed **[here](https://ashgw.github.io/litecrypt)**, I made it so I don't forget tf I was yapping about a couple of months ago, probably not so useful for visitors.
 
 ## Installation
 ```shell
