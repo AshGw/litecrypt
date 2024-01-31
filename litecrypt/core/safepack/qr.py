@@ -23,6 +23,3 @@ def tqr(text: str) -> QRResult:
 
     except Exception:
         return QRResult.FAILURE
-
-
-tqr("hey")

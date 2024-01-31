@@ -1,4 +1,8 @@
-class MessageTamperingError(Exception):
+class LiteCryptError(Exception):
+    pass
+
+
+class MessageTamperingError(LiteCryptError):
     def __init__(self) -> None:
         self.display = (
             "HMAC mismatch ! Message has been TAMPERED with ,\n"
@@ -7,31 +11,31 @@ class MessageTamperingError(Exception):
         super().__init__(self.display)
 
 
-class EmptyContentError(Exception):
+class EmptyContentError(LiteCryptError):
     def __init__(self) -> None:
         self.display = "Empty content !"
         super().__init__(self.display)
 
 
-class GivenDirectoryError(Exception):
+class GivenDirectoryError(LiteCryptError):
     def __init__(self) -> None:
         self.display = "Given directory instead of file"
         super().__init__(self.display)
 
 
-class FileDoesNotExistError(Exception):
+class FileDoesNotExistError(LiteCryptError):
     def __init__(self) -> None:
         self.display = "Given path does not contain the specified file !"
         super().__init__(self.display)
 
 
-class SysError(Exception):
+class SysError(LiteCryptError):
     def __init__(self) -> None:
         self.display = "System related Error."
         super().__init__(self.display)
 
 
-class FileCryptError(Exception):
+class FileCryptError(LiteCryptError):
     def __init__(self) -> None:
         self.display = (
             "Error in cryptographic operation for the file, probable distortion."
@@ -39,25 +43,25 @@ class FileCryptError(Exception):
         super().__init__(self.display)
 
 
-class CryptError(Exception):
+class CryptError(LiteCryptError):
     def __init__(self) -> None:
         self.display = "Error in cryptographic operation, probable distortion."
         super().__init__(self.display)
 
 
-class AlreadyEncryptedError(Exception):
+class AlreadyEncryptedError(LiteCryptError):
     def __init__(self) -> None:
         self.display = "File is already encrypted !"
         super().__init__(self.display)
 
 
-class AlreadyDecryptedError(Exception):
+class AlreadyDecryptedError(LiteCryptError):
     def __init__(self) -> None:
         self.display = "File is already decrypted !"
         super().__init__(self.display)
 
 
-class ColumnDoesNotExist(Exception):
+class ColumnDoesNotExist(LiteCryptError):
     def __init__(self) -> None:
         self.display = "Specified column does not include: ['name','content','ref']"
         super().__init__(self.display)

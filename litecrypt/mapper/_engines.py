@@ -18,10 +18,8 @@ def get_engine(
     if engine == EngineFor.SQLITE:
         engine_type = EngineConstructs.SQLITE + url
     elif engine == EngineFor.POSTGRESQL:
-        # Assuming db_url is in the format 'username:password@host:port/database'
         engine_type = EngineConstructs.POSTGRES + url
     elif engine == EngineFor.MYSQL:
-        # Also assuming db_url is in the format 'username:password@host:port/database'
         engine_type = EngineConstructs.MYSQL + url
     else:
         raise ValueError(f"Unsupported engine type: {engine}")

@@ -14,14 +14,6 @@ from litecrypt.utils.consts import Colors, Size
 
 @dataclass
 class CryptFile:
-    """
-    Class to encrypt/decrypt a given file. Pass in the filename as well as a 256-bit key.
-
-    Args:
-        filename (str): The path to the file to be encrypted/decrypted.
-        key (str): The encryption/decryption key.
-    """
-
     filename: str = field()
     key: str = field()
     intensive_compute: bool = field(default=False)
