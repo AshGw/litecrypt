@@ -22,26 +22,12 @@ class KeyCheckResult(Enum):
 
 @dataclass
 class Crypt:
-    """
-    Class to encrypt & decrypt data of type bytes or str.
-
-    :param:
-        dat (str, bytes): The data to be encrypted/decrypted.
-        key (str): The encryption/decryption key.
-    """
-
     data: Union[str, bytes] = field()
     key: str = field()
     intensive_compute: bool = field(default=False)
     iteration_rounds: int = field(default=Size.MIN_ITERATIONS)
 
     def __post_init__(self) -> None:
-        """
-        Initialize the Crypt object and verify the provided key.
-
-        Raises:
-            exceptions.dynamic.KeyLengthError: If the provided key is invalid.
-        """
         if self.key_verify(self.key) != KeyCheckResult.VALID_LENGTH:
             raise exceptions.dynamic.KeyLengthError()
 
@@ -118,21 +104,6 @@ class Crypt:
 
 
 def gen_ref(n: int = 6) -> str:
-    """
-    generates a random key reference value using a combination of letters,
-    digits, and special characters. The length of the reference can be specified using
-    the 'n' parameter.
-
-    Example:
-        #-rs&u!
-
-    Args:
-        n (int, optional): The length of the key reference value. Default is 6.
-
-    Returns:
-        str: The generated key reference value containing a mix of characters.
-
-    """
     ref = "#"
     for _ in range(n):
         character = secrets.choice(
@@ -151,11 +122,4 @@ def gen_ref(n: int = 6) -> str:
 
 
 def gen_key() -> str:
-    """
-    This function generates a random encryption key in the form of a hex string.
-    The key can be used for various cryptographic purposes.
-
-    Returns:
-        str: A random 256-bit encryption key as a hex string.
-    """
     return Enc.gen_key()

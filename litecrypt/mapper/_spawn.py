@@ -224,7 +224,6 @@ def _spawn_all_files(
             ]
         dir = directory if directory is not None else Default.SPAWN_DIRECTORY
 
-        # The creation of the extracted files in the specified directory
         full_paths_list = [
             os.path.join(dir, os.path.split(path)[1]) for path in filenames_list
         ]

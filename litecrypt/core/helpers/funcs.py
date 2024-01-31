@@ -38,21 +38,6 @@ def check_iterations(iterations: int) -> int:
 
 
 def intensive_KDF(mainkey: str, salt_pepper: bytes, iterations: int) -> bytes:
-    """
-    AES Key & HMAC derivation function.
-
-    This method derives encryption and HMAC keys using the specified main key,
-    salt or pepper, and
-    the number of iterations.
-
-    Args:
-    mainkey (str): The main encryption key.
-    salt_pepper (bytes): The salt or pepper for key derivation.
-    iterations (int): The number of iterations for key derivation.
-
-    Returns:
-    bytes: The derived key bytes.
-    """
     return b_kdf(
         password=mainkey.encode("UTF-8"),
         salt=salt_pepper,
@@ -62,15 +47,6 @@ def intensive_KDF(mainkey: str, salt_pepper: bytes, iterations: int) -> bytes:
 
 
 def blazingly_fast_KDF(key: str, salt: bytes) -> bytes:
-    """
-    Fast key derivation function.
-    Args:
-        key (bytes): 256-bit key.
-        salt (bytes): 128-bit salt
-
-    Returns:
-        bytes: Derived 256-bit  key.
-    """
     use_key = key.encode("UTF-8")
     key_material = use_key + salt
     derived_key = sha256(key_material).digest()

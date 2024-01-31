@@ -6,7 +6,7 @@ import os
 from dataclasses import dataclass, field
 from datetime import datetime
 from typing import Any, Generator, List, Optional, Tuple, Union
-
+from typing_extensions import Literal
 from sqlalchemy import MetaData
 from sqlalchemy.engine.row import Row
 from sqlalchemy.orm import sessionmaker
@@ -34,8 +34,6 @@ from litecrypt.utils.exceptions.fixed import ColumnDoesNotExist
 @dataclass
 class Database:
     """
-    Represents a database class with various methods to interact with a given database.
-
     This class provides a simplified interface to interact with a database,
     designed for various database systems (MySQL, PostgreSQL and SQLite).
     It includes methods to connect to the database, perform basic operations, and more.
@@ -49,7 +47,7 @@ class Database:
 
     url: str = field()
     echo: bool = field(default=False)
-    engine_for: str = field(default=Default.ENGINE)
+    engine_for: Literal["postgres", "sqlite", "mysql"] = field(default=Default.ENGINE)
     for_main: Optional[bool] = True
     for_keys: Optional[bool] = False
     silent_errors: Optional[bool] = True
@@ -99,6 +97,7 @@ class Database:
         return self.Table.__name__
 
     def end_session(self) -> None:
+        # TODO: have this as a context manager
         """
         Closes the database session and commits pending transactions.
 
@@ -125,17 +124,6 @@ class Database:
         content: Union[MainContent, KeysContent],
         ref: str,
     ) -> None:
-        """
-        Adds a new record to the current table with the specified
-        filename, content, and reference values.
-
-        :param filename: The name of the file.
-        :type filename: str
-        :param content: The content of the file, either as bytes or a string.
-        :type content: Union[bytes, str]
-        :param ref: A reference identifier for the file.
-        :type ref: str
-        """
         record = self.Table(filename=filename, ref=ref, content=content)
         self.session.add(record)
         self.session.commit()
@@ -164,9 +152,6 @@ class Database:
     def content(self) -> Union[Generator[QueryResult], DatabaseFailureResponse]:
         """
         Queries and returns ALL records from the current table.
-
-        :return: A generator yielding lists representing records.
-        :rtype: Union[Generator, DatabaseFailureResponse]
         """
         try:
             result = self.session.query(self.Table).all()
@@ -182,11 +167,6 @@ class Database:
     ) -> Union[List[Union[MainContent, KeysContent]], DatabaseFailureResponse]:
         """
         Retrieve a specific record from the current table by its ID.
-
-        :param id: The ID of the record to retrieve.
-        :type id: int
-
-        :return: A list representing the record.
         """
         try:
             result = self.session.query(self.Table).filter_by(id=id).first()

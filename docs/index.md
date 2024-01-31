@@ -258,13 +258,13 @@ The reference value, such as `#8jX?7c`, remains independent of both the encrypte
 
 The primary database holds the filenames and their encrypted data, while the keys database stores the filenames and the keys used to encrypt them. To recover files, both databases need to be simultaneously accessible. However, a crucial point to note is that robust security for the keys database is necessary only when BOTH databases are accessible together.
 
-If someone gets hold of the main database, they'll only get some encrypted content and file names. Trying to break this content would be really hard. On the other hand, if someone only accesses the keys database, they'll only find keys and filenames. It won't help them much.
+If someone gets hold of the main database, they'll only get dog shit. Trying to break the content would be really hard. On the other hand, if someone only accesses the keys database, they'll only find keys and filenames. It won't help much.
 
 You can keep the databases separate (though that might be hard and impractical) or make copies of your main database—regardless of your level of trust in the system you place them in.
 
 In this situation, the keys database should be kept safe, preferably encrypted. When you want your files back, get your main database from wherever you stored it. Then, use the keys database to unlock the files you need.
 
-The process of getting files back really simple, actually it's just one function called `spawn()`.
+The process of getting files back really simple, actually it's just one function called `spawn()`
 
 ## All In One App
 Wait... Install the library first

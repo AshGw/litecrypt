@@ -1,5 +1,5 @@
 # type: ignore
-# this is a mess and i don't plan on fixing it just know it works
+# this is an absolute fucking mess and i don't plan on fixing it just know it works
 
 import atexit
 import json
